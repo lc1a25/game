@@ -11,6 +11,7 @@ enum class Phase
 {
 	Approach,//Ú‹ß
 	Leave,	//—£’E
+	Stop,  //Ž~‚Ü‚é
 };
 
 class Enemy
@@ -20,7 +21,7 @@ class Enemy
 	Object3d* enemy = enemy->Create();
 	std::list<std::unique_ptr<EnemyBullet>> bullets_;
 	Player* player_ = nullptr;
-	Phase phase = Phase::Approach;
+	Phase phase = Phase::Stop;
 
 	XMFLOAT3 playerWorldPos;
 	XMVECTOR lockOn;

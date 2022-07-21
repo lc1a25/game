@@ -51,6 +51,13 @@ void Enemy::Update()
 			phase = Phase::Approach;
 		}
 		break;
+	case Phase::Stop:
+		shotTimer--;
+		if (shotTimer <= 0)
+		{
+			Shot();
+			shotTimer = shotInterval;
+		}
 	default:
 		break;
 	}

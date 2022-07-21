@@ -26,4 +26,6 @@ public:
 	void OnCollision();
 
 	bool IsDead() const { return isDead; }
+
+	XMFLOAT3 GetWorldPosition();
 };

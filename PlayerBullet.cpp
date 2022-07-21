@@ -35,3 +35,12 @@ void PlayerBullet::OnCollision()
 {
 	isDead = true;
 }
+
+XMFLOAT3 PlayerBullet::GetWorldPosition()
+{
+	XMFLOAT3 worldPos;
+	worldPos.x = bullet->matWorld.r[3].m128_f32[0];
+	worldPos.y = bullet->matWorld.r[3].m128_f32[1];
+	worldPos.z = bullet->matWorld.r[3].m128_f32[2];
+	return worldPos;
+}

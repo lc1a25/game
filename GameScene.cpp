@@ -51,8 +51,6 @@ void GameScene::Draw()
 void GameScene::CheckAllCollision()
 {
 	XMFLOAT3 pos1, pos2;
-	
-
 
 	//Ž©’eƒŠƒXƒg
 	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player->GetBullets();
@@ -72,6 +70,46 @@ void GameScene::CheckAllCollision()
 			player->OnCollision();
 
 			bullet->OnCollision();
+		}
+	}
+
+	pos1 = enemy->GetWorldPosition();
+	//Ž©’e‚Æ“G“–‚½‚è”»’è
+	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
+	{
+		pos2 = bullet->GetWorldPosition();
+		
+		length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
+			((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
+			((pos2.z - pos1.z) * (pos2.z - pos1.z));
+		if (length <= size + 7)
+		{
+			enemy->OnCollision();
+
+			bullet->OnCollision();
+		}
+	}
+
+	
+	//Ž©’e‚Æ“G’e“–‚½‚è”»’è
+	for (const std::unique_ptr<PlayerBullet>& playerBullet : playerBullets)
+	{
+	
+		pos1 = playerBullet->GetWorldPosition();
+		for (const std::unique_ptr<EnemyBullet>& enemyBullet : enemyBullets)
+		{
+			pos2 = enemyBullet->GetWorldPosition();
+
+			length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
+				((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
+				((pos2.z - pos1.z) * (pos2.z - pos1.z));
+			if (length <= size + 3)
+			{
+				enemy->OnCollision();
+
+				playerBullet->OnCollision();
+				enemyBullet->OnCollision();
+			}
 		}
 	}
 }
