@@ -7,7 +7,7 @@ class EnemyBullet
 private:
 	Model* bulletModel_ = nullptr;
 	Object3d* enemyBullet = enemyBullet->Create();
-	XMVECTOR velocity_ = { 0,0,0 };
+	
 
 	//生存時間
 	static const int32_t lifeTime = 60 * 5;
@@ -15,7 +15,11 @@ private:
 	int32_t deathTimer = lifeTime;
 	//デスフラグ
 	bool isDead = false;
+
+	XMVECTOR lockOn = { 0,0,0 };
 public:
+	XMVECTOR velocity_ = { 0,0,0 };
+
 	void Init(Model* model, XMFLOAT3 enemyPosition,XMVECTOR velocity);
 
 	void Update();
@@ -27,5 +31,7 @@ public:
 	void OnCollision();
 
 	XMFLOAT3 GetWorldPosition();
+
+	void SetLockOnPosition(XMFLOAT3 enemyPosition, XMFLOAT3 playerPosition);
 
 };

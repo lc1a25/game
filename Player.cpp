@@ -17,21 +17,47 @@ void Player::Update()
 		{
 			return bullet->IsDead();
 		});
+	if (player->position.x <= -40)
+	{
+		player->position.x += playerVelocity;
+		player->rotation.y += playerVelocity / 2;
+	}
+	if (player->position.x >= +40)
+	{
+		player->position.x -= playerVelocity;
+		player->rotation.y -= playerVelocity / 2;
+	}
+
+	if (player->position.y <= -30)
+	{
+		player->position.y += playerVelocity;
+		player->rotation.x -= playerVelocity / 2;
+	}
+	if (player->position.y >= 20)
+	{
+		player->position.y -= playerVelocity;
+		player->rotation.x += playerVelocity / 2;
+	}
+
 	if (input->isKey(DIK_W))
 	{
 		player->position.y+= playerVelocity;
+		player->rotation.x -= playerVelocity / 2;
 	}
 	if (input->isKey(DIK_D))
 	{
 		player->position.x+= playerVelocity;
+		player->rotation.y += playerVelocity / 2;
 	}
 	if (input->isKey(DIK_A))
 	{
 		player->position.x-= playerVelocity;
+		player->rotation.y -= playerVelocity / 2;
 	}
 	if (input->isKey(DIK_S))
 	{
 		player->position.y-= playerVelocity;
+		player->rotation.x += playerVelocity / 2;
 	}
 
 	if (input->isKey(DIK_Q))
@@ -42,11 +68,16 @@ void Player::Update()
 	{
 		player->rotation.y -= playerVelocity;
 	}
+
 	Attack();
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
 	{
+		
+		//bullet->SetLockOnPosition(enemyWorldPos);
+		
 		bullet->Update();
 	}
+	
 	player->Update();
 }
 
@@ -75,29 +106,35 @@ void Player::OnCollision()
 
 void Player::Attack()
 {
-	if (input->isKeyTrigger(DIK_SPACE))
+	if (input->isKey(DIK_SPACE))
 	{
-		XMFLOAT3 velocity = { 0,0,1 };
-		velocity = transform(velocity, player->matWorld);
-		//íeê∂ê¨
-		std::unique_ptr<PlayerBullet> newBullet = std::make_unique<PlayerBullet>();
-		newBullet->Init(bulletModel_, player->position,velocity);
-		
-		
-		//íeìoò^
-		bullets_.push_back(std::move(newBullet));//move ÇÕÉÜÉjÅ[ÉNÇ©ÇÁè˜ìnÇ∑ÇÈÇΩÇﬂ
+		coolTimer--;
+		if (coolTimer <= 0)
+		{
+			XMVECTOR velocity = { 0,0,1 };
+			velocity = transform(velocity, player->matWorld);
+			//íeê∂ê¨
+			std::unique_ptr<PlayerBullet> newBullet = std::make_unique<PlayerBullet>();
+			newBullet->Init(bulletModel_, player->position, velocity);
+
+
+			//íeìoò^
+			bullets_.push_back(std::move(newBullet));//move ÇÕÉÜÉjÅ[ÉNÇ©ÇÁè˜ìnÇ∑ÇÈÇΩÇﬂ
+
+			coolTimer = bulletCoolTimer;
+		}
 	}
 }
 
-XMFLOAT3 Player::transform(const XMFLOAT3& v, const DirectX::XMMATRIX& m)
+XMVECTOR Player::transform(const XMVECTOR& v, const DirectX::XMMATRIX& m)
 {
-	float w = v.x * m.r[0].m128_f32[3] + v.y * m.r[1].m128_f32[3] + v.z * m.r[2].m128_f32[3] + m.r[3].m128_f32[3];
+	float w = v.m128_f32[0] * m.r[0].m128_f32[3] + v.m128_f32[1] * m.r[1].m128_f32[3] + v.m128_f32[2] * m.r[2].m128_f32[3] + m.r[3].m128_f32[3];
 
-	XMFLOAT3 result
+	XMVECTOR result
 	{
-		(v.x * m.r[0].m128_f32[0] + v.y * m.r[1].m128_f32[0] + v.z * m.r[2].m128_f32[0]) / w,
-		(v.x * m.r[0].m128_f32[1] + v.y * m.r[1].m128_f32[1] + v.z * m.r[2].m128_f32[1]) / w,
-		(v.x * m.r[0].m128_f32[2] + v.y * m.r[1].m128_f32[2] + v.z * m.r[2].m128_f32[2]) / w
+		(v.m128_f32[0] * m.r[0].m128_f32[0] + v.m128_f32[1] * m.r[1].m128_f32[0] + v.m128_f32[2] * m.r[2].m128_f32[0]) / w,
+		(v.m128_f32[0] * m.r[0].m128_f32[1] + v.m128_f32[1] * m.r[1].m128_f32[1] + v.m128_f32[2] * m.r[2].m128_f32[1]) / w,
+		(v.m128_f32[0] * m.r[0].m128_f32[2] + v.m128_f32[1] * m.r[1].m128_f32[2] + v.m128_f32[2] * m.r[2].m128_f32[2]) / w
 
 	};
 	return result;

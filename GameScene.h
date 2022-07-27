@@ -8,6 +8,7 @@
 
 #include "Player.h"
 #include "Enemy.h"
+#include "EnemyCircle.h"
 
 class GameScene
 {
@@ -47,7 +48,7 @@ public: // ƒƒ“ƒoŠÖ”
 	/// </summary>
 	void Draw();
 
-	void CheckAllCollision();
+	void CheckAllCollision(Enemy* enemy);
 
 private: // ƒƒ“ƒo•Ï”
 	DirectXCommon* dxcommon = nullptr;
@@ -57,6 +58,8 @@ private: // ƒƒ“ƒo•Ï”
 
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
+	Enemy* enemyL = nullptr;
+	EnemyCircle* enemyCircle = nullptr;
 
 	Model* playerModel = nullptr;
 	Model* bulletModel = nullptr;

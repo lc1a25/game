@@ -7,7 +7,7 @@ class PlayerBullet
 private:
 	Model* model_ = nullptr;
 	Object3d* bullet = bullet->Create();
-	XMFLOAT3 velocity_ = { 0,0,0 };
+	XMVECTOR velocity_ = { 0,0,0 };
 
 	//ê∂ë∂éûä‘
 	static const int32_t lifeTime = 60 * 5;
@@ -17,7 +17,7 @@ private:
 	bool isDead = false;
 public:
 	
-	void Init(Model* model, XMFLOAT3 playerPosition,XMFLOAT3 velocity);
+	void Init(Model* model, XMFLOAT3 playerPosition, XMVECTOR velocity);
 
 	void Update();
 
@@ -28,4 +28,6 @@ public:
 	bool IsDead() const { return isDead; }
 
 	XMFLOAT3 GetWorldPosition();
+	
+	void SetLockOnPosition(XMFLOAT3 enemyPosition);
 };

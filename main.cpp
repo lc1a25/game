@@ -132,9 +132,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	postEffect = new PostEffect();
 	postEffect->Init(spriteCommon,100, { 0.5f,0.5f }, false, false);
 
-	//音声読み込み
-	audio->LoadWave("powerdown07.wav");
-
 #pragma region model
 	
 	ModelFbx* modelFbx = nullptr;
@@ -153,19 +150,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	skydome->SetPosition({ 0,0,0 });
 
 
-	//当たり判定　球
-	Sphere sphere;
-
-	//当たり判定　三角形
-	Triangle triangle_ene2;
-
-	//球の初期値を設定
-	sphere.center = XMVectorSet(0, -10, -5, 1);//中心点座標
-	sphere.radius = 10.0f;//半径
-
-
-	//LoadFbx::GetInstance()->LoadModelFile("cube");
-
 #pragma endregion
 	//描画初期化処理　ここまで
 
@@ -173,22 +157,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 #pragma region シェーダーの色,初期化
 
-	char moji[64];
-	char moji2[64];
-	char moji3[64];
-
-	bool bulletFlag = false;
-
-	int secound_x = 150;
-	int secound_y = 0;
-	int secound2_x = 100;
-	int secound2_y = 0;
-
-
-	int timer = 60;
-	int secound = 0;
-	int secound2 = 0;
-	int minute = 0;
+	
 
 	sprite->SetPosition({ 0.0f,0.0f,0.0f });
 	sprite->SetTexsize({1280.0f,720.0f });
@@ -261,32 +230,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			{
 				camera->CameraRot(0.0f, 0.1f);
 			}
-
-
-			//三角形の初期値を設定
-			//triangle_ene2.p0 = XMVectorSet(ene_x2 - 1.0f, ene_y2, ene_z2, 1);//左手前
-			//triangle_ene2.p1 = XMVectorSet(ene_x2, ene_y2, ene_z2 + 5.0f, 1);//左奥
-			//triangle_ene2.p2 = XMVectorSet(ene_x2 + 1.0f, ene_y2, ene_z2, 1);//右手前
-			//triangle_ene2.normal = XMVectorSet(0.0f, 1.0f, 0.0f, 0);//上向き
-
-			bool hit_left = Collision::CheckSphere2Triangle(sphere, triangle_ene2);
-
-
-			sprintf_s(moji, "%2.1f", camera->GetEyex());
-			sprintf_s(moji2, "%2.1f", camera->GetEyey());
-			sprintf_s(moji3, "%2.1f", camera->GetEyez());
-		
-
-
-	//当たり判定
-			if (hit_left)
-			{
-				audio->PlayWave("powerdown07.wav");
-			}
-
-		debugtext_minute->Print( moji, secound_x, secound_y, 1.0f);
-		debugtext_minute2->Print(moji2, secound2_x, secound2_y + 60, 1.0f);
-		debugtext_minute2->Print(moji3, secound2_x, secound2_y + 110, 1.0f);
 		
 		gameScene->Update();
 

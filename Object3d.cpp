@@ -857,10 +857,10 @@ void Object3d::Update()
 {
 	HRESULT result;
 	XMMATRIX matScale, matRot, matTrans;
-	rotation.x++;
 	// スケール、回転、平行移動行列の計算
 	matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
 	matRot = XMMatrixIdentity();
+
 	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation.z));
 	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation.x));
 	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation.y));
@@ -884,7 +884,7 @@ void Object3d::Update()
 	//constMap->color = color;
 	constMap->mat = matWorld * matView * matProjection;	// 行列の合成
 	constBuffB0->Unmap(0, nullptr);
-
+	
 }
 
 void Object3d::Draw()

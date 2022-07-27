@@ -27,15 +27,25 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	player->Init(playerModel, bulletModel);
 
 	enemy = new Enemy();
-	enemy->Init(enemyModel);
+	enemy->Init(enemyModel,{30,0,100},true);
+
+	enemyL = new Enemy();
+	enemyL->Init(enemyModel, { -30,0,100 }, false);
 
 }
 
 void GameScene::Update()
 {
-	CheckAllCollision();
+	CheckAllCollision(enemy);
+	CheckAllCollision(enemyL);
 	enemy->SetPlayerPosition(player->GetWorldPosition());
+	player->SetEnemyPosition(enemy->GetWorldPosition());
 	enemy->Update();
+
+	enemyL->SetPlayerPosition(player->GetWorldPosition());
+	player->SetEnemyPosition(enemyL->GetWorldPosition());
+	enemyL->Update();
+
 	player->Update();
 
 }
@@ -45,10 +55,11 @@ void GameScene::Draw()
 	Object3d::PreDraw(dxcommon->GetCmdlist());
 	player->Draw();
 	enemy->Draw();
+	enemyL->Draw();
 	Object3d::PostDraw();
 }
 
-void GameScene::CheckAllCollision()
+void GameScene::CheckAllCollision(Enemy* enemy)
 {
 	XMFLOAT3 pos1, pos2;
 
@@ -82,7 +93,7 @@ void GameScene::CheckAllCollision()
 		length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
 			((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
 			((pos2.z - pos1.z) * (pos2.z - pos1.z));
-		if (length <= size + 7)
+		if (length <= size + 12)
 		{
 			enemy->OnCollision();
 
