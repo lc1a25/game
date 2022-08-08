@@ -5,6 +5,7 @@
 #include "Sprite.h"
 #include "DebugText.h"
 #include "Audio.h"
+#include "Matrix4.h"
 
 #include "Player.h"
 #include "Enemy.h"
@@ -49,12 +50,21 @@ public: // ƒƒ“ƒoŠÖ”
 	void Draw();
 
 	void CheckAllCollision(Enemy* enemy);
+	HWND hwnd;
+	HWND GetHwnd(HWND winHwnd) { return hwnd = winHwnd; }
+	float mouseX;
+	float mouseY;
 
+	XMMATRIX GetViewPort(XMMATRIX winViewPort) { return viewPort = winViewPort; }
 private: // ƒƒ“ƒo•Ï”
+	XMMATRIX viewPort;
 	DirectXCommon* dxcommon = nullptr;
 	Input* input = nullptr;
 	Audio* audio = nullptr;
 	DebugText* debugText;
+	Object3d* camera = camera->Create();
+
+
 
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;

@@ -40,6 +40,7 @@
 #include "Player.h"
 #include "Enemy.h"
 
+#include "Matrix4.h"
 #include "GameScene.h"
 
 #pragma comment(lib, "d3d12.lib")
@@ -108,7 +109,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// DirectX初期化処理　ここまで
 
 	//描画初期化処理　ここから
-	spriteCommon->LoadTexture(0, L"Resource/background.png");
+	spriteCommon->LoadTexture(0, L"Resource/target.png");
 
 	Sprite *sprite = Sprite::Create(spriteCommon,0);
 
@@ -188,6 +189,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		sprite->Update();
 
+		gameScene->GetHwnd(win->GetHwnd());
+		gameScene->GetViewPort(dxcommon->viewPort);
+		
+		sprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
+	
+		
+
 			XMVECTOR moveZ = XMVectorSet(0, 0, 1.0f, 0);//z speed
 
 			XMVECTOR moveX2 = XMVectorSet(1.0f, 0, 0, 0);//debug
@@ -261,7 +269,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		////スプライト共通コマンド
 		// スプライト
-		
+		spriteCommon->PreDraw();
+		sprite->Draw();
 		//debugtext_minute->DrawAll();
 		//debugtext_minute2->DrawAll();
 		// ４．描画コマンドここまで

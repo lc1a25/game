@@ -13,6 +13,8 @@ float Vector3::length() const
 	return (float)sqrt(x * x + y * y + z * z);
 }
 
+
+
 Vector3 &Vector3::normalize()
 {
 	float len = length();

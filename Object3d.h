@@ -8,6 +8,7 @@
 #include <string>
 
 #include "Model.h"
+#include "Camera.h"
 
 /// <summary>
 /// 3Dオブジェクト
@@ -70,6 +71,9 @@ public: // サブクラス
 	};
 
 	static Material material;
+
+	// 射影行列
+	static XMMATRIX matProjection;
 
 private: // 定数
 	static const int division = 50;					// 分割数
@@ -168,8 +172,7 @@ private: // 静的メンバ変数
 	static CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV;
 	// ビュー行列
 	static XMMATRIX matView;
-	// 射影行列
-	static XMMATRIX matProjection;
+	
 	// 視点座標
 	static XMFLOAT3 eye;
 	// 注視点座標
@@ -273,7 +276,7 @@ private: // メンバ変数
 	XMFLOAT4 color = { 1,1,1,1 };
 
 
-
+	Camera* camera = nullptr;
 	// 親オブジェクト
 	Object3d* parent = nullptr;
 

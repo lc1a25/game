@@ -5,7 +5,7 @@
 #include <d3dx12.h>//7-3
 #include <dxgi1_6.h>
 #include "Win.h"
-
+#include <DirectXMath.h>
 #include <cassert>
 
 #pragma comment(lib, "d3d12.lib")
@@ -13,7 +13,7 @@
 //#pragma comment(lib, "dxguid.lib")
 
 using namespace Microsoft::WRL;
-
+using namespace DirectX;
 class DirectXCommon
 {
 public:
@@ -52,6 +52,8 @@ public:
 
 	ID3D12Device* GetDev() { return dev.Get(); }
 	ID3D12GraphicsCommandList* GetCmdlist() { return cmdList.Get(); }
+
+	XMMATRIX viewPort;
 
 private:
 	Win* win = nullptr;

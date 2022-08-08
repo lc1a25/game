@@ -36,6 +36,31 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 void GameScene::Update()
 {
+	POINT mousePosition;
+
+	GetCursorPos(&mousePosition);
+	ScreenToClient(hwnd, &mousePosition);
+	mouseX = mousePosition.x;//k¬•ÏŠ·@long -> float
+	mouseY = mousePosition.y;
+
+
+	XMMATRIX matVPV = Matrix4::matrixMatrix(camera->matProjection, viewPort);
+	XMMATRIX matInverse = XMMatrixInverse(nullptr, matVPV);
+
+	XMVECTOR posNear = XMVECTOR{ (Win::window_width, Win::window_height, 0) };
+	XMVECTOR posFar = XMVECTOR{ (Win::window_width, Win::window_height, 1) };
+
+	posNear = Matrix4::transform(posNear, matInverse);
+	posFar = Matrix4::transform(posFar, matInverse);
+
+	XMVECTOR mouseDirection;
+	mouseDirection.m128_f32[0] = posFar.m128_f32[0] - posNear.m128_f32[0];
+	mouseDirection.m128_f32[1] = posFar.m128_f32[1] - posNear.m128_f32[1];
+	mouseDirection.m128_f32[2] = posFar.m128_f32[2] - posNear.m128_f32[2];
+	mouseDirection = XMVector3Normalize(mouseDirection);
+
+	const float kDistanceTestObject = 1.0f;
+
 	CheckAllCollision(enemy);
 	CheckAllCollision(enemyL);
 	enemy->SetPlayerPosition(player->GetWorldPosition());
