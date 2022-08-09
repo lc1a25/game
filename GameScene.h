@@ -75,6 +75,8 @@ private: // ƒƒ“ƒo•Ï”
 	Model* bulletModel = nullptr;
 	Model* enemyModel = nullptr;
 
+	XMVECTOR reticlePos;
+
 	float length = 0.0f;
 	float size = 2.0f;
 	//std::unique_ptr<Enemy> enemy(new Enemy());

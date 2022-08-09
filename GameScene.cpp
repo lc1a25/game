@@ -59,7 +59,14 @@ void GameScene::Update()
 	mouseDirection.m128_f32[2] = posFar.m128_f32[2] - posNear.m128_f32[2];
 	mouseDirection = XMVector3Normalize(mouseDirection);
 
-	const float kDistanceTestObject = 1.0f;
+	const float distanceTestObject = 1.0f;
+
+	reticlePos.m128_f32[0] = player->GetReticleWorldPosition().x;
+	reticlePos.m128_f32[1] = player->GetReticleWorldPosition().y;
+	reticlePos.m128_f32[2] = player->GetReticleWorldPosition().z;
+
+	reticlePos = (mouseDirection - posNear) * distanceTestObject;
+	player->SetReticleWorldPos(reticlePos);
 
 	CheckAllCollision(enemy);
 	CheckAllCollision(enemyL);

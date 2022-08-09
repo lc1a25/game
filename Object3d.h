@@ -268,6 +268,7 @@ public: // メンバ関数
 
 	// ローカルワールド変換行列
 	XMMATRIX matWorld;
+	
 private: // メンバ変数
 	//ComPtr<ID3D12Resource> constBuff; // 定数バッファ
 	ComPtr<ID3D12Resource> constBuffB0; // 定数バッファ
