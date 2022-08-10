@@ -75,26 +75,32 @@ void Player::Update()
 		player->rotation.y -= playerVelocity;
 	}
 
-	//自機からレティクルの距離
-	const float distancePlayerReticle = 50.0f;
-	XMVECTOR offset = { 0.0f,0.0f,1.0f };
-	//自機のワールド行列の回転を反映
-	offset = transform(offset, player->matWorld);
-	//ベクトルの正規化
-	offset = XMVector3Normalize(offset)* distancePlayerReticle;
-	////レティクルの座標設定
-	//
+	////自機からレティクルの距離
+	//const float distancePlayerReticle = 50.0f;
+	//XMVECTOR offset = { 0.0f,0.0f,1.0f };
+	////自機のワールド行列の回転を反映
+	//offset = transform(offset, player->matWorld);
+	////ベクトルの正規化
+	//offset = XMVector3Normalize(offset)* distancePlayerReticle;
+	//////レティクルの座標設定
+	//reticle->matWorld.r[3].m128_f32[0]	= offset.m128_f32[0];
+	//reticle->matWorld.r[3].m128_f32[1]	= offset.m128_f32[1];
+	//reticle->matWorld.r[3].m128_f32[2]	= offset.m128_f32[2];
 
 
-	reticle->matWorld.r[3].m128_f32[0]	= offset.m128_f32[0];
-	reticle->matWorld.r[3].m128_f32[1]	= offset.m128_f32[1];
-	reticle->matWorld.r[3].m128_f32[2]	= offset.m128_f32[2];
 
-	reticle->position.x = reticle->matWorld.r[3].m128_f32[0];
-	reticle->position.y = reticle->matWorld.r[3].m128_f32[1];
-	reticle->position.z = reticle->matWorld.r[3].m128_f32[2];
+	reticle->position.x =  reticle->matWorld.r[3].m128_f32[0];
+	reticle->position.y =  reticle->matWorld.r[3].m128_f32[1];
+	reticle->position.z =  reticle->matWorld.r[3].m128_f32[2];
 
-	/*reticle->matWorld.r[3].m128_f32[0] = reticleWorldPos.m128_f32[0];
+
+	//XMMATRIX matViewPort = viewPortMatrix;
+
+	//XMMATRIX matViewProjectionViewPort = cameraMatViewProjection * matViewPort;
+
+	//reticleWorldPos = transform(reticleWorldPos, matViewProjectionViewPort);
+	
+/*reticle->matWorld.r[3].m128_f32[0] =   reticleWorldPos.m128_f32[0];
 	reticle->matWorld.r[3].m128_f32[1] = reticleWorldPos.m128_f32[1];
 	reticle->matWorld.r[3].m128_f32[2] = reticleWorldPos.m128_f32[2];*/
 
@@ -124,6 +130,18 @@ void Player::Draw()
 
 
 
+void Player::SetReticleWorldPos(XMVECTOR reticlePos)
+{
+	reticle->matWorld.r[3].m128_f32[0] = reticlePos.m128_f32[0];
+	reticle->matWorld.r[3].m128_f32[1] = -1 *reticlePos.m128_f32[1];
+	reticle->matWorld.r[3].m128_f32[2] = reticlePos.m128_f32[2];
+
+
+	/*reticle->position.x = reticlePos.m128_f32[0];
+	reticle->position.y = reticlePos.m128_f32[1];
+	reticle->position.z = reticlePos.m128_f32[2];*/
+}
+
 XMFLOAT3 Player::GetWorldPosition()
 {
 	XMFLOAT3 worldPos;
@@ -144,6 +162,11 @@ XMFLOAT3 Player::GetReticleWorldPosition()
 
 void Player::OnCollision()
 {
+}
+
+XMFLOAT3 Player::GetSpriteReticle()
+{
+	return XMFLOAT3({reticleWorldPos.m128_f32[0],reticleWorldPos.m128_f32[1] ,0});
 }
 
 void Player::Attack()

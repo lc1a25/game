@@ -27,6 +27,8 @@ private:
 
 	XMFLOAT3 enemyWorldPos;
 	XMVECTOR reticleWorldPos;
+	XMMATRIX viewPortMatrix;
+	XMMATRIX cameraMatViewProjection;
 
 	int32_t coolTimer = 5;
 	int32_t bulletCoolTimer = 5;
@@ -45,10 +47,16 @@ public:
 	void Draw();
 
 	//ゲームシーンからマウス座標をうけとる
-	void SetReticleWorldPos(XMVECTOR reticlePos) {reticleWorldPos = reticlePos;}
+	void SetReticleWorldPos(XMVECTOR reticlePos);
+
+	XMMATRIX GetViewPort(XMMATRIX viewPort) { return viewPortMatrix = viewPort; }
+	XMMATRIX GetCameraMatViewProjection(XMMATRIX matViewProjection)
+	{return cameraMatViewProjection = matViewProjection;}
+
 
 	XMFLOAT3 GetWorldPosition();
 	XMFLOAT3 GetReticleWorldPosition();
+	XMFLOAT3 GetSpriteReticle();
 
 	//自機の弾のロックオンに必要
 	void SetEnemyPosition(XMFLOAT3 position) { enemyWorldPos = position; }

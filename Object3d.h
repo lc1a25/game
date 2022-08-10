@@ -8,7 +8,7 @@
 #include <string>
 
 #include "Model.h"
-#include "Camera.h"
+#include "CameraObj.h"
 
 /// <summary>
 /// 3Dオブジェクト
@@ -73,7 +73,7 @@ public: // サブクラス
 	static Material material;
 
 	// 射影行列
-	static XMMATRIX matProjection;
+	//static XMMATRIX matProjection;
 
 private: // 定数
 	static const int division = 50;					// 分割数
@@ -113,19 +113,19 @@ public: // 静的メンバ関数
 	/// 視点座標の取得
 	/// </summary>
 	/// <returns>座標</returns>
-	static const XMFLOAT3& GetEye() { return eye; }
+	//static const XMFLOAT3& GetEye() { return eye; }
 
 	/// <summary>
 	/// 視点座標の設定
 	/// </summary>
 	/// <param name="position">座標</param>
-	static void SetEye(XMFLOAT3 eye);
+	//static void SetEye(XMFLOAT3 eye);
 
 	/// <summary>
 	/// 注視点座標の取得
 	/// </summary>
 	/// <returns>座標</returns>
-	static const XMFLOAT3& GetTarget() { return target; }
+	//static const XMFLOAT3& GetTarget() { return target; }
 
 	/// <summary>
 	/// 注視点座標の設定
@@ -170,15 +170,15 @@ private: // 静的メンバ変数
 	static CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV;
 	// シェーダリソースビューのハンドル(CPU)
 	static CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV;
-	// ビュー行列
-	static XMMATRIX matView;
-	
-	// 視点座標
-	static XMFLOAT3 eye;
-	// 注視点座標
-	static XMFLOAT3 target;
-	// 上方向ベクトル
-	static XMFLOAT3 up;
+	//// ビュー行列
+	//static XMMATRIX matView;
+	//
+	//// 視点座標
+	//static XMFLOAT3 eye;
+	//// 注視点座標
+	//static XMFLOAT3 target;
+	//// 上方向ベクトル
+	//static XMFLOAT3 up;
 	// 頂点バッファビュー
 	static D3D12_VERTEX_BUFFER_VIEW vbView;
 	// インデックスバッファビュー
@@ -277,7 +277,7 @@ private: // メンバ変数
 	XMFLOAT4 color = { 1,1,1,1 };
 
 
-	Camera* camera = nullptr;
+	CameraObj* camera = nullptr;
 	// 親オブジェクト
 	Object3d* parent = nullptr;
 

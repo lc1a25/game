@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CameraObj.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="CollisionBase.cpp" />
     <ClCompile Include="DebugText.cpp" />
@@ -184,6 +185,7 @@
   <ItemGroup>
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraObj.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="CollisionBase.h" />
     <ClInclude Include="DebugText.h" />

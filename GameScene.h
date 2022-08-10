@@ -62,7 +62,8 @@ private: // ƒƒ“ƒo•Ï”
 	Input* input = nullptr;
 	Audio* audio = nullptr;
 	DebugText* debugText;
-	Object3d* camera = camera->Create();
+	//Object3d* camera = camera->Create();
+	CameraObj* camera = nullptr;
 
 
 

@@ -27,7 +27,9 @@ class Matrix4
 	static XMVECTOR transform(const XMVECTOR& v, const XMMATRIX& m);
 
 	// 代入演算子オーバーロード
-	static XMMATRIX matrixMatrix(XMMATRIX m1, const XMMATRIX m2);
+	static XMMATRIX matrixMatrix(XMMATRIX& m1, const XMMATRIX& m2);
+
+	static XMMATRIX matrixInverse(XMMATRIX& m);
 	
 };
 

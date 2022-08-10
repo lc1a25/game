@@ -43,29 +43,39 @@ void GameScene::Update()
 	mouseX = mousePosition.x;//縮小変換　long -> float
 	mouseY = mousePosition.y;
 
+	//カメラのプロジェクション行列
+	XMMATRIX matProjection = camera->GetMatProjection();
+	XMMATRIX matView = camera->GetMatView();
+	//ビュープロジェクションビューポート行列
+	XMMATRIX matVP = Matrix4::matrixMatrix(matView , matProjection);
+	XMMATRIX matVPV = Matrix4::matrixMatrix(matVP, viewPort);
+	//逆行列を計算
+	XMMATRIX matInverse = Matrix4::matrixInverse(matVPV);
+	//スクリーン座標
+	XMVECTOR posNear = XMVECTOR{ mouseX, mouseY, 0 };
+	XMVECTOR posFar = XMVECTOR{ mouseX, mouseY, 1 };
 
-	XMMATRIX matVPV = Matrix4::matrixMatrix(camera->matProjection, viewPort);
-	XMMATRIX matInverse = XMMatrixInverse(nullptr, matVPV);
-
-	XMVECTOR posNear = XMVECTOR{ (Win::window_width, Win::window_height, 0) };
-	XMVECTOR posFar = XMVECTOR{ (Win::window_width, Win::window_height, 1) };
-
+	//スクリーンからワールド座標に
 	posNear = Matrix4::transform(posNear, matInverse);
 	posFar = Matrix4::transform(posFar, matInverse);
 
+	//マウスレイの方向
 	XMVECTOR mouseDirection;
 	mouseDirection.m128_f32[0] = posFar.m128_f32[0] - posNear.m128_f32[0];
 	mouseDirection.m128_f32[1] = posFar.m128_f32[1] - posNear.m128_f32[1];
 	mouseDirection.m128_f32[2] = posFar.m128_f32[2] - posNear.m128_f32[2];
 	mouseDirection = XMVector3Normalize(mouseDirection);
 
-	const float distanceTestObject = 1.0f;
-
+	//3dのレティクルの座標をうけとる
 	reticlePos.m128_f32[0] = player->GetReticleWorldPosition().x;
 	reticlePos.m128_f32[1] = player->GetReticleWorldPosition().y;
 	reticlePos.m128_f32[2] = player->GetReticleWorldPosition().z;
+	//カメラから3dレティクルの距離
+	const float distanceObject = 50.0f;
+	//near から far に　distanceObject 分進んだ距離
+	reticlePos = (mouseDirection - posNear) * distanceObject;
 
-	reticlePos = (mouseDirection - posNear) * distanceTestObject;
+	//3dのレティクルをマウスがさしているところに行かせる
 	player->SetReticleWorldPos(reticlePos);
 
 	CheckAllCollision(enemy);
