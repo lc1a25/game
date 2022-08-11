@@ -31,7 +31,11 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 	enemyL = new Enemy();
 	enemyL->Init(enemyModel, { -30,0,100 }, false);
+	//camera->cameraObj->Init();
+	camera = new Camera();
+	camera->Init();
 
+	Object3d::SetCamera(camera);
 }
 
 void GameScene::Update()
@@ -42,13 +46,13 @@ void GameScene::Update()
 	ScreenToClient(hwnd, &mousePosition);
 	mouseX = mousePosition.x;//縮小変換　long -> float
 	mouseY = mousePosition.y;
-
+	
 	//カメラのプロジェクション行列
-	XMMATRIX matProjection = camera->GetMatProjection();
-	XMMATRIX matView = camera->GetMatView();
+	XMMATRIX matProjection = camera->GetMatViewProjection();
+	//XMMATRIX matView = camera->GetMatView();
 	//ビュープロジェクションビューポート行列
-	XMMATRIX matVP = Matrix4::matrixMatrix(matView , matProjection);
-	XMMATRIX matVPV = Matrix4::matrixMatrix(matVP, viewPort);
+	//XMMATRIX matVP = Matrix4::matrixMatrix(matView , matProjection);
+	XMMATRIX matVPV = Matrix4::matrixMatrix(matProjection, viewPort);
 	//逆行列を計算
 	XMMATRIX matInverse = Matrix4::matrixInverse(matVPV);
 	//スクリーン座標
@@ -78,6 +82,7 @@ void GameScene::Update()
 	//3dのレティクルをマウスがさしているところに行かせる
 	player->SetReticleWorldPos(reticlePos);
 
+	camera->UpdateCamera();
 	CheckAllCollision(enemy);
 	CheckAllCollision(enemyL);
 	enemy->SetPlayerPosition(player->GetWorldPosition());

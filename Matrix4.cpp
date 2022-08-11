@@ -106,6 +106,20 @@ XMVECTOR  Matrix4::transform(const XMVECTOR&v, const XMMATRIX&m)
 	return result;
 }
 
+XMVECTOR Matrix4::transformCamera(const XMVECTOR& v, const XMMATRIX& m)
+{
+	float w = v.m128_f32[0] * m.r[0].m128_f32[3] + v.m128_f32[1] * m.r[1].m128_f32[3] + v.m128_f32[2] * m.r[2].m128_f32[3] + m.r[3].m128_f32[3];
+
+	XMVECTOR result
+	{
+		(v.m128_f32[0] * m.r[0].m128_f32[0] + v.m128_f32[1] * m.r[1].m128_f32[0] + v.m128_f32[2] * m.r[2].m128_f32[0] + m.r[3].m128_f32[0]) / w,
+		(v.m128_f32[0] * m.r[0].m128_f32[1] + v.m128_f32[1] * m.r[1].m128_f32[1] + v.m128_f32[2] * m.r[2].m128_f32[1] + m.r[3].m128_f32[1]) / w,
+		(v.m128_f32[0] * m.r[0].m128_f32[2] + v.m128_f32[1] * m.r[1].m128_f32[2] + v.m128_f32[2] * m.r[2].m128_f32[2] + m.r[3].m128_f32[2]) / w
+
+	};
+	return result;
+}
+
 XMMATRIX Matrix4::matrixMatrix(XMMATRIX& m1, const XMMATRIX& m2)
 {
 	XMMATRIX result =
@@ -303,38 +317,38 @@ XMMATRIX Matrix4::matrixInverse(XMMATRIX& m)
 
 
 
-XMMATRIX& operator*=(XMMATRIX& m1, const XMMATRIX& m2)
-{
-	
-	XMMATRIX result =
-	  { 0.0f,0.0f,0.0f,0.0f,
-		0.0f,0.0f,0.0f,0.0f,
-		0.0f,0.0f,0.0f,0.0f,
-		0.0f,0.0f,0.0f,0.0f };
-
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			for (int k = 0; k < 4; k++)
-			{
-				result.r[i].m128_f32[j] += m1.r[i].m128_f32[k] * m2.r[k].m128_f32[j];
-			}
-		}
-	}
-	m1 = result;
-
-	return m1;
-}
-
-XMMATRIX operator*(const XMMATRIX& m1, const XMMATRIX& m2)
-{
-	return XMMATRIX();
-}
-
-Vector3 operator*(const Vector3 &v, const XMMATRIX&m)
-{
-	return transform(v, m);
-}
+//XMMATRIX& operator*=(XMMATRIX& m1, const XMMATRIX& m2)
+//{
+//	
+//	XMMATRIX result =
+//	  { 0.0f,0.0f,0.0f,0.0f,
+//		0.0f,0.0f,0.0f,0.0f,
+//		0.0f,0.0f,0.0f,0.0f,
+//		0.0f,0.0f,0.0f,0.0f };
+//
+//	for (int i = 0; i < 4; i++)
+//	{
+//		for (int j = 0; j < 4; j++)
+//		{
+//			for (int k = 0; k < 4; k++)
+//			{
+//				result.r[i].m128_f32[j] += m1.r[i].m128_f32[k] * m2.r[k].m128_f32[j];
+//			}
+//		}
+//	}
+//	m1 = result;
+//
+//	return m1;
+//}
+//
+//XMMATRIX operator*(const XMMATRIX& m1, const XMMATRIX& m2)
+//{
+//	return XMMATRIX();
+//}
+//
+//Vector3 operator*(const Vector3 &v, const XMMATRIX&m)
+//{
+//	return transform(v, m);
+//}
 
 

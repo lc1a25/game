@@ -47,6 +47,7 @@ std::vector<Object3d::VertexPosNormalUv>Object3d::vertices;
 std::vector<unsigned short>Object3d::indices;
 
 Object3d::Material Object3d::material;
+Camera* Object3d::camera = nullptr;
 
 
 
@@ -834,7 +835,7 @@ bool Object3d::Initialize()
 	// nullptrチェック
 	assert(device);
 
-	camera->Init();
+	//camera->Init();
 
 
 	HRESULT result;
@@ -865,6 +866,42 @@ void Object3d::Update()
 	// スケール、回転、平行移動行列の計算
 	matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
 	matRot = XMMatrixIdentity();
+	
+	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation.z));
+	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation.x));
+	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation.y));
+	matTrans = XMMatrixTranslation(position.x, position.y, position.z);
+
+	// ワールド行列の合成
+	matWorld = XMMatrixIdentity(); // 変形をリセット
+	matWorld *= matScale; // ワールド行列にスケーリングを反映
+	matWorld *= matRot; // ワールド行列に回転を反映
+	matWorld *= matTrans; // ワールド行列に平行移動を反映
+
+	// 親オブジェクトがあれば
+	if (parent != nullptr) {
+		// 親オブジェクトのワールド行列を掛ける
+		matWorld *= parent->matWorld;
+	}
+	// 定数バッファへデータ転送
+	ConstBufferDataB0* constMap = nullptr;
+	result = constBuffB0->Map(0, nullptr, (void**)&constMap);
+	//constMap->color = color;
+	
+	
+	constMap->mat = matWorld * camera->GetMatViewProjection();	// 行列の合成
+	constBuffB0->Unmap(0, nullptr);
+	
+}
+
+void Object3d::UpdateCamera()
+{
+
+	HRESULT result;
+	XMMATRIX matScale, matRot, matTrans;
+	// スケール、回転、平行移動行列の計算
+	matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
+	matRot = XMMatrixIdentity();
 
 	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation.z));
 	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation.x));
@@ -882,16 +919,18 @@ void Object3d::Update()
 		// 親オブジェクトのワールド行列を掛ける
 		matWorld *= parent->matWorld;
 	}
-
+	//matWorld = camera->GetWorldTransform();
+	//cameraObj->SetWorldTransform(matWorld);
+	//cameraObj->UpdateCamera();
+	//SetMatWorld(cameraObj->GetWorldTransform());
 	// 定数バッファへデータ転送
 	ConstBufferDataB0* constMap = nullptr;
 	result = constBuffB0->Map(0, nullptr, (void**)&constMap);
 	//constMap->color = color;
-	
-	
+
+
 	constMap->mat = matWorld * camera->GetMatViewProjection();	// 行列の合成
 	constBuffB0->Unmap(0, nullptr);
-	
 }
 
 void Object3d::Draw()

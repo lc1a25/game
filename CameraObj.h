@@ -1,6 +1,8 @@
 #pragma once
 #include "Win.h"
 #include <DirectXMath.h>
+#include "Matrix4.h"
+#include "Camera.h"
 
 class CameraObj
 {
@@ -12,8 +14,9 @@ private:
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMMATRIX = DirectX::XMMATRIX;
 
+	//Object3d* cameraObj = cameraObj->Create();
 public:
-	void Init();
+	void Init(XMVECTOR worldPos,XMFLOAT3 rotation);
 
 	void UpdateCamera();
 
@@ -21,9 +24,9 @@ public:
 
 	void CameraMoveVector(XMFLOAT3 move, bool addFrag);
 
-	void CameraMoveVectorAdd(XMFLOAT3 move);
+	//void CameraMoveVectorAdd(XMFLOAT3 move);
 
-	void CameraMoveVectorSub(XMFLOAT3 move);
+	//void CameraMoveVectorSub(XMFLOAT3 move);
 
 	//getter
 	const XMMATRIX& GetMatViewProjection() { return matViewProjection; }
@@ -37,7 +40,7 @@ public:
 	const XMFLOAT3& GetTarget() { return target; }
 
 	//setter
-	void SetEye(XMFLOAT3 eye)
+	/*void SetEye(XMFLOAT3 eye)
 	{
 		this->eye = eye;
 		UpdateCamera();
@@ -51,24 +54,44 @@ public:
 	{
 		this->up = up;
 		UpdateCamera();
+	}*/
+
+	void SetWorldTransform(XMMATRIX& cameraWorldTransform)
+	{
+		worldTransform = cameraWorldTransform;
+	}
+
+	XMMATRIX GetWorldTransform()
+	{
+		return worldTransform;
 	}
 
 private:
 
 	float distance = 20.0f;
 	// ビュー行列
-	static XMMATRIX matView;
+	XMMATRIX matView;
 	// 射影行列
-	static XMMATRIX matProjection;
+	XMMATRIX matProjection;
 	// 視点座標
-	static XMFLOAT3 eye;
+	XMFLOAT3 eye;
 	// 注視点座標
-	static XMFLOAT3 target;
+	XMFLOAT3 target;
 	// 上方向ベクトル
-	static XMFLOAT3 up;
+	XMFLOAT3 up;
 	// 回転行列
 	XMMATRIX matRot = DirectX::XMMatrixIdentity();
 
-	static XMMATRIX matViewProjection;
+	XMMATRIX matViewProjection;
+
+	XMMATRIX worldTransform ;
+
+	//ワールド座標
+	XMVECTOR worldPos;
+
+	// X,Y,Z軸回りの回転角
+	XMFLOAT3 rotation = { 0,0,0 };
+
+	Camera* camera = nullptr;
 
 };

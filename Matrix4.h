@@ -26,6 +26,8 @@ class Matrix4
 	// 座標変換（ベクトルと行列の掛け算をする）
 	static XMVECTOR transform(const XMVECTOR& v, const XMMATRIX& m);
 
+	static XMVECTOR transformCamera(const XMVECTOR& v, const XMMATRIX& m);
+
 	// 代入演算子オーバーロード
 	static XMMATRIX matrixMatrix(XMMATRIX& m1, const XMMATRIX& m2);
 
@@ -33,10 +35,10 @@ class Matrix4
 	
 };
 
-// 代入演算子オーバーロード
-XMMATRIX& operator*=(XMMATRIX& m1, const XMMATRIX& m2);
-
-// 2項演算子オーバーロード
-XMMATRIX operator*(const XMMATRIX& m1, const XMMATRIX& m2);
-
-Vector3 operator*(const Vector3& v, const XMMATRIX& m);
+//// 代入演算子オーバーロード
+//XMMATRIX& operator*=(XMMATRIX& m1, const XMMATRIX& m2);
+//
+//// 2項演算子オーバーロード
+//XMMATRIX operator*(const XMMATRIX& m1, const XMMATRIX& m2);
+//
+//Vector3 operator*(const Vector3& v, const XMMATRIX& m);

@@ -8,7 +8,7 @@
 #include <string>
 
 #include "Model.h"
-#include "CameraObj.h"
+#include "Camera.h"
 
 /// <summary>
 /// 3Dオブジェクト
@@ -239,6 +239,11 @@ public: // メンバ関数
 	void Update();
 
 	/// <summary>
+	/// 毎フレーム処理
+	/// </summary>
+	void UpdateCamera();
+
+	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw();
@@ -257,6 +262,10 @@ public: // メンバ関数
 
 	void SetModel(Model* model) { this->model = model; }
 
+	static void SetCamera(Camera* camera) { Object3d::camera = camera; }
+
+	//void SetMatWorld(XMMATRIX worldTransform) { this->matWorld = worldTransform; }
+
 	// ローカル座標
 	XMFLOAT3 position = { 0,0,0 };
 
@@ -268,7 +277,9 @@ public: // メンバ関数
 
 	// ローカルワールド変換行列
 	XMMATRIX matWorld;
-	
+
+	static Camera* camera;
+
 private: // メンバ変数
 	//ComPtr<ID3D12Resource> constBuff; // 定数バッファ
 	ComPtr<ID3D12Resource> constBuffB0; // 定数バッファ
@@ -277,7 +288,7 @@ private: // メンバ変数
 	XMFLOAT4 color = { 1,1,1,1 };
 
 
-	CameraObj* camera = nullptr;
+
 	// 親オブジェクト
 	Object3d* parent = nullptr;
 
