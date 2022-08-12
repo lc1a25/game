@@ -35,11 +35,15 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	camera = new Camera();
 	camera->Init();
 
+	cameraObj = new CameraObj();
+	cameraObj->Init({0,0,0},{0,0,0});
+
 	Object3d::SetCamera(camera);
 }
 
 void GameScene::Update()
 {
+
 	POINT mousePosition;
 
 	GetCursorPos(&mousePosition);
@@ -95,6 +99,7 @@ void GameScene::Update()
 
 	player->Update();
 
+	cameraObj->UpdateCamera();
 }
 
 void GameScene::Draw()

@@ -33,11 +33,13 @@ public:
 	const float& GetEyey() { return eye.y; }
 	const float& GetEyez() { return eye.z; }
 	const XMFLOAT3& GetTarget() { return target; }
+	const XMFLOAT3& GetUp() { return up; }
 
 	//setter
 	void SetEye(XMFLOAT3 eye) 
 	{ this->eye = eye; 
-	  UpdateCamera(); }
+	  UpdateCamera(); 
+	}
 	void SetTarget(XMFLOAT3 target) 
 	{ this->target = target; 
 	  UpdateCamera();
@@ -56,7 +58,7 @@ private:
 	// 射影行列
 	XMMATRIX matProjection;
 	// 視点座標
-	XMFLOAT3 eye = {0,10,-10};
+	XMFLOAT3 eye = {0,0,-50};
 	// 注視点座標
 	XMFLOAT3 target = { 0,0,0 };
 	// 上方向ベクトル

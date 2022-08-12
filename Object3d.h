@@ -4,7 +4,6 @@
 #include <wrl.h>
 #include <d3d12.h>
 //#include <DirectXMath.h>
-#include <d3dx12.h>
 #include <string>
 
 #include "Model.h"
@@ -190,6 +189,7 @@ private: // 静的メンバ変数
 	//static unsigned short indices[planeCount * 3];
 	static std::vector<unsigned short> indices;
 
+	static Camera* camera;
 private:// 静的メンバ関数
 	/// <summary>
 	/// デスクリプタヒープの初期化
@@ -264,6 +264,17 @@ public: // メンバ関数
 
 	static void SetCamera(Camera* camera) { Object3d::camera = camera; }
 
+	const XMFLOAT3& GetEye() { return camera->GetEye(); }
+	const XMFLOAT3& GetTarget() { return camera->GetTarget(); }
+	const XMFLOAT3& GetUp() { return camera->GetUp(); }
+	
+	void SetEyeCamera(XMFLOAT3 eye);
+	
+	void SetTargetCamera(XMFLOAT3 target);
+	
+	void SetUpCamera(XMFLOAT3 up);
+	
+
 	//void SetMatWorld(XMMATRIX worldTransform) { this->matWorld = worldTransform; }
 
 	// ローカル座標
@@ -278,7 +289,7 @@ public: // メンバ関数
 	// ローカルワールド変換行列
 	XMMATRIX matWorld;
 
-	static Camera* camera;
+	
 
 private: // メンバ変数
 	//ComPtr<ID3D12Resource> constBuff; // 定数バッファ
@@ -287,7 +298,7 @@ private: // メンバ変数
 	// 色
 	XMFLOAT4 color = { 1,1,1,1 };
 
-
+	XMFLOAT3 eye123 = { 0,0,0 };
 
 	// 親オブジェクト
 	Object3d* parent = nullptr;

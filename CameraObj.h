@@ -2,7 +2,8 @@
 #include "Win.h"
 #include <DirectXMath.h>
 #include "Matrix4.h"
-#include "Camera.h"
+
+#include "Object3d.h"
 
 class CameraObj
 {
@@ -14,7 +15,7 @@ private:
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMMATRIX = DirectX::XMMATRIX;
 
-	//Object3d* cameraObj = cameraObj->Create();
+	Object3d* cameraObj = cameraObj->Create();
 public:
 	void Init(XMVECTOR worldPos,XMFLOAT3 rotation);
 
@@ -91,7 +92,5 @@ private:
 
 	// X,Y,ZŽ²‰ñ‚è‚Ì‰ñ“]Šp
 	XMFLOAT3 rotation = { 0,0,0 };
-
-	Camera* camera = nullptr;
 
 };

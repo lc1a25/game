@@ -861,6 +861,7 @@ bool Object3d::Initialize()
 
 void Object3d::Update()
 {
+
 	HRESULT result;
 	XMMATRIX matScale, matRot, matTrans;
 	// スケール、回転、平行移動行列の計算
@@ -919,10 +920,7 @@ void Object3d::UpdateCamera()
 		// 親オブジェクトのワールド行列を掛ける
 		matWorld *= parent->matWorld;
 	}
-	//matWorld = camera->GetWorldTransform();
-	//cameraObj->SetWorldTransform(matWorld);
-	//cameraObj->UpdateCamera();
-	//SetMatWorld(cameraObj->GetWorldTransform());
+	
 	// 定数バッファへデータ転送
 	ConstBufferDataB0* constMap = nullptr;
 	result = constBuffB0->Map(0, nullptr, (void**)&constMap);
@@ -950,4 +948,17 @@ void Object3d::Draw()
 	model->Draw(cmdList, 1);
 	
 
+}
+
+void Object3d::SetEyeCamera(XMFLOAT3 eye)
+{
+	eye123 = eye;
+}
+
+void Object3d::SetTargetCamera(XMFLOAT3 target)
+{
+}
+
+void Object3d::SetUpCamera(XMFLOAT3 up)
+{
 }

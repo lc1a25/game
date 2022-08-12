@@ -10,6 +10,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "EnemyCircle.h"
+#include "CameraObj.h"
 
 class GameScene
 {
@@ -65,6 +66,7 @@ private: // ƒƒ“ƒo•Ï”
 	//Object3d* camera = camera->Create();
 	Camera* camera = nullptr;
 
+	CameraObj* cameraObj = nullptr;
 
 
 	Player* player = nullptr;

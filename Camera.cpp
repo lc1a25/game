@@ -27,7 +27,7 @@ void Camera::Init()
 void Camera::UpdateCamera()
 {
 	
-
+	
 	// ビュー行列の更新
 	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
 
