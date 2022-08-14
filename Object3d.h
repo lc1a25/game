@@ -169,15 +169,13 @@ private: // 静的メンバ変数
 	static CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV;
 	// シェーダリソースビューのハンドル(CPU)
 	static CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV;
-	//// ビュー行列
-	//static XMMATRIX matView;
-	//
-	//// 視点座標
-	//static XMFLOAT3 eye;
-	//// 注視点座標
-	//static XMFLOAT3 target;
-	//// 上方向ベクトル
-	//static XMFLOAT3 up;
+
+	// 視点座標
+	static XMFLOAT3 eye;
+	// 注視点座標
+	static XMFLOAT3 target;
+	// 上方向ベクトル
+	static XMFLOAT3 up;
 	// 頂点バッファビュー
 	static D3D12_VERTEX_BUFFER_VIEW vbView;
 	// インデックスバッファビュー
@@ -267,13 +265,7 @@ public: // メンバ関数
 	const XMFLOAT3& GetEye() { return camera->GetEye(); }
 	const XMFLOAT3& GetTarget() { return camera->GetTarget(); }
 	const XMFLOAT3& GetUp() { return camera->GetUp(); }
-	
-	void SetEyeCamera(XMFLOAT3 eye);
-	
-	void SetTargetCamera(XMFLOAT3 target);
-	
-	void SetUpCamera(XMFLOAT3 up);
-	
+
 
 	//void SetMatWorld(XMMATRIX worldTransform) { this->matWorld = worldTransform; }
 
@@ -289,16 +281,17 @@ public: // メンバ関数
 	// ローカルワールド変換行列
 	XMMATRIX matWorld;
 
-	
+	// ビュー行列
+	XMMATRIX matView;
+
+	ComPtr<ID3D12Resource> constBuffB0; // 定数バッファ
 
 private: // メンバ変数
 	//ComPtr<ID3D12Resource> constBuff; // 定数バッファ
-	ComPtr<ID3D12Resource> constBuffB0; // 定数バッファ
-	ComPtr<ID3D12Resource> constBuffB1; // 定数バッファ
+	//ComPtr<ID3D12Resource> constBuffB0; // 定数バッファ
+	//ComPtr<ID3D12Resource> constBuffB1; // 定数バッファ
 	// 色
 	XMFLOAT4 color = { 1,1,1,1 };
-
-	XMFLOAT3 eye123 = { 0,0,0 };
 
 	// 親オブジェクト
 	Object3d* parent = nullptr;

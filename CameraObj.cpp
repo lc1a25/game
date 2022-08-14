@@ -4,7 +4,7 @@ using namespace DirectX;
 
 //XMMATRIX CameraObj::matView{};
 //XMMATRIX CameraObj::matProjection{};
-//XMFLOAT3 CameraObj::eye = { 0, 0, -50.0f };
+//XMFLOAT3 CameraObj::eye = { 0, 0, -150.0f };
 //XMFLOAT3 CameraObj::target = { 0, 0, 0 };
 //XMFLOAT3 CameraObj::up = { 0, 1, 0 };
 //XMMATRIX CameraObj::matViewProjection{};
@@ -18,33 +18,28 @@ void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
 
 
 	//camera->Init();
-	//// ビュー行列の生成
-	//matView = XMMatrixLookAtLH(
-	//	XMLoadFloat3(&eye),
-	//	XMLoadFloat3(&target),
-	//	XMLoadFloat3(&up));
+	// ビュー行列の生成
+	/*matView = XMMatrixLookAtLH(
+		XMLoadFloat3(&eye),
+		XMLoadFloat3(&target),
+		XMLoadFloat3(&up));*/
+	// 透視投影による射影行列の生成
+	/*matProjection = XMMatrixPerspectiveFovLH(
+		XMConvertToRadians(60.0f),
+		(float)Win::window_width / Win::window_height,
+		0.1f, 1000.0f
+	);
 
-	//// 平行投影による射影行列の生成
-	////constMap->mat = XMMatrixOrthographicOffCenterLH(
-	////	0, window_width,
-	////	window_height, 0,
-	////	0, 1);
-	//// 透視投影による射影行列の生成
-	//matProjection = XMMatrixPerspectiveFovLH(
-	//	XMConvertToRadians(60.0f),
-	//	(float)Win::window_width / Win::window_height,
-	//	0.1f, 1000.0f
-	//);
+	matViewProjection = matView * matProjection;*/
 
-	//matViewProjection = matView * matProjection;
+	
 }
 
 void CameraObj::UpdateCamera()
 {
 	
-	eye = cameraObj->GetEye();
-	target = cameraObj->GetTarget();
-	up = cameraObj->GetUp();
+	//cameraObj->position.z--;
+
 
 	eye = XMFLOAT3({ cameraObj->matWorld.r[3].m128_f32[0],
 					 cameraObj->matWorld.r[3].m128_f32[1],
@@ -63,60 +58,19 @@ void CameraObj::UpdateCamera()
 	up.y = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[1];
 	up.z = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[2];
 
-	cameraObj->SetEyeCamera(eye);
-	cameraObj->SetTargetCamera(target);
-	cameraObj->SetUpCamera(up);
+	
+
+
+	matViewProjection = matView * matProjection;
+
+	cameraObj->matView = matViewProjection;
 
 	cameraObj->Update();
-	//XMMATRIX matRot, matTrans;
-	////回転、平行移動行列の計算
-	//
-	//matRot = XMMatrixIdentity();
-	//rotation.z++;
-	//matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation.z));
-	//matRot *= XMMatrixRotationX(XMConvertToRadians(rotation.x));
-	//matRot *= XMMatrixRotationY(XMConvertToRadians(rotation.y));
-	////worldPos.m128_f32[0] = matWorld.r[3].m128_f32[0];
-	////worldPos.m128_f32[1] = matWorld.r[3].m128_f32[1];
-	////worldPos.m128_f32[2] = matWorld.r[3].m128_f32[2];
-
-	//matTrans = XMMatrixTranslation(worldPos.m128_f32[0],worldPos.m128_f32[1],worldPos.m128_f32[2]);
-
-	//worldTransform *= matRot;
-	//worldTransform *= matTrans;
-	//// ビュー行列の更新
-	//matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
-
-	//matProjection = XMMatrixPerspectiveFovLH(
-	//	XMConvertToRadians(60.0f),
-	//	(float)Win::window_width / Win::window_height,
-	//	0.1f, 1000.0f
-	//);
-
-	//matViewProjection = matView * matProjection;
 }
 
 void CameraObj::CameraRot(float anglex, float angley)
 {
-	XMMATRIX matRotNew = XMMatrixIdentity();
-	matRotNew *= XMMatrixRotationX(-anglex);
-	matRotNew *= XMMatrixRotationY(-angley);
-
-
-	matRot = matRotNew * matRot;
-
-	// 注視点から視点へのベクトルと、上方向ベクトル
-	XMVECTOR vTargetEye = { 0.0f, 0.0f, distance, 1.0f };
-	XMVECTOR vUp = { 0.0f, 1.0f, 0.0f, 0.0f };
-
-	// ベクトルを回転
-	vTargetEye = XMVector3Transform(vTargetEye, matRot);
-	vUp = XMVector3Transform(vUp, matRot);
-
-	// 注視点からずらした位置に視点座標を決定
-	const XMFLOAT3& target = GetTarget();
-	//SetEye({ target.x + vTargetEye.m128_f32[0], target.y + vTargetEye.m128_f32[1], target.z + vTargetEye.m128_f32[2] });
-	//SetUp({ vUp.m128_f32[0], vUp.m128_f32[1], vUp.m128_f32[2] });
+	
 }
 
 void CameraObj::CameraMoveVector(XMFLOAT3 move, bool addFrag)

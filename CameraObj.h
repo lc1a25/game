@@ -1,8 +1,7 @@
 #pragma once
-#include "Win.h"
-#include <DirectXMath.h>
+//#include "Win.h"
+//#include <DirectXMath.h>
 #include "Matrix4.h"
-
 #include "Object3d.h"
 
 class CameraObj
@@ -40,6 +39,8 @@ public:
 	const float& GetEyez() { return eye.z; }
 	const XMFLOAT3& GetTarget() { return target; }
 
+	const float& GetpositionX() { return cameraObj->position.x; }
+
 	//setter
 	/*void SetEye(XMFLOAT3 eye)
 	{
@@ -66,7 +67,8 @@ public:
 	{
 		return worldTransform;
 	}
-
+	// 視点座標
+	XMFLOAT3 eye = { 0,0,-50 };
 private:
 
 	float distance = 20.0f;
@@ -74,16 +76,15 @@ private:
 	XMMATRIX matView;
 	// 射影行列
 	XMMATRIX matProjection;
-	// 視点座標
-	XMFLOAT3 eye;
+	
 	// 注視点座標
-	XMFLOAT3 target;
+	 XMFLOAT3 target = {0,0,0};
 	// 上方向ベクトル
-	XMFLOAT3 up;
+	 XMFLOAT3 up = {0,1,0};
 	// 回転行列
 	XMMATRIX matRot = DirectX::XMMatrixIdentity();
 
-	XMMATRIX matViewProjection;
+	 XMMATRIX matViewProjection;
 
 	XMMATRIX worldTransform ;
 

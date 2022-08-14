@@ -17,6 +17,8 @@ public:
 
 	void UpdateCamera();
 
+	void UpdateMatView();
+
 	void CameraRot(float anglex, float angley);
 
 	void CameraMoveVector(XMFLOAT3 move, bool addFrag);
@@ -37,8 +39,8 @@ public:
 
 	//setter
 	void SetEye(XMFLOAT3 eye) 
-	{ this->eye = eye; 
-	  UpdateCamera(); 
+	{ 
+		this->eye = eye;  
 	}
 	void SetTarget(XMFLOAT3 target) 
 	{ this->target = target; 
@@ -49,7 +51,8 @@ public:
 		this->up = up;
 		UpdateCamera();
 	}
-
+	// 視点座標
+	XMFLOAT3 eye = { 0,0,-50 };
 private:
 
 	float distance = 20.0f;
@@ -57,8 +60,7 @@ private:
 	XMMATRIX matView;
 	// 射影行列
 	XMMATRIX matProjection;
-	// 視点座標
-	XMFLOAT3 eye = {0,0,-50};
+
 	// 注視点座標
 	XMFLOAT3 target = { 0,0,0 };
 	// 上方向ベクトル

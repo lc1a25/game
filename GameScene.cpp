@@ -39,13 +39,16 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	cameraObj->Init({0,0,0},{0,0,0});
 
 	Object3d::SetCamera(camera);
+	
 }
 
 void GameScene::Update()
 {
+	sprintf_s(moji, "%f", cameraObj->GetpositionX());
+	//camera->eye = cameraObj->eye;
+
 
 	POINT mousePosition;
-
 	GetCursorPos(&mousePosition);
 	ScreenToClient(hwnd, &mousePosition);
 	mouseX = mousePosition.x;//k¬•ÏŠ·@long -> float
@@ -99,6 +102,7 @@ void GameScene::Update()
 
 	player->Update();
 
+	//camera->SetEye({0,0,150});
 	cameraObj->UpdateCamera();
 }
 

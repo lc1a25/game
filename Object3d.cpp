@@ -921,13 +921,13 @@ void Object3d::UpdateCamera()
 		matWorld *= parent->matWorld;
 	}
 	
-	// 定数バッファへデータ転送
+	//// 定数バッファへデータ転送
 	ConstBufferDataB0* constMap = nullptr;
 	result = constBuffB0->Map(0, nullptr, (void**)&constMap);
 	//constMap->color = color;
 
 
-	constMap->mat = matWorld * camera->GetMatViewProjection();	// 行列の合成
+	constMap->mat = matWorld * matView;	// 行列の合成
 	constBuffB0->Unmap(0, nullptr);
 }
 
@@ -950,15 +950,4 @@ void Object3d::Draw()
 
 }
 
-void Object3d::SetEyeCamera(XMFLOAT3 eye)
-{
-	eye123 = eye;
-}
 
-void Object3d::SetTargetCamera(XMFLOAT3 target)
-{
-}
-
-void Object3d::SetUpCamera(XMFLOAT3 up)
-{
-}

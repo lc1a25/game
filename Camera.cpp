@@ -1,6 +1,13 @@
 #include "Camera.h"
 using namespace DirectX;
 
+//XMMATRIX Camera::matView{};
+//XMMATRIX Camera::matProjection{};
+//XMFLOAT3 Camera::eye = { 0, 0, -50.0f };
+//XMFLOAT3 Camera::target = { 0, 0, 0 };
+//XMFLOAT3 Camera::up = { 0, 1, 0 };
+//XMMATRIX Camera::matViewProjection{};
+
 void Camera::Init()
 {
 	// ビュー行列の生成
@@ -37,6 +44,13 @@ void Camera::UpdateCamera()
 		0.1f, 1000.0f
 	);
 
+	matViewProjection = matView * matProjection;
+}
+
+void Camera::UpdateMatView()
+{
+	// ビュー行列の更新
+	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
 	matViewProjection = matView * matProjection;
 }
 

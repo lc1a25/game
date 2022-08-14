@@ -55,6 +55,7 @@ public: // ƒƒ“ƒoŠÖ”
 	HWND GetHwnd(HWND winHwnd) { return hwnd = winHwnd; }
 	float mouseX;
 	float mouseY;
+	char moji[64];
 
 	XMMATRIX GetViewPort(XMMATRIX winViewPort) { return viewPort = winViewPort; }
 private: // ƒƒ“ƒo•Ï”

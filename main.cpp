@@ -157,8 +157,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 #pragma region シェーダーの色,初期化
-
+	char moji[64];
 	
+	float secound_x = 150;
+	float secound_y = 0;
 
 	sprite->SetPosition({ 0.0f,0.0f,0.0f });
 	sprite->SetTexsize({1280.0f,720.0f });
@@ -195,7 +197,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		sprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
 	
 		
-
+		
+		debugtext_minute->Print(gameScene->moji, secound_x, secound_y, 1.0f);
 			XMVECTOR moveZ = XMVectorSet(0, 0, 1.0f, 0);//z speed
 
 			XMVECTOR moveX2 = XMVectorSet(1.0f, 0, 0, 0);//debug
@@ -271,6 +274,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		// スプライト
 		spriteCommon->PreDraw();
 		sprite->Draw();
+		debugtext_minute->DrawAll();
 		//debugtext_minute->DrawAll();
 		//debugtext_minute2->DrawAll();
 		// ４．描画コマンドここまで
