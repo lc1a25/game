@@ -266,6 +266,7 @@ public: // メンバ関数
 	const XMFLOAT3& GetTarget() { return camera->GetTarget(); }
 	const XMFLOAT3& GetUp() { return camera->GetUp(); }
 
+	const XMMATRIX& GetMatViewProjection() { return camera->GetMatViewProjection(); }
 
 	//void SetMatWorld(XMMATRIX worldTransform) { this->matWorld = worldTransform; }
 

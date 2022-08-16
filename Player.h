@@ -3,7 +3,7 @@
 #include "Input.h"
 #include "PlayerBullet.h"
 #include "Enemy.h"
-
+#include "Matrix4.h"
 #include <memory>//ユニークポインタ
 #include <list>
 
@@ -29,7 +29,8 @@ private:
 	XMVECTOR reticleWorldPos;
 	XMMATRIX viewPortMatrix;
 	XMMATRIX cameraMatViewProjection;
-
+	XMVECTOR positionReticle = {0,0,0};
+	bool isDeadEnemy = false;
 	int32_t coolTimer = 5;
 	int32_t bulletCoolTimer = 5;
 
@@ -50,8 +51,7 @@ public:
 	void SetReticleWorldPos(XMVECTOR reticlePos);
 
 	XMMATRIX GetViewPort(XMMATRIX viewPort) { return viewPortMatrix = viewPort; }
-	XMMATRIX GetCameraMatViewProjection(XMMATRIX matViewProjection)
-	{return cameraMatViewProjection = matViewProjection;}
+	XMMATRIX GetCameraMatViewProjection(XMMATRIX matViewProjection){return cameraMatViewProjection = matViewProjection;}
 
 
 	XMFLOAT3 GetWorldPosition();
@@ -60,6 +60,7 @@ public:
 
 	//自機の弾のロックオンに必要
 	void SetEnemyPosition(XMFLOAT3 position) { enemyWorldPos = position; }
+	void SetEnemyFlag(bool isDead) { isDeadEnemy = isDead; }
 
 	void OnCollision();
 };

@@ -33,7 +33,7 @@ public:
 	const XMMATRIX& GetMatProjection() { return matProjection; }
 	const XMMATRIX& GetMatView() { return matView; }
 
-	const XMFLOAT3& GetEye() { return eye; }
+	XMFLOAT3& GetEye() { return eye; }
 	const float& GetEyex() { return eye.x; }
 	const float& GetEyey() { return eye.y; }
 	const float& GetEyez() { return eye.z; }

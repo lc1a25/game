@@ -175,6 +175,7 @@ XMFLOAT3 Enemy::GetWorldPosition()
 
 void Enemy::OnCollision()
 {
+	isDead = true;
 	enemy->position.z -= 150;
 	phase = Phase::Leave;
 }

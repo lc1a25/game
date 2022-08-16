@@ -39,6 +39,8 @@ private:
 	float length = 0.3f;//â~ÇÃîºåa
 	float addCircleX = cos(radius) * length;//â~è„ÇÃà íu x
 	float addCircleY = sin(radius) * length;//â~è„ÇÃà íu y
+
+	bool isDead = false;
 public:
 	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; }
 
@@ -62,4 +64,6 @@ public:
 	XMFLOAT3 GetWorldPosition();
 
 	void OnCollision();
+
+	bool IsDead() const { return isDead; }
 };

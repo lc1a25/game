@@ -45,20 +45,26 @@ XMFLOAT3 PlayerBullet::GetWorldPosition()
 	return worldPos;
 }
 
-void PlayerBullet::SetLockOnPosition(XMFLOAT3 enemyPosition)
+void PlayerBullet::SetLockOnPosition(XMFLOAT3 enemyPosition,bool isDead)
 {
-	//assert(player_);
-	const float speed = 3.0f;//1フレーム進む距離
+	if (isDead == true)
+	{
+	}
+	else
+	{
+		//assert(player_);
+		const float speed = 2.5f;//1フレーム進む距離
 
-	//差分ベクトル
-	velocity_.m128_f32[0] = enemyPosition.x - bullet->position.x;
-	velocity_.m128_f32[1] = enemyPosition.y - bullet->position.y;
-	velocity_.m128_f32[2] = enemyPosition.z - bullet->position.z;
+		//差分ベクトル
+		velocity_.m128_f32[0] = enemyPosition.x - bullet->position.x;
+		velocity_.m128_f32[1] = enemyPosition.y - bullet->position.y;
+		velocity_.m128_f32[2] = enemyPosition.z - bullet->position.z;
 
-	
-	//正規化
-	velocity_ = XMVector3Normalize(velocity_);
 
-	//正規化ベクトルと1フレーム進む距離をかける
-	velocity_ *= speed;
+		//正規化
+		velocity_ = XMVector3Normalize(velocity_);
+
+		//正規化ベクトルと1フレーム進む距離をかける
+		velocity_ *= speed;
+	}
 }

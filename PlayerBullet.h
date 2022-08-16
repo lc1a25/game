@@ -15,6 +15,8 @@ private:
 	int32_t deathTimer = lifeTime;
 	//デスフラグ
 	bool isDead = false;
+
+	bool enemyIsDead = false;
 public:
 	
 	void Init(Model* model, XMFLOAT3 playerPosition, XMVECTOR velocity);
@@ -29,5 +31,7 @@ public:
 
 	XMFLOAT3 GetWorldPosition();
 	
-	void SetLockOnPosition(XMFLOAT3 enemyPosition);
+	void SetLockOnPosition(XMFLOAT3 enemyPosition, bool isDead);
+
+	void SetEnemyDead(bool isDead) { isDead = enemyIsDead; }
 };

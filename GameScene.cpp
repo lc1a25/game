@@ -44,8 +44,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 void GameScene::Update()
 {
-	sprintf_s(moji, "%f", cameraObj->GetpositionX());
-	//camera->eye = cameraObj->eye;
 
 
 	POINT mousePosition;
@@ -56,9 +54,9 @@ void GameScene::Update()
 	
 	//カメラのプロジェクション行列
 	XMMATRIX matProjection = camera->GetMatViewProjection();
-	//XMMATRIX matView = camera->GetMatView();
+	
 	//ビュープロジェクションビューポート行列
-	//XMMATRIX matVP = Matrix4::matrixMatrix(matView , matProjection);
+	
 	XMMATRIX matVPV = Matrix4::matrixMatrix(matProjection, viewPort);
 	//逆行列を計算
 	XMMATRIX matInverse = Matrix4::matrixInverse(matVPV);
@@ -89,9 +87,16 @@ void GameScene::Update()
 	//3dのレティクルをマウスがさしているところに行かせる
 	player->SetReticleWorldPos(reticlePos);
 
+	sprintf_s(moji, "%f", reticlePos.m128_f32[0]);
+	/*player->GetCameraMatViewProjection(camera->GetMatViewProjection());
+    mouseX = player->GetSpriteReticle().x;
+	mouseY = player->GetSpriteReticle().y;*/
+
 	camera->UpdateCamera();
+
 	CheckAllCollision(enemy);
 	CheckAllCollision(enemyL);
+
 	enemy->SetPlayerPosition(player->GetWorldPosition());
 	player->SetEnemyPosition(enemy->GetWorldPosition());
 	enemy->Update();
@@ -100,9 +105,11 @@ void GameScene::Update()
 	player->SetEnemyPosition(enemyL->GetWorldPosition());
 	enemyL->Update();
 
+	player->SetEnemyFlag(enemyL->IsDead());
 	player->Update();
 
-	//camera->SetEye({0,0,150});
+	//XMFLOAT3 eye = { cameraObj->GetEye()};
+	//camera->SetEye({eye});
 	cameraObj->UpdateCamera();
 }
 
@@ -110,7 +117,7 @@ void GameScene::Draw()
 {
 	Object3d::PreDraw(dxcommon->GetCmdlist());
 	player->Draw();
-	enemy->Draw();
+	//enemy->Draw();
 	enemyL->Draw();
 	Object3d::PostDraw();
 }
@@ -149,7 +156,7 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 		length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
 			((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
 			((pos2.z - pos1.z) * (pos2.z - pos1.z));
-		if (length <= size + 12)
+		if (length <= size + 4)
 		{
 			enemy->OnCollision();
 
@@ -172,10 +179,10 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 				((pos2.z - pos1.z) * (pos2.z - pos1.z));
 			if (length <= size + 3)
 			{
-				enemy->OnCollision();
+				/*enemy->OnCollision();
 
 				playerBullet->OnCollision();
-				enemyBullet->OnCollision();
+				enemyBullet->OnCollision();*/
 			}
 		}
 	}
