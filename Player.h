@@ -30,7 +30,15 @@ private:
 	XMMATRIX viewPortMatrix;
 	XMMATRIX cameraMatViewProjection;
 	XMVECTOR positionReticle = {0,0,0};
+
+	HWND hwnd;
+	XMMATRIX viewPort;
+
+	float mouseX;
+	float mouseY;
+
 	bool isDeadEnemy = false;
+	//弾のクールタイム
 	int32_t coolTimer = 5;
 	int32_t bulletCoolTimer = 5;
 
@@ -41,26 +49,32 @@ public:
 	
 	void Init(Model* model, Model* bulletModel);
 	void Attack();
-	XMVECTOR transform(const XMVECTOR& v, const DirectX::XMMATRIX& m);
-	XMVECTOR transform2(const XMVECTOR& v, const DirectX::XMMATRIX& m);
+
 	void Update();
 
 	void Draw();
 
+	XMVECTOR transform(const XMVECTOR& v, const DirectX::XMMATRIX& m);
+	XMVECTOR transform2(const XMVECTOR& v, const DirectX::XMMATRIX& m);
+
 	//ゲームシーンからマウス座標をうけとる
 	void SetReticleWorldPos(XMVECTOR reticlePos);
 
-	XMMATRIX GetViewPort(XMMATRIX viewPort) { return viewPortMatrix = viewPort; }
-	XMMATRIX GetCameraMatViewProjection(XMMATRIX matViewProjection){return cameraMatViewProjection = matViewProjection;}
-
-
-	XMFLOAT3 GetWorldPosition();
-	XMFLOAT3 GetReticleWorldPosition();
-	XMFLOAT3 GetSpriteReticle();
+	void SetViewPort(XMMATRIX viewPort) { viewPortMatrix = viewPort; }
+	void SetHwnd(HWND hwnd) { this->hwnd = hwnd; }
+	void SetCameraMatViewProjection(XMMATRIX matViewProjection){ cameraMatViewProjection = matViewProjection;}
 
 	//自機の弾のロックオンに必要
 	void SetEnemyPosition(XMFLOAT3 position) { enemyWorldPos = position; }
 	void SetEnemyFlag(bool isDead) { isDeadEnemy = isDead; }
+
+	XMFLOAT3 GetWorldPosition();
+	XMFLOAT3 GetReticleWorldPosition();
+	XMFLOAT3 GetSpriteReticle();
+	FLOAT GetMouseX(){return  mouseX;}
+	FLOAT GetMouseY() { return  mouseY; }
+
+
 
 	void OnCollision();
 };

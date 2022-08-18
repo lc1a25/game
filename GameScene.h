@@ -50,37 +50,46 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
+	//当たり判定
 	void CheckAllCollision(Enemy* enemy);
-	HWND hwnd;
-	HWND GetHwnd(HWND winHwnd) { return hwnd = winHwnd; }
+
+	//hwndの取得
+	void SetHwnd(HWND winHwnd) { hwnd = winHwnd; }
+
+	//ビューポート行列の取得
+	void SetViewPort(XMMATRIX winViewPort) { viewPort = winViewPort; }
+
+
 	float mouseX;
 	float mouseY;
 	char moji[64];
-
-	XMMATRIX GetViewPort(XMMATRIX winViewPort) { return viewPort = winViewPort; }
 private: // メンバ変数
+	HWND hwnd;
 	XMMATRIX viewPort;
 	DirectXCommon* dxcommon = nullptr;
 	Input* input = nullptr;
 	Audio* audio = nullptr;
-	DebugText* debugText;
-	//Object3d* camera = camera->Create();
+	//DebugText* debugText;
+
+	//カメラ
 	Camera* camera = nullptr;
 
-	CameraObj* cameraObj = nullptr;
-
+	CameraObj* cameraObj = nullptr;//カメラオブジェクト
 
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
 	Enemy* enemyL = nullptr;
 	EnemyCircle* enemyCircle = nullptr;
 
+	XMVECTOR reticlePos;//レティクル用変数
+
+	//モデル
 	Model* playerModel = nullptr;
 	Model* bulletModel = nullptr;
 	Model* enemyModel = nullptr;
 
-	XMVECTOR reticlePos;
 
+	//当たり判定用変数
 	float length = 0.0f;
 	float size = 2.0f;
 	//std::unique_ptr<Enemy> enemy(new Enemy());

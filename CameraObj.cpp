@@ -11,9 +11,13 @@ using namespace DirectX;
 
 void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
 {
-	//cameraObj->matWorld.r[3].m128_f32[0] = worldPos.m128_f32[0];
-	cameraObj->SetPosition({ cameraObj->matWorld.r[3].m128_f32[0],	cameraObj->matWorld.r[3].m128_f32[1] ,	cameraObj->matWorld.r[3].m128_f32[2] });
 	this->worldPos = worldPos;
+	cameraObj->matWorld.r[3].m128_f32[0] = this->worldPos.m128_f32[0];
+	cameraObj->matWorld.r[3].m128_f32[1] = this->worldPos.m128_f32[1];
+	cameraObj->matWorld.r[3].m128_f32[2] = this->worldPos.m128_f32[2];
+
+	cameraObj->SetPosition({ cameraObj->matWorld.r[3].m128_f32[0],	cameraObj->matWorld.r[3].m128_f32[1] ,	cameraObj->matWorld.r[3].m128_f32[2] });
+
 	this->rotation = rotation;
 
 
@@ -38,22 +42,23 @@ void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
 void CameraObj::UpdateCamera()
 {
 	
-	//cameraObj->position.z--;
-
-
+	//cameraObj->matWorld.r[3].m128_f32[2];
+	//cameraObj->rotation.z++;
+	
 	eye = XMFLOAT3({ cameraObj->matWorld.r[3].m128_f32[0],
 					 cameraObj->matWorld.r[3].m128_f32[1],
 					 cameraObj->matWorld.r[3].m128_f32[2] });
-
+	//前方ベクトル
 	XMVECTOR forward({ 0, 0, 1 });
-
+	//回転(前方ベクトル)
 	forward = Matrix4::transform(forward, cameraObj->matWorld);
 
 	target.x = eye.x + forward.m128_f32[0];
 	target.y = eye.y + forward.m128_f32[1];
 	target.z = eye.z + forward.m128_f32[2];
-
+	//上方ベクトル
 	XMVECTOR upV({ 0,1,0 });
+	//回転(上方ベクトル)
 	up.x = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[0];
 	up.y = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[1];
 	up.z = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[2];
@@ -61,9 +66,9 @@ void CameraObj::UpdateCamera()
 	
 
 
-	matViewProjection = matView * matProjection;
+	//matViewProjection = matView * matProjection;
 
-	cameraObj->matView = matViewProjection;
+	//cameraObj->matView = matViewProjection;
 
 	cameraObj->Update();
 }

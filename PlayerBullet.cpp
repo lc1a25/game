@@ -5,10 +5,19 @@ void PlayerBullet::Init(Model* model,XMFLOAT3 playerPosition ,XMVECTOR velocity)
 	model_ = model;
 	velocity_ = velocity;
 	bullet->SetModel(model_);
-	bullet->SetPosition({ playerPosition });
+	bullet->matWorld.r[3].m128_f32[0] = playerPosition.x;
+	bullet->matWorld.r[3].m128_f32[1] = playerPosition.y;
+	bullet->matWorld.r[3].m128_f32[2] = playerPosition.z;
+
+	bullet->SetPosition({ bullet->matWorld.r[3].m128_f32[0],bullet->matWorld.r[3].m128_f32[1],bullet->matWorld.r[3].m128_f32[2] });
 	bullet->position.x += velocity_.m128_f32[0];
 	bullet->position.y += velocity_.m128_f32[1];
 	bullet->position.z += velocity_.m128_f32[2];
+
+	bullet->matWorld.r[3].m128_f32[0] = bullet->position.x ;
+	bullet->matWorld.r[3].m128_f32[1] = bullet->position.y ;
+	bullet->matWorld.r[3].m128_f32[2] = bullet->position.z ;
+
 	bullet->scale = { 2,2,2 };
 }
 
@@ -22,6 +31,10 @@ void PlayerBullet::Update()
 	bullet->position.x += velocity_.m128_f32[0];
 	bullet->position.y += velocity_.m128_f32[1];
 	bullet->position.z += velocity_.m128_f32[2];
+
+	bullet->matWorld.r[3].m128_f32[0] = bullet->position.x;
+	bullet->matWorld.r[3].m128_f32[1] = bullet->position.y;
+	bullet->matWorld.r[3].m128_f32[2] = bullet->position.z;
 
 	bullet->Update();
 }

@@ -26,7 +26,8 @@ class Matrix4
 	// 座標変換（ベクトルと行列の掛け算をする）
 	static XMVECTOR transform(const XMVECTOR& v, const XMMATRIX& m);
 
-	static XMVECTOR transformCamera(const XMVECTOR& v, const XMMATRIX& m);
+	//スクリーン座標からワールド座標に
+	static XMVECTOR transformScreenToWorld(const XMVECTOR& v, const XMMATRIX& m);
 
 	// 代入演算子オーバーロード
 	static XMMATRIX matrixMatrix(XMMATRIX& m1, const XMMATRIX& m2);

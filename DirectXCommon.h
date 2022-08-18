@@ -52,9 +52,11 @@ public:
 
 	ID3D12Device* GetDev() { return dev.Get(); }
 	ID3D12GraphicsCommandList* GetCmdlist() { return cmdList.Get(); }
+	XMMATRIX GetViewPort() { return viewPort; }
 
-	XMMATRIX viewPort;
+	
 
 private:
+	XMMATRIX viewPort;
 	Win* win = nullptr;
 };

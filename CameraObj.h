@@ -38,6 +38,7 @@ public:
 	const float& GetEyey() { return eye.y; }
 	const float& GetEyez() { return eye.z; }
 	const XMFLOAT3& GetTarget() { return target; }
+	const XMFLOAT3& GetUp() { return up; }
 
 	const float& GetpositionX() { return cameraObj->position.x; }
 
@@ -67,8 +68,7 @@ public:
 	{
 		return worldTransform;
 	}
-	// 視点座標
-	XMFLOAT3 eye = { 0,0,-50 };
+
 private:
 
 	float distance = 20.0f;
@@ -76,7 +76,8 @@ private:
 	XMMATRIX matView;
 	// 射影行列
 	XMMATRIX matProjection;
-	
+	// 視点座標
+	XMFLOAT3 eye = { 0,0,0 };
 	// 注視点座標
 	 XMFLOAT3 target = {0,0,0};
 	// 上方向ベクトル

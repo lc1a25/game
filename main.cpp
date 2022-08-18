@@ -163,7 +163,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	float secound_y = 0;
 
 	sprite->SetPosition({ 0.0f,0.0f,0.0f });
-	sprite->SetTexsize({1280.0f,720.0f });
+	sprite->SetSize({ 100,100 });
+	//sprite->SetTexsize({100.0f,100.0f });
 
 	sprite->TransVertexBuffer();
 
@@ -191,8 +192,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		sprite->Update();
 
-		gameScene->GetHwnd(win->GetHwnd());
-		gameScene->GetViewPort(dxcommon->viewPort);
+		gameScene->SetHwnd(win->GetHwnd());
+		gameScene->SetViewPort(dxcommon->GetViewPort());
 		
 		sprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
 	

@@ -18,12 +18,15 @@ void DirectXCommon::Init(Win* win)
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
 		infoQueue->Release();
 	}
+	
+
 	viewPort = {
 	  win->window_width / 2,0.0f				   ,0.0f,0.0f,
 	  0.0f				   ,-win->window_height / 2,0.0f,0.0f,
 	  0.0f				   ,0.0f				   ,1.0f,0.0f,
 	  win->window_width / 2,win->window_height / 2 ,0.0f,1.0f
 	};
+
 	InitCommand();
 	InitSwapChain();
 	InitRenderTargetView();

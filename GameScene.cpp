@@ -36,7 +36,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	camera->Init();
 
 	cameraObj = new CameraObj();
-	cameraObj->Init({0,0,0},{0,0,0});
+	cameraObj->Init({0,0,-50},{0,0,0});
 
 	Object3d::SetCamera(camera);
 	
@@ -46,52 +46,23 @@ void GameScene::Update()
 {
 
 
-	POINT mousePosition;
-	GetCursorPos(&mousePosition);
-	ScreenToClient(hwnd, &mousePosition);
-	mouseX = mousePosition.x;//縮小変換　long -> float
-	mouseY = mousePosition.y;
-	
-	//カメラのプロジェクション行列
-	XMMATRIX matProjection = camera->GetMatViewProjection();
-	
-	//ビュープロジェクションビューポート行列
-	
-	XMMATRIX matVPV = Matrix4::matrixMatrix(matProjection, viewPort);
-	//逆行列を計算
-	XMMATRIX matInverse = Matrix4::matrixInverse(matVPV);
-	//スクリーン座標
-	XMVECTOR posNear = XMVECTOR{ mouseX, mouseY, 0 };
-	XMVECTOR posFar = XMVECTOR{ mouseX, mouseY, 1 };
+	//レティクルのため
+	player->SetHwnd(hwnd);
+	player->SetViewPort(viewPort);
+	player->SetCameraMatViewProjection(camera->GetMatViewProjection());
 
-	//スクリーンからワールド座標に
-	posNear = Matrix4::transform(posNear, matInverse);
-	posFar = Matrix4::transform(posFar, matInverse);
+	//2dレティクルスプライトの座標
+	mouseX = player->GetMouseX();
+	mouseY = player->GetMouseY();
 
-	//マウスレイの方向
-	XMVECTOR mouseDirection;
-	mouseDirection.m128_f32[0] = posFar.m128_f32[0] - posNear.m128_f32[0];
-	mouseDirection.m128_f32[1] = posFar.m128_f32[1] - posNear.m128_f32[1];
-	mouseDirection.m128_f32[2] = posFar.m128_f32[2] - posNear.m128_f32[2];
-	mouseDirection = XMVector3Normalize(mouseDirection);
+	//デバッグ用
+	sprintf_s(moji, "%f",player->GetReticleWorldPosition().z);
 
-	//3dのレティクルの座標をうけとる
-	reticlePos.m128_f32[0] = player->GetReticleWorldPosition().x;
-	reticlePos.m128_f32[1] = player->GetReticleWorldPosition().y;
-	reticlePos.m128_f32[2] = player->GetReticleWorldPosition().z;
-	//カメラから3dレティクルの距離
-	const float distanceObject = 50.0f;
-	//near から far に　distanceObject 分進んだ距離
-	reticlePos = (mouseDirection - posNear) * distanceObject;
+	cameraObj->UpdateCamera();
 
-	//3dのレティクルをマウスがさしているところに行かせる
-	player->SetReticleWorldPos(reticlePos);
-
-	sprintf_s(moji, "%f", reticlePos.m128_f32[0]);
-	/*player->GetCameraMatViewProjection(camera->GetMatViewProjection());
-    mouseX = player->GetSpriteReticle().x;
-	mouseY = player->GetSpriteReticle().y;*/
-
+	camera->SetEye({ cameraObj->GetEye() });
+	camera->SetTarget({ cameraObj->GetTarget() });
+	camera->SetUp({ cameraObj->GetUp() });
 	camera->UpdateCamera();
 
 	CheckAllCollision(enemy);
@@ -107,10 +78,8 @@ void GameScene::Update()
 
 	player->SetEnemyFlag(enemyL->IsDead());
 	player->Update();
-
-	//XMFLOAT3 eye = { cameraObj->GetEye()};
-	//camera->SetEye({eye});
-	cameraObj->UpdateCamera();
+	
+	
 }
 
 void GameScene::Draw()
@@ -156,7 +125,7 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 		length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
 			((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
 			((pos2.z - pos1.z) * (pos2.z - pos1.z));
-		if (length <= size + 4)
+		if (length <= size + 25)
 		{
 			enemy->OnCollision();
 
