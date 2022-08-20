@@ -50,11 +50,11 @@ void Player::Update()
 	mouseDirection = XMVector3Normalize(mouseDirection);
 
 	//カメラから3dレティクルの距離
-	const float distanceObject = 280.0f;
+	const float distanceObject = 500.0f;
 	//near から far に　distanceObject 分進んだ距離
-	reticle->matWorld.r[3].m128_f32[0] = (mouseDirection - posNear).m128_f32[0] * 300;
+	reticle->matWorld.r[3].m128_f32[0] = (mouseDirection - posNear).m128_f32[0] * distanceObject;
 	reticle->matWorld.r[3].m128_f32[1] = (mouseDirection - posNear).m128_f32[1] * distanceObject;
-	reticle->matWorld.r[3].m128_f32[2] = (mouseDirection - posNear).m128_f32[2] * 3;
+	reticle->matWorld.r[3].m128_f32[2] = (mouseDirection - posNear).m128_f32[2] * distanceObject / 100;
 
 	//reticle->SetPosition({ reticle->matWorld.r[3].m128_f32[0], reticle->matWorld.r[3].m128_f32[1], reticle->matWorld.r[3].m128_f32[2] });
 
@@ -131,8 +131,8 @@ void Player::Update()
 		//bullet->SetLockOnPosition(enemyWorldPos,isDeadEnemy);	
 		bullet->Update();
 	}
-	
-	player->Update();
+	player->SetCameraMatWorld(cameraObj);
+	player->Update(true);
 	reticle->Update();
 }
 

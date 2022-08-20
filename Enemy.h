@@ -26,7 +26,7 @@ private:
 	Object3d* enemy = enemy->Create();
 	std::list<std::unique_ptr<EnemyBullet>> bullets_;
 	//Player* player_ = nullptr;
-	Phase phase = Phase::CircleR;
+	Phase phase = Phase::Stop;
 
 	XMFLOAT3 playerWorldPos;
 	XMVECTOR lockOn;

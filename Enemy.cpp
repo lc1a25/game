@@ -158,7 +158,7 @@ void Enemy::PhaseInit(bool rightMoveTrue)
 {
 	if (!rightMoveTrue)
 	{
-		phase = Phase::CircleL;
+		phase = Phase::Stop;
 	}
 	//発射タイマー初期化
 	shotTimer = shotInterval;

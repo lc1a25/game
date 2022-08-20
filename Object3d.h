@@ -108,41 +108,7 @@ public: // 静的メンバ関数
 	/// <returns></returns>
 	static Object3d* Create();
 
-	/// <summary>
-	/// 視点座標の取得
-	/// </summary>
-	/// <returns>座標</returns>
-	//static const XMFLOAT3& GetEye() { return eye; }
 
-	/// <summary>
-	/// 視点座標の設定
-	/// </summary>
-	/// <param name="position">座標</param>
-	//static void SetEye(XMFLOAT3 eye);
-
-	/// <summary>
-	/// 注視点座標の取得
-	/// </summary>
-	/// <returns>座標</returns>
-	//static const XMFLOAT3& GetTarget() { return target; }
-
-	/// <summary>
-	/// 注視点座標の設定
-	/// </summary>
-	/// <param name="position">座標</param>
-	static void SetTarget(XMFLOAT3 target);
-
-	/// <summary>
-	/// ベクトルによる移動
-	/// </summary>
-	/// <param name="move">移動量</param>
-	static void CameraMoveVector(XMFLOAT3 move);
-
-	/// <summary>
-/// ベクトルによる移動
-/// </summary>
-/// <param name="move">移動量</param>
-	static void CameraMoveVector2(XMFLOAT3 move);
 	
 	
 private: // 静的メンバ変数
@@ -234,12 +200,7 @@ public: // メンバ関数
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
-	void Update();
-
-	/// <summary>
-	/// 毎フレーム処理
-	/// </summary>
-	void UpdateCamera();
+	void Update(bool parent = false);
 
 	/// <summary>
 	/// 描画
@@ -261,6 +222,8 @@ public: // メンバ関数
 	void SetModel(Model* model) { this->model = model; }
 
 	static void SetCamera(Camera* camera) { Object3d::camera = camera; }
+
+	void SetCameraMatWorld(XMMATRIX matWorld) { matCameraWorld = matWorld; }
 
 	const XMFLOAT3& GetEye() { return camera->GetEye(); }
 	const XMFLOAT3& GetTarget() { return camera->GetTarget(); }
@@ -285,18 +248,17 @@ public: // メンバ関数
 	// ビュー行列
 	XMMATRIX matView;
 
-	ComPtr<ID3D12Resource> constBuffB0; // 定数バッファ
+	// 親オブジェクト
+	Object3d* parent = nullptr;
 
 private: // メンバ変数
 	//ComPtr<ID3D12Resource> constBuff; // 定数バッファ
-	//ComPtr<ID3D12Resource> constBuffB0; // 定数バッファ
+	ComPtr<ID3D12Resource> constBuffB0; // 定数バッファ
 	//ComPtr<ID3D12Resource> constBuffB1; // 定数バッファ
 	// 色
 	XMFLOAT4 color = { 1,1,1,1 };
 
-	// 親オブジェクト
-	Object3d* parent = nullptr;
-
+	XMMATRIX matCameraWorld;
 	//model
 	Model* model = nullptr;
 };

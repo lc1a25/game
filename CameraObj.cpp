@@ -12,6 +12,7 @@ using namespace DirectX;
 void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
 {
 	this->worldPos = worldPos;
+	
 	cameraObj->matWorld.r[3].m128_f32[0] = this->worldPos.m128_f32[0];
 	cameraObj->matWorld.r[3].m128_f32[1] = this->worldPos.m128_f32[1];
 	cameraObj->matWorld.r[3].m128_f32[2] = this->worldPos.m128_f32[2];
@@ -19,43 +20,56 @@ void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
 	cameraObj->SetPosition({ cameraObj->matWorld.r[3].m128_f32[0],	cameraObj->matWorld.r[3].m128_f32[1] ,	cameraObj->matWorld.r[3].m128_f32[2] });
 
 	this->rotation = rotation;
-
-
-	//camera->Init();
-	// ビュー行列の生成
-	/*matView = XMMatrixLookAtLH(
-		XMLoadFloat3(&eye),
-		XMLoadFloat3(&target),
-		XMLoadFloat3(&up));*/
-	// 透視投影による射影行列の生成
-	/*matProjection = XMMatrixPerspectiveFovLH(
-		XMConvertToRadians(60.0f),
-		(float)Win::window_width / Win::window_height,
-		0.1f, 1000.0f
-	);
-
-	matViewProjection = matView * matProjection;*/
-
 	
+	time = timeGetTime();
+
+	start = this->worldPos;
 }
 
 void CameraObj::UpdateCamera()
 {
 	
-	//cameraObj->matWorld.r[3].m128_f32[2];
-	//cameraObj->rotation.z++;
+	/*nowCount = timeGetTime();
+
+	elapsedCount = nowCount - startCount;
+
+	float elapsedTime = static_cast<float> (elapsedCount) / 1000.0f;
+
+	timeRate = elapsedTime / maxTime;
+
+	if (timeRate >= 1.0f)
+	{
+		if (startIndex < points.size() - 3)
+		{
+			startIndex++;
+			timeRate -= 1.0f;
+			startCount = timeGetTime();
+		}
+		else
+		{
+			startIndex = 0;
+			timeRate = -1.0f;
+		}
+	}
+
+	eye = splinePosition(points, startIndex, timeRate);
+	target = splinePosition(points, startIndex + 1, timeRate);*/
 	
-	eye = XMFLOAT3({ cameraObj->matWorld.r[3].m128_f32[0],
-					 cameraObj->matWorld.r[3].m128_f32[1],
-					 cameraObj->matWorld.r[3].m128_f32[2] });
+	//cameraObj->position.z--;
+	//cameraObj->rotation.z++;
+	worldTransform = cameraObj->matWorld;
+	eye = { cameraObj->matWorld.r[3].m128_f32[0],
+			cameraObj->matWorld.r[3].m128_f32[1],
+			cameraObj->matWorld.r[3].m128_f32[2] };
+
 	//前方ベクトル
 	XMVECTOR forward({ 0, 0, 1 });
 	//回転(前方ベクトル)
 	forward = Matrix4::transform(forward, cameraObj->matWorld);
 
-	target.x = eye.x + forward.m128_f32[0];
-	target.y = eye.y + forward.m128_f32[1];
-	target.z = eye.z + forward.m128_f32[2];
+	target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
+	target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
+	target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
 	//上方ベクトル
 	XMVECTOR upV({ 0,1,0 });
 	//回転(上方ベクトル)
@@ -63,75 +77,35 @@ void CameraObj::UpdateCamera()
 	up.y = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[1];
 	up.z = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[2];
 
-	
-
-
-	//matViewProjection = matView * matProjection;
-
-	//cameraObj->matView = matViewProjection;
 
 	cameraObj->Update();
 }
 
-void CameraObj::CameraRot(float anglex, float angley)
+ XMVECTOR CameraObj::splinePosition(const std::vector<XMVECTOR>& points, size_t startIndex, float t)
 {
-	
-}
+	size_t n = points.size() - 2;
 
-void CameraObj::CameraMoveVector(XMFLOAT3 move, bool addFrag)
-{
-	if (addFrag == false)
+	if (startIndex > n)
 	{
-		move.x = move.x * -1;
-		move.y = move.y * -1;
-		move.z = move.z * -1;
+		return points[n];
+	}
+	if (startIndex < 1)
+	{
+		return points[1];
 	}
 
-	XMFLOAT3 eye_moved = GetEye();
-	XMFLOAT3 target_moved = GetTarget();
+	XMVECTOR p0 = points[startIndex - 1];
+	XMVECTOR p1 = points[startIndex];
+	XMVECTOR p2 = points[startIndex + 1];
+	XMVECTOR p3 = points[startIndex + 2];
 
-	eye_moved.x += move.x;
-	eye_moved.y += move.y;
-	eye_moved.z += move.z;
+	XMVECTOR position = ((2 * p1 + (-p0 + p2) * t) +
+		((2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t) +
+		((-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t)) * 0.5;
 
-	target_moved.x += move.x;
-	target_moved.y += move.y;
-	target_moved.z += move.z;
 
-	/*SetEye(eye_moved);
-	SetTarget(target_moved);*/
+
+	return position;
 }
 
-//void CameraObj::CameraMoveVectorAdd(XMFLOAT3 move)
-//{
-//	XMFLOAT3 eye_moved = GetEye();
-//	XMFLOAT3 target_moved = GetTarget();
-//
-//	eye_moved.x += move.x;
-//	eye_moved.y += move.y;
-//	eye_moved.z += move.z;
-//
-//	target_moved.x += move.x;
-//	target_moved.y += move.y;
-//	target_moved.z += move.z;
-//
-//	SetEye(eye_moved);
-//	SetTarget(target_moved);
-//}
-//
-//void CameraObj::CameraMoveVectorSub(XMFLOAT3 move)
-//{
-//	XMFLOAT3 eye_moved = GetEye();
-//	XMFLOAT3 target_moved = GetTarget();
-//
-//	eye_moved.x -= move.x;
-//	eye_moved.y -= move.y;
-//	eye_moved.z -= move.z;
-//
-//	target_moved.x -= move.x;
-//	target_moved.y -= move.y;
-//	target_moved.z -= move.z;
-//
-//	SetEye(eye_moved);
-//	SetTarget(target_moved);
-//}
+

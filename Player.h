@@ -20,11 +20,14 @@ private:
 
 	Object3d* player = player->Create();
 	Object3d* reticle = reticle->Create();
+
+
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 	Input* input = nullptr;
 
 	const float playerVelocity = 1.2f;
 
+	XMMATRIX cameraObj;
 	XMFLOAT3 enemyWorldPos;
 	XMVECTOR reticleWorldPos;
 	XMMATRIX viewPortMatrix;
@@ -67,6 +70,8 @@ public:
 	//自機の弾のロックオンに必要
 	void SetEnemyPosition(XMFLOAT3 position) { enemyWorldPos = position; }
 	void SetEnemyFlag(bool isDead) { isDeadEnemy = isDead; }
+
+	void SetCameraObj(XMMATRIX cameraObj) { this->cameraObj = cameraObj; }
 
 	XMFLOAT3 GetWorldPosition();
 	XMFLOAT3 GetReticleWorldPosition();
