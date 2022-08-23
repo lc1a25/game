@@ -6,7 +6,7 @@ void EnemyBullet::Init(Model* model, XMFLOAT3 enemyPosition, XMVECTOR velocity)
 	velocity_ = velocity;
 	enemyBullet->SetPosition({ enemyPosition });
 	enemyBullet->SetModel(bulletModel_);
-	enemyBullet->scale = { 1,1,1 };
+	enemyBullet->scale = { 0.5,0.5,0.5 };
 	enemyBullet->position.x += velocity_.m128_f32[0];
 	enemyBullet->position.y += velocity_.m128_f32[1];
 	enemyBullet->position.z += velocity_.m128_f32[2];

@@ -28,8 +28,8 @@ void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
 
 void CameraObj::UpdateCamera()
 {
-	
-	/*nowCount = timeGetTime();
+
+	nowCount = timeGetTime();
 
 	elapsedCount = nowCount - startCount;
 
@@ -37,45 +37,69 @@ void CameraObj::UpdateCamera()
 
 	timeRate = elapsedTime / maxTime;
 
-	if (timeRate >= 1.0f)
+	if (pointsLast == false)
 	{
-		if (startIndex < points.size() - 3)
+		//前方ベクトル
+		XMVECTOR forward({ 0, 0, 1 });
+		//回転(前方ベクトル)
+		forward = Matrix4::transform(forward, cameraObj->matWorld);
+		targetEnd = eye + forward;
+		if (timeRate >= 1.0f)
 		{
-			startIndex++;
-			timeRate -= 1.0f;
-			startCount = timeGetTime();
+			if (startIndex < points.size() - 4)
+			{
+				startIndex++;
+				targetIndex++;
+				timeRate = 0.0f;
+				startCount = timeGetTime();
+			}
+			else
+			{
+				/*startIndex = 0;
+				timeRate = 0.0f;*/
+				pointsLast = true;
+			}
+			if (targetIndex > points.size() - 4)
+			{
+				pointsLast = true;
+				targetIndex = points.size() - 1;
+			}
+
 		}
-		else
-		{
-			startIndex = 0;
-			timeRate = -1.0f;
-		}
+		eye = splinePosition(points, startIndex, timeRate);
+		target = splinePosition(points, targetIndex, timeRate);
+
+	}
+	else
+	{
+		//cameraObj->position.z+= 0.1f;
+	//cameraObj->rotation.z++;
+	//eye = { cameraObj->matWorld.r[3].m128_f32[0],cameraObj->matWorld.r[3].m128_f32[1],cameraObj->matWorld.r[3].m128_f32[2] };
+
+
+
+		
+			eye = { end };
+			//前方ベクトル
+			XMVECTOR forward({ 0, 0, 1 });
+			//回転(前方ベクトル)
+			forward = Matrix4::transform(forward, cameraObj->matWorld);
+			target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
+			target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
+			target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
+			targetEnd = eye + forward;
 	}
 
-	eye = splinePosition(points, startIndex, timeRate);
-	target = splinePosition(points, startIndex + 1, timeRate);*/
 	
-	//cameraObj->position.z--;
-	//cameraObj->rotation.z++;
-	worldTransform = cameraObj->matWorld;
-	eye = { cameraObj->matWorld.r[3].m128_f32[0],
-			cameraObj->matWorld.r[3].m128_f32[1],
-			cameraObj->matWorld.r[3].m128_f32[2] };
-
-	//前方ベクトル
-	XMVECTOR forward({ 0, 0, 1 });
-	//回転(前方ベクトル)
-	forward = Matrix4::transform(forward, cameraObj->matWorld);
-
-	target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
-	target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
-	target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
 	//上方ベクトル
 	XMVECTOR upV({ 0,1,0 });
 	//回転(上方ベクトル)
 	up.x = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[0];
 	up.y = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[1];
 	up.z = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[2];
+
+	worldTransform = cameraObj->matWorld;
+
 
 
 	cameraObj->Update();

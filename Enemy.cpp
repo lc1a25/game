@@ -158,7 +158,7 @@ void Enemy::PhaseInit(bool rightMoveTrue)
 {
 	if (!rightMoveTrue)
 	{
-		phase = Phase::Stop;
+		phase = Phase::CircleR;
 	}
 	//発射タイマー初期化
 	shotTimer = shotInterval;
@@ -176,6 +176,6 @@ XMFLOAT3 Enemy::GetWorldPosition()
 void Enemy::OnCollision()
 {
 	isDead = true;
-	enemy->position.z -= 150;
+	enemy->position.z -= 350;
 	phase = Phase::Leave;
 }

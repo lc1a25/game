@@ -38,10 +38,10 @@ public:
 	const XMFLOAT3& GetTarget() { return XMFLOAT3{ target.m128_f32[0],target.m128_f32[1] ,target.m128_f32[2] }; }
 	const XMFLOAT3& GetUp() { return up; }
 
-	const float& GetpositionX() { return cameraObj->position.x; }
+	const float& GetpositionX() { return cameraObj->position.z; }
 
 
-	const FLOAT& GetTimerate() { return startIndex; }
+	const FLOAT& GetTimerate() { return points.size(); }
 
 	//setter
 	/*void SetEye(XMFLOAT3 eye)
@@ -100,20 +100,24 @@ private:
 	long long elapsedCount = 0;
 
 	XMVECTOR start{ 0.0f, 0.0f, 0.0f };
-	XMVECTOR p2{ -50.0f, 50.0f, +50.0f };
-	XMVECTOR p3{ 0.0f, 50.0f, +70.0f };
-	XMVECTOR p4{ +50.0f, -30.0f, -50.0f };
-	XMVECTOR p5{ +50.0f, 20.0f, -25.0f };
-	XMVECTOR p6{ +30.0f, 40.0f, 50.0f };
-	XMVECTOR p7{ -40.0f, 30.0f, 20.0f };
+	XMVECTOR p2{ 10.0f, 0.0f, +20.0f };
+	XMVECTOR p3{ 0.0f, 0.0f, +30.0f };
+	XMVECTOR p4{ -10.0f, 0.0f, +40.0f };
+	XMVECTOR p5{ 0.0f, 0.0f, +50.0f };
+	XMVECTOR p6{ 10.0f, 0.0f, +60.0f };
+	XMVECTOR p7{ 0.0f, 0.0f, +70.0f };
 
-	XMVECTOR end{ -100.0f, 0.0f, 0.0f };
+	XMVECTOR end{ 0.0f, 0.0f, 80.0f };
+	XMVECTOR targetEnd{};
 	float maxTime = 5.0f;
 	float timeRate = 0.0f;
+
+	bool pointsLast = false;
 
 	std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,p6,p7,end,end };
 
 	int startIndex = 1;
+	int targetIndex = 2;
 
 	//XMVECTOR position{ 0, 0, 0 };
 	//XMVECTOR target{ 0, 0, 0 };

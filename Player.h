@@ -33,6 +33,7 @@ private:
 	XMMATRIX viewPortMatrix;
 	XMMATRIX cameraMatViewProjection;
 	XMVECTOR positionReticle = {0,0,0};
+	XMFLOAT3 cameraPos = { 0.0f,0,0 };
 
 	HWND hwnd;
 	XMMATRIX viewPort;
@@ -72,6 +73,8 @@ public:
 	void SetEnemyFlag(bool isDead) { isDeadEnemy = isDead; }
 
 	void SetCameraObj(XMMATRIX cameraObj) { this->cameraObj = cameraObj; }
+
+	void SetCameraPos(XMFLOAT3 cameraPos) { this->cameraPos = cameraPos; }
 
 	XMFLOAT3 GetWorldPosition();
 	XMFLOAT3 GetReticleWorldPosition();

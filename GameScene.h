@@ -63,6 +63,7 @@ public: // ƒƒ“ƒoŠÖ”
 	float mouseX;
 	float mouseY;
 	char moji[64];
+	char moji2[64];
 private: // ƒƒ“ƒo•Ï”
 	HWND hwnd;
 	XMMATRIX viewPort;

@@ -27,10 +27,10 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	player->Init(playerModel, bulletModel);
 
 	enemy = new Enemy();
-	enemy->Init(enemyModel,{ -50.0f, 50.0f, +60.0f },true);//30,0,100
+	enemy->Init(enemyModel,{ 30.0f, 0.0f, 150.0f },true);//30,0,100
 
 	enemyL = new Enemy();
-	enemyL->Init(enemyModel, { 50.0f, 50.0f, +70.0f }, false);
+	enemyL->Init(enemyModel, { -30.0f, 0.0f, 150.0f }, false);
 	//camera->cameraObj->Init();
 	camera = new Camera();
 	camera->Init();
@@ -56,7 +56,8 @@ void GameScene::Update()
 	mouseY = player->GetMouseY();
 
 	//デバッグ用
-	sprintf_s(moji, "%f",player->GetWorldPosition().z);
+	sprintf_s(moji, "%f", cameraObj->GetTarget().x);
+	sprintf_s(moji2, "%f", player->GetWorldPosition().x);
 
 	cameraObj->UpdateCamera();
 
@@ -78,6 +79,7 @@ void GameScene::Update()
 
 	player->SetEnemyFlag(enemyL->IsDead());
 	player->SetCameraObj(cameraObj->GetWorldTransform());
+	player->SetCameraPos(cameraObj->GetEye());
 	player->Update();
 	
 	
@@ -87,7 +89,7 @@ void GameScene::Draw()
 {
 	Object3d::PreDraw(dxcommon->GetCmdlist());
 	player->Draw();
-	//enemy->Draw();
+	enemy->Draw();
 	enemyL->Draw();
 	Object3d::PostDraw();
 }

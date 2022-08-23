@@ -148,6 +148,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Object3d* skydome = skydome->Create();
 
 	skydome->SetModel(skydome_model);
+	skydome->scale = { 3,3,3 };
 	skydome->SetPosition({ 0,0,0 });
 
 
@@ -200,6 +201,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		
 		
 		debugtext_minute->Print(gameScene->moji, secound_x, secound_y, 1.0f);
+		debugtext_minute2->Print(gameScene->moji2, secound_x, secound_y + 100, 1.0f);
 			XMVECTOR moveZ = XMVectorSet(0, 0, 1.0f, 0);//z speed
 
 			XMVECTOR moveX2 = XMVectorSet(1.0f, 0, 0, 0);//debug
@@ -276,7 +278,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		spriteCommon->PreDraw();
 		sprite->Draw();
 		debugtext_minute->DrawAll();
-		//debugtext_minute->DrawAll();
 		//debugtext_minute2->DrawAll();
 		// ４．描画コマンドここまで
 		

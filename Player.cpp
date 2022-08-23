@@ -6,18 +6,23 @@ void Player::Init(Model* model,Model* bulletModel)
 	bulletModel_ = bulletModel;
 	reticleModel_ = model;
 	player->SetModel(model_);
-	player->SetPosition({ 0,-20,0 });
-	player->scale = { 3,3,3 };
+	player->SetPosition({ 0,0,0 });
+	player->scale = { 1,1,1 };
 
 	reticle->SetModel(model_);
 	reticle->SetPosition({ reticle->matWorld.r[3].m128_f32[0], reticle->matWorld.r[3].m128_f32[1], reticle->matWorld.r[3].m128_f32[2] });
 	reticle->scale = { 1,1,1 };
+
+	//playerの座標をワールド座標に カメラの前に
+	player->matWorld.r[3].m128_f32[0] = cameraPos.x;
+	player->matWorld.r[3].m128_f32[1] = cameraPos.y;
+	player->matWorld.r[3].m128_f32[2] = cameraPos.z + 10;
 }
 
 
 void Player::Update()
 {
-	//2dレティクル
+//2dレティクル
 	POINT mousePosition;
 	GetCursorPos(&mousePosition);
 	ScreenToClient(hwnd, &mousePosition);
@@ -49,12 +54,14 @@ void Player::Update()
 	mouseDirection = posFar - posNear;
 	mouseDirection = XMVector3Normalize(mouseDirection);
 
+
+
 	//カメラから3dレティクルの距離
 	const float distanceObject = 500.0f;
 	//near から far に　distanceObject 分進んだ距離
 	reticle->matWorld.r[3].m128_f32[0] = (mouseDirection - posNear).m128_f32[0] * distanceObject;
 	reticle->matWorld.r[3].m128_f32[1] = (mouseDirection - posNear).m128_f32[1] * distanceObject;
-	reticle->matWorld.r[3].m128_f32[2] = (mouseDirection - posNear).m128_f32[2] * distanceObject / 100;
+	reticle->matWorld.r[3].m128_f32[2] = (mouseDirection - posNear).m128_f32[2] * distanceObject/100;
 
 	//reticle->SetPosition({ reticle->matWorld.r[3].m128_f32[0], reticle->matWorld.r[3].m128_f32[1], reticle->matWorld.r[3].m128_f32[2] });
 
@@ -62,16 +69,21 @@ void Player::Update()
 	reticle->position.y = reticle->matWorld.r[3].m128_f32[1];
 	reticle->position.z = reticle->matWorld.r[3].m128_f32[2];
 
+
+	player->matWorld.r[3].m128_f32[2] = cameraPos.z + 20;
+
 	player->position.x = player->matWorld.r[3].m128_f32[0];
 	player->position.y = player->matWorld.r[3].m128_f32[1];
 	player->position.z = player->matWorld.r[3].m128_f32[2];
 
-	//デスフラグが立っている弾を消す
+
+//デスフラグが立っている弾を消す
 	bullets_.remove_if([](std::unique_ptr<PlayerBullet>& bullet)
 		{
 			return bullet->IsDead();
 		});
-	if (player->position.x <= -40)
+//移動処理
+	/*if (player->position.x <= -50)
 	{
 		player->position.x += playerVelocity;
 		player->rotation.y += playerVelocity / 2;
@@ -91,7 +103,7 @@ void Player::Update()
 	{
 		player->position.y -= playerVelocity;
 		player->rotation.x += playerVelocity / 2;
-	}
+	}*/
 
 	if (input->isKey(DIK_W))
 	{
@@ -115,22 +127,16 @@ void Player::Update()
 		player->rotation.x += playerVelocity / 4;
 	}
 
-	/*if (input->isKey(DIK_Q))
-	{
-		player->rotation.y+= playerVelocity;
-	}
-	if (input->isKey(DIK_E))
-	{
-		player->rotation.y -= playerVelocity;
-	}*/
 
+//攻撃
 	Attack();
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
 	{
 
-		//bullet->SetLockOnPosition(enemyWorldPos,isDeadEnemy);	
+		bullet->SetLockOnPosition(enemyWorldPos,isDeadEnemy);	
 		bullet->Update();
 	}
+//更新
 	player->SetCameraMatWorld(cameraObj);
 	player->Update(true);
 	reticle->Update();
