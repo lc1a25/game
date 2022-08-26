@@ -4,10 +4,11 @@ void Enemy::Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue)
 {
 	enemyModel_ = enemyModel;
 	bulletModel_ = enemyModel;
-	enemy->SetModel(enemyModel_);
+	enemy->SetModel(enemyModel);
 	enemy->SetPosition({ position });
 	enemy->scale = { 2,2,2 };
 
+	ShotInit();
 	PhaseInit(rightMoveTrue);
 }
 
@@ -20,99 +21,99 @@ void Enemy::Update()
 		});
 
 	
-	switch (phase)
-	{
-	case Phase::Approach:
-		//ŠÖ”‚É‚·‚é
-		enemy->position.x -= 0.5;
-		if (enemy->position.x <= 1280 / 4 * 3)
-		{
-			phase = Phase::CircleR;
-		}
-		
-		break;
-	case Phase::ApproachL:
-		//ŠÖ”‚É‚·‚é
-		enemy->position.x += 0.5;
-		if (enemy->position.x <= 1280 / 4 )
-		{
-			phase = Phase::CircleR;
-		}
+	//switch (phase)
+	//{
+	//case Phase::Approach:
+	//	//ŠÖ”‚É‚·‚é
+	//	enemy->position.x -= 0.5;
+	//	if (enemy->position.x <= 1280 / 4 * 3)
+	//	{
+	//		phase = Phase::CircleR;
+	//	}
+	//	
+	//	break;
+	//case Phase::ApproachL:
+	//	//ŠÖ”‚É‚·‚é
+	//	enemy->position.x += 0.5;
+	//	if (enemy->position.x <= 1280 / 4 )
+	//	{
+	//		phase = Phase::CircleR;
+	//	}
 
-		break;
-	case Phase::Leave:
-		//ŠÖ”‚É‚·‚é
-		enemy->position.z -= 0.5;
-		break;
-	case Phase::Stop:
-		shotTimer--;
-		if (shotTimer <= 0)
-		{
-			Shot();
-			shotTimer = shotInterval;
-		}
-		break;
-	case Phase::CircleR://‰E‚©‚ç—ˆ‚½ver 90‚Ç
-		//‰~‚ÌŠp“x
-		radius = angle * 3.14f / 180.0f;
+	//	break;
+	//case Phase::Leave:
+	//	//ŠÖ”‚É‚·‚é
+	//	enemy->position.z -= 0.5;
+	//	break;
+	//case Phase::Stop:
+	//	shotTimer--;
+	//	if (shotTimer <= 0)
+	//	{
+	//		Shot();
+	//		shotTimer = shotInterval;
+	//	}
+	//	break;
+	//case Phase::CircleR://‰E‚©‚ç—ˆ‚½ver 90‚Ç
+	//	//‰~‚ÌŠp“x
+	//	radius = angle * 3.14f / 180.0f;
 
-		//‰~ó‚ÌêŠ
-		addCircleX = cos(radius) * length;
-		addCircleY = sin(radius) * length;
+	//	//‰~ó‚ÌêŠ
+	//	addCircleX = cos(radius) * length;
+	//	addCircleY = sin(radius) * length;
 
-		//“G‚ÌÀ•W‚É‘«‚·
-		enemy->position.x += addCircleX;
-		enemy->position.y += addCircleY;
+	//	//“G‚ÌÀ•W‚É‘«‚·
+	//	enemy->position.x += addCircleX;
+	//	enemy->position.y += addCircleY;
 
-		//Šp“x‚ğ‚½‚µ‚Ä‰~ó‚É“®‚©‚·
-		angle += 0.5f;
-		if (angle >= 460.0f)
-		{
-			shotTimer = shotInterval;
-			enemy->position.z -= 0.5;
-		}
+	//	//Šp“x‚ğ‚½‚µ‚Ä‰~ó‚É“®‚©‚·
+	//	angle += 0.5f;
+	//	if (angle >= 460.0f)
+	//	{
+	//		shotTimer = shotInterval;
+	//		enemy->position.z -= 0.5;
+	//	}
 
-		//’e‚ğŒ‚‚Â
-		shotTimer--;
-		if (shotTimer <= 0)
-		{
-			Shot();
-			shotTimer = shotInterval;
-		}
-		
-		break;
-	case Phase::CircleL://¶‚©‚ç—ˆ‚½ver 270‚Ç
-	//‰~‚ÌŠp“x
-		radius = angle * 3.14f / 180.0f;
+	//	//’e‚ğŒ‚‚Â
+	//	shotTimer--;
+	//	if (shotTimer <= 0)
+	//	{
+	//		Shot();
+	//		shotTimer = shotInterval;
+	//	}
+	//	
+	//	break;
+	//case Phase::CircleL://¶‚©‚ç—ˆ‚½ver 270‚Ç
+	////‰~‚ÌŠp“x
+	//	radius = angle * 3.14f / 180.0f;
 
-		//‰~ó‚ÌêŠ
-		addCircleX = cos(radius) * length;
-		addCircleY = sin(radius) * length;
+	//	//‰~ó‚ÌêŠ
+	//	addCircleX = cos(radius) * length;
+	//	addCircleY = sin(radius) * length;
 
-		//“G‚ÌÀ•W‚É‘«‚·
-		enemy->position.x += addCircleX;
-		enemy->position.y += addCircleY;
+	//	//“G‚ÌÀ•W‚É‘«‚·
+	//	enemy->position.x += addCircleX;
+	//	enemy->position.y += addCircleY;
 
-		//Šp“x‚ğ‚½‚µ‚Ä‰~ó‚É“®‚©‚·
-		angle -= 0.5f;
-		if (angle <= -270.0f)
-		{
-			shotTimer = shotInterval;
-			enemy->position.z -= 0.5;
-		}
+	//	//Šp“x‚ğ‚½‚µ‚Ä‰~ó‚É“®‚©‚·
+	//	angle -= 0.5f;
+	//	if (angle <= -270.0f)
+	//	{
+	//		shotTimer = shotInterval;
+	//		enemy->position.z -= 0.5;
+	//	}
 
-		//’e‚ğŒ‚‚Â
-		shotTimer--;
-		if (shotTimer <= 0)
-		{
-			Shot();
-			shotTimer = shotInterval;
-		}
-		break;
+	//	//’e‚ğŒ‚‚Â
+	//	shotTimer--;
+	//	if (shotTimer <= 0)
+	//	{
+	//		Shot();
+	//		shotTimer = shotInterval;
+	//	}
+	//	break;
 
-	default:
-		break;
-	}
+	//default:
+	//	break;
+	//}
 	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
 	{
 		//bullet->SetLockOnPosition(GetWorldPosition(), playerWorldPos);
@@ -160,8 +161,6 @@ void Enemy::PhaseInit(bool rightMoveTrue)
 	{
 		phase = Phase::CircleR;
 	}
-	//”­Ëƒ^ƒCƒ}[‰Šú‰»
-	shotTimer = shotInterval;
 }
 
 XMFLOAT3 Enemy::GetWorldPosition()
@@ -178,4 +177,27 @@ void Enemy::OnCollision()
 	isDead = true;
 	enemy->position.z -= 350;
 	phase = Phase::Leave;
+}
+
+void Enemy::ShotInit()
+{
+	//”­Ëƒ^ƒCƒ}[‰Šú‰»
+	shotTimer = shotInterval;
+}
+
+void Enemy::ShotTimerLower(int32_t lowerTime)
+{
+	shotTimer -= lowerTime;
+}
+
+bool Enemy::IsTimer()
+{
+	if (shotTimer <= 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

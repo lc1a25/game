@@ -31,6 +31,9 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 	enemyL = new Enemy();
 	enemyL->Init(enemyModel, { -30.0f, 0.0f, 150.0f }, false);
+
+	enemyCircle = new EnemyCircle();
+	enemyCircle->Init(enemyModel, { -30.0f, 0.0f, 150.0f }, false);
 	//camera->cameraObj->Init();
 	camera = new Camera();
 	camera->Init();
@@ -61,21 +64,24 @@ void GameScene::Update()
 
 	cameraObj->UpdateCamera();
 
-	camera->SetEye({ cameraObj->GetEye() });
+	/*camera->SetEye({ cameraObj->GetEye() });
 	camera->SetTarget({ cameraObj->GetTarget() });
-	camera->SetUp({ cameraObj->GetUp() });
+	camera->SetUp({ cameraObj->GetUp() });*/
 	camera->UpdateCamera();
 
 	CheckAllCollision(enemy);
 	CheckAllCollision(enemyL);
 
-	enemy->SetPlayerPosition(player->GetWorldPosition());
+	/*enemy->SetPlayerPosition(player->GetWorldPosition());
 	player->SetEnemyPosition(enemy->GetWorldPosition());
 	enemy->Update();
 
 	enemyL->SetPlayerPosition(player->GetWorldPosition());
 	player->SetEnemyPosition(enemyL->GetWorldPosition());
-	enemyL->Update();
+	enemyL->Update();*/
+	
+	enemyCircle->SetPlayerPosition(player->GetWorldPosition());
+	enemyCircle->Update();
 
 	player->SetEnemyFlag(enemyL->IsDead());
 	player->SetCameraObj(cameraObj->GetWorldTransform());
@@ -89,8 +95,9 @@ void GameScene::Draw()
 {
 	Object3d::PreDraw(dxcommon->GetCmdlist());
 	player->Draw();
-	enemy->Draw();
-	enemyL->Draw();
+	/*enemy->Draw();
+	enemyL->Draw();*/
+	enemyCircle->Draw();
 	Object3d::PostDraw();
 }
 

@@ -64,9 +64,21 @@ public:
 
 	void SetPlayerPosition(XMFLOAT3 position) { playerWorldPos = position; }
 
+	void SetPosition(XMFLOAT3 position) { enemy->position = position; }
+
 	XMFLOAT3 GetWorldPosition();
+
+	XMFLOAT3 GetPosition() { return enemy->position; }
 
 	void OnCollision();
 
+	void ShotInit();
+
+	//発射タイマーをへらす
+	void ShotTimerLower(int32_t lowerTime = 1);
+
+	bool IsTimer();
+
 	bool IsDead() const { return isDead; }
+
 };
