@@ -70,7 +70,7 @@ void Player::Update()
 	reticle->position.z = reticle->matWorld.r[3].m128_f32[2];
 
 
-	player->matWorld.r[3].m128_f32[2] = cameraPos.z + 20;
+	player->matWorld.r[3].m128_f32[2] = cameraPos.z +	10;
 
 	player->position.x = player->matWorld.r[3].m128_f32[0];
 	player->position.y = player->matWorld.r[3].m128_f32[1];
@@ -133,7 +133,7 @@ void Player::Update()
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
 	{
 
-		bullet->SetLockOnPosition(enemyWorldPos,isDeadEnemy);	
+		//bullet->SetLockOnPosition(enemyWorldPos,isDeadEnemy);	
 		bullet->Update();
 	}
 //XV

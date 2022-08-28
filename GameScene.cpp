@@ -33,8 +33,11 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	enemyL->Init(enemyModel, { -30.0f, 0.0f, 150.0f }, false);
 
 	enemyCircle = new EnemyCircle();
-	enemyCircle->Init(enemyModel, { -30.0f, 0.0f, 150.0f }, false);
-	//camera->cameraObj->Init();
+	enemyCircle->Init(enemyModel, { -80.0f, 0.0f, 150.0f }, false);
+
+	enemyOneWay = new EnemyOneWay();
+	enemyOneWay->Init(enemyModel, { 100.0f,20.0f,150.0f }, true);
+
 	camera = new Camera();
 	camera->Init();
 
@@ -62,6 +65,7 @@ void GameScene::Update()
 	sprintf_s(moji, "%f", cameraObj->GetTarget().x);
 	sprintf_s(moji2, "%f", player->GetWorldPosition().x);
 
+//ƒJƒƒ‰
 	cameraObj->UpdateCamera();
 
 	/*camera->SetEye({ cameraObj->GetEye() });
@@ -69,9 +73,11 @@ void GameScene::Update()
 	camera->SetUp({ cameraObj->GetUp() });*/
 	camera->UpdateCamera();
 
-	CheckAllCollision(enemy);
+//“–‚½‚è”»’è
+	CheckAllCollision(enemyCircle->GetEnemy());
 	CheckAllCollision(enemyL);
 
+//“G
 	/*enemy->SetPlayerPosition(player->GetWorldPosition());
 	player->SetEnemyPosition(enemy->GetWorldPosition());
 	enemy->Update();
@@ -83,6 +89,9 @@ void GameScene::Update()
 	enemyCircle->SetPlayerPosition(player->GetWorldPosition());
 	enemyCircle->Update();
 
+	enemyOneWay->Update();
+
+//Ž©‹@
 	player->SetEnemyFlag(enemyL->IsDead());
 	player->SetCameraObj(cameraObj->GetWorldTransform());
 	player->SetCameraPos(cameraObj->GetEye());
@@ -94,10 +103,12 @@ void GameScene::Update()
 void GameScene::Draw()
 {
 	Object3d::PreDraw(dxcommon->GetCmdlist());
+
 	player->Draw();
-	/*enemy->Draw();
-	enemyL->Draw();*/
+
 	enemyCircle->Draw();
+	enemyOneWay->Draw();
+
 	Object3d::PostDraw();
 }
 

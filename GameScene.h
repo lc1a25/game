@@ -10,6 +10,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "EnemyCircle.h"
+#include "EnemyOneWay.h"
 #include "CameraObj.h"
 
 class GameScene
@@ -81,6 +82,7 @@ private: // メンバ変数
 	Enemy* enemy = nullptr;
 	Enemy* enemyL = nullptr;
 	EnemyCircle* enemyCircle = nullptr;
+	EnemyOneWay* enemyOneWay = nullptr;
 
 	XMVECTOR reticlePos;//レティクル用変数
 

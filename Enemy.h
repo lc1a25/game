@@ -15,6 +15,8 @@ enum class Phase
 	Stop,  //~‚Ü‚é
 	CircleR,//‰~‰^“®‰E‚©‚ç‚­‚é
 	CircleL,//¶‚©‚ç‚­‚é
+	OneWayR,//‰E‚©‚ç¶‚És‚­
+	OneWayL,//¶‚©‚ç‰E‚És‚­
 };
 
 class Enemy
@@ -44,7 +46,7 @@ private:
 public:
 
 
-	Phase phase = Phase::CircleL;
+	Phase phase;
 	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; }
 
 	//”­ËŠÔŠu

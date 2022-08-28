@@ -159,6 +159,7 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBullet.cpp" />
     <ClCompile Include="EnemyCircle.cpp" />
+    <ClCompile Include="EnemyOneWay.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="LoadFbx.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="DirectXCommon.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyBullet.h" />
+    <ClInclude Include="EnemyOneWay.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="LoadFbx.h" />
     <ClInclude Include="imgui\imconfig.h" />
