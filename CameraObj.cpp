@@ -67,8 +67,11 @@ void CameraObj::UpdateCamera()
 
 		}
 		eye = splinePosition(points, startIndex, timeRate);
-		target = splinePosition(points, targetIndex, timeRate);
+		//target = splinePosition(points, targetIndex, timeRate);
 
+		target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
+		target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
+		target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
 	}
 	else
 	{

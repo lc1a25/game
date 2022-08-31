@@ -52,25 +52,22 @@ void GameScene::Update()
 {
 
 
-	//レティクルのため
-	player->SetHwnd(hwnd);
-	player->SetViewPort(viewPort);
-	player->SetCameraMatViewProjection(camera->GetMatViewProjection());
+	
 
 	//2dレティクルスプライトの座標
 	mouseX = player->GetMouseX();
 	mouseY = player->GetMouseY();
 
 	//デバッグ用
-	sprintf_s(moji, "%f", cameraObj->GetTarget().x);
+	sprintf_s(moji, "%f", player->GetReticleWorldPosition().z);
 	sprintf_s(moji2, "%f", player->GetWorldPosition().x);
 
 //カメラ
 	cameraObj->UpdateCamera();
 
-	/*camera->SetEye({ cameraObj->GetEye() });
+	camera->SetEye({ cameraObj->GetEye() });
 	camera->SetTarget({ cameraObj->GetTarget() });
-	camera->SetUp({ cameraObj->GetUp() });*/
+	camera->SetUp({ cameraObj->GetUp() });
 	camera->UpdateCamera();
 
 //当たり判定
@@ -91,6 +88,10 @@ void GameScene::Update()
 
 	enemyOneWay->Update();
 
+//レティクルのため
+	player->SetHwnd(hwnd);
+	player->SetViewPort(viewPort);
+	player->SetCameraMatViewProjection(camera->GetMatViewProjection());
 //自機
 	player->SetEnemyFlag(enemyL->IsDead());
 	player->SetCameraObj(cameraObj->GetWorldTransform());

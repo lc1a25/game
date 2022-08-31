@@ -100,14 +100,14 @@ private:
 	long long elapsedCount = 0;
 
 	XMVECTOR start{ 0.0f, 0.0f, 0.0f };
-	XMVECTOR p2{ 10.0f, 0.0f, +20.0f };
-	XMVECTOR p3{ 0.0f, 0.0f, +30.0f };
-	XMVECTOR p4{ -10.0f, 0.0f, +40.0f };
-	XMVECTOR p5{ 0.0f, 0.0f, +50.0f };
-	XMVECTOR p6{ 10.0f, 0.0f, +60.0f };
-	XMVECTOR p7{ 0.0f, 0.0f, +70.0f };
+	XMVECTOR p2{ 10.0f, 0.0f, +60.0f };
+	XMVECTOR p3{ 0.0f, 0.0f, +100.0f };
+	XMVECTOR p4{ -10.0f, 0.0f, +150.0f };
+	XMVECTOR p5{ 0.0f, 0.0f, +200.0f };
+	XMVECTOR p6{ 10.0f, 0.0f, +250.0f };
+	XMVECTOR p7{ 0.0f, 0.0f, +300.0f };
 
-	XMVECTOR end{ 0.0f, 0.0f, 80.0f };
+	XMVECTOR end{ 0.0f, 0.0f, 350.0f };
 	XMVECTOR targetEnd{};
 	float maxTime = 5.0f;
 	float timeRate = 0.0f;

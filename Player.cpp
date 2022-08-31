@@ -61,16 +61,17 @@ void Player::Update()
 	//near ‚©‚ç far ‚É@distanceObject •ªi‚ñ‚¾‹——£
 	reticle->matWorld.r[3].m128_f32[0] = (mouseDirection - posNear).m128_f32[0] * distanceObject;
 	reticle->matWorld.r[3].m128_f32[1] = (mouseDirection - posNear).m128_f32[1] * distanceObject;
-	reticle->matWorld.r[3].m128_f32[2] = (mouseDirection - posNear).m128_f32[2] * distanceObject/100;
+	reticle->matWorld.r[3].m128_f32[2] = (mouseDirection - posNear).m128_f32[2] * distanceObject/500;
 
 	//reticle->SetPosition({ reticle->matWorld.r[3].m128_f32[0], reticle->matWorld.r[3].m128_f32[1], reticle->matWorld.r[3].m128_f32[2] });
+	
 
 	reticle->position.x = reticle->matWorld.r[3].m128_f32[0];
 	reticle->position.y = reticle->matWorld.r[3].m128_f32[1];
 	reticle->position.z = reticle->matWorld.r[3].m128_f32[2];
 
 
-	player->matWorld.r[3].m128_f32[2] = cameraPos.z +	10;
+	player->matWorld.r[3].m128_f32[2] = cameraPos.z +	30;
 
 	player->position.x = player->matWorld.r[3].m128_f32[0];
 	player->position.y = player->matWorld.r[3].m128_f32[1];
