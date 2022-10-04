@@ -91,7 +91,7 @@ void GameScene::Update()
 //レティクルのため
 	player->SetHwnd(hwnd);
 	player->SetViewPort(viewPort);
-	player->SetCameraMatViewProjection(camera->GetMatViewProjection());
+	player->SetCameraMatViewProjection(cameraObj->GetMatViewProjection());
 //自機
 	player->SetEnemyFlag(enemyL->IsDead());
 	player->SetCameraObj(cameraObj->GetWorldTransform());

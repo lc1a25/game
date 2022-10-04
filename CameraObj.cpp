@@ -29,6 +29,9 @@ void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
 void CameraObj::UpdateCamera()
 {
 
+	/*eye = XMVECTOR({ cameraObj->matWorld.r[3].m128_f32[0],
+							 cameraObj->matWorld.r[3].m128_f32[1],
+							 cameraObj->matWorld.r[3].m128_f32[2] });*/
 	nowCount = timeGetTime();
 
 	elapsedCount = nowCount - startCount;
@@ -93,7 +96,15 @@ void CameraObj::UpdateCamera()
 			targetEnd = eye + forward;
 	}
 
-	
+	////前方ベクトル
+	//XMVECTOR forward({ 0, 0, 1 });
+	////回転(前方ベクトル)
+	//forward = Matrix4::transform(forward, cameraObj->matWorld);
+	//target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
+	//target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
+	//target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
+	////targetEnd = eye + forward;
+
 	//上方ベクトル
 	XMVECTOR upV({ 0,1,0 });
 	//回転(上方ベクトル)
@@ -101,10 +112,31 @@ void CameraObj::UpdateCamera()
 	up.y = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[1];
 	up.z = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[2];
 
+	cameraObj->matWorld.r[3].m128_f32[0] = eye.m128_f32[0];
+	cameraObj->matWorld.r[3].m128_f32[1] = eye.m128_f32[1];
+	cameraObj->matWorld.r[3].m128_f32[2] = eye.m128_f32[2];
+
 	worldTransform = cameraObj->matWorld;
 
+	eyeView.x = eye.m128_f32[0];
+	eyeView.y = eye.m128_f32[1];
+	eyeView.z = eye.m128_f32[2];
 
+	targetView.x = target.m128_f32[0];
+	targetView.y = target.m128_f32[1];
+	targetView.z = target.m128_f32[2];
 
+	
+	// ビュー行列の更新
+	matView = XMMatrixLookAtLH(XMLoadFloat3(&eyeView), XMLoadFloat3(&targetView), XMLoadFloat3(&up));
+
+	matProjection = XMMatrixPerspectiveFovLH(
+		XMConvertToRadians(60.0f),
+		(float)Win::window_width / Win::window_height,
+		0.1f, 1100.0f
+	);
+
+	matViewProjection = matView * matProjection;
 	cameraObj->Update();
 }
 

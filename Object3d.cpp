@@ -882,8 +882,9 @@ void Object3d::Update(bool parent)
 	// 親オブジェクトがあれば
 	if (parent == true) {
 		// 親オブジェクトのワールド行列を掛ける
-		//matWorld *= matCameraWorld;
+		matWorld *= matCameraWorld;
 	}
+
 	// 定数バッファへデータ転送
 	ConstBufferDataB0* constMap = nullptr;
 	result = constBuffB0->Map(0, nullptr, (void**)&constMap);

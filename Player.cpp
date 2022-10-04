@@ -10,8 +10,8 @@ void Player::Init(Model* model,Model* bulletModel)
 	player->scale = { 1,1,1 };
 
 	reticle->SetModel(model_);
-	reticle->SetPosition({ reticle->matWorld.r[3].m128_f32[0], reticle->matWorld.r[3].m128_f32[1], reticle->matWorld.r[3].m128_f32[2] });
-	reticle->scale = { 1,1,1 };
+	reticle->SetPosition({ reticle->matWorld.r[3].m128_f32[0], reticle->matWorld.r[3].m128_f32[1], player->matWorld.r[3].m128_f32[2] + 100 });
+	reticle->scale = { 1,1,1 }; 
 
 	//playerの座標をワールド座標に カメラの前に
 	player->matWorld.r[3].m128_f32[0] = cameraPos.x;
@@ -56,12 +56,20 @@ void Player::Update()
 
 
 
+	////カメラから3dレティクルの距離
+	//const float distanceObject = 500.0f;
+	////near から far に　distanceObject 分進んだ距離
+	//reticle->matWorld.r[3].m128_f32[0] = (mouseDirection - posNear).m128_f32[0] * distanceObject;
+	//reticle->matWorld.r[3].m128_f32[1] = (mouseDirection - posNear).m128_f32[1] * distanceObject;
+	//reticle->matWorld.r[3].m128_f32[2] = (mouseDirection - posNear).m128_f32[2] * distanceObject/500;
+
+
 	//カメラから3dレティクルの距離
-	const float distanceObject = 500.0f;
+	//const float distanceObject = 280.0f;
 	//near から far に　distanceObject 分進んだ距離
-	reticle->matWorld.r[3].m128_f32[0] = (mouseDirection - posNear).m128_f32[0] * distanceObject;
-	reticle->matWorld.r[3].m128_f32[1] = (mouseDirection - posNear).m128_f32[1] * distanceObject;
-	reticle->matWorld.r[3].m128_f32[2] = (mouseDirection - posNear).m128_f32[2] * distanceObject/500;
+	reticle->matWorld.r[3].m128_f32[0] = (mouseDirection - posNear).m128_f32[0] * 100;
+	reticle->matWorld.r[3].m128_f32[1] = (mouseDirection - posNear).m128_f32[1] * 100;
+	reticle->matWorld.r[3].m128_f32[2] = cameraObj.r[3].m128_f32[2] + 100;//player->matWorld.r[3].m128_f32[2] + 100;//(mouseDirection - posNear).m128_f32[2] * 10;
 
 	//reticle->SetPosition({ reticle->matWorld.r[3].m128_f32[0], reticle->matWorld.r[3].m128_f32[1], reticle->matWorld.r[3].m128_f32[2] });
 	
@@ -70,6 +78,7 @@ void Player::Update()
 	reticle->position.y = reticle->matWorld.r[3].m128_f32[1];
 	reticle->position.z = reticle->matWorld.r[3].m128_f32[2];
 
+	//reticle->matWorld *= player->matWorld;
 
 	player->matWorld.r[3].m128_f32[2] = cameraPos.z +	30;
 

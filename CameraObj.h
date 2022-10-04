@@ -76,8 +76,12 @@ private:
 	XMMATRIX matProjection;
 	// 視点座標
 	XMVECTOR eye = { 0,0,0 };
+
+	XMFLOAT3 eyeView = { 0,0,0 };
 	// 注視点座標
 	XMVECTOR target = {0,0,0};
+
+	XMFLOAT3 targetView = { 0,0,0 };
 	// 上方向ベクトル
 	 XMFLOAT3 up = {0,1,0};
 	// 回転行列
@@ -100,7 +104,7 @@ private:
 	long long elapsedCount = 0;
 
 	XMVECTOR start{ 0.0f, 0.0f, 0.0f };
-	XMVECTOR p2{ 10.0f, 0.0f, +60.0f };
+	XMVECTOR p2{ 0.0f, 0.0f, 0.0f };
 	XMVECTOR p3{ 0.0f, 0.0f, +100.0f };
 	XMVECTOR p4{ -10.0f, 0.0f, +150.0f };
 	XMVECTOR p5{ 0.0f, 0.0f, +200.0f };
