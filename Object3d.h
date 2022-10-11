@@ -200,7 +200,7 @@ public: // メンバ関数
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
-	void Update(bool parent = false);
+	void Update();
 
 	/// <summary>
 	/// 描画
@@ -223,7 +223,7 @@ public: // メンバ関数
 
 	static void SetCamera(Camera* camera) { Object3d::camera = camera; }
 
-	void SetCameraMatWorld(XMMATRIX matWorld) { matCameraWorld = matWorld; }
+	//void SetCameraMatWorld(XMMATRIX matWorld) { matCameraWorld = matWorld; }
 
 	const XMFLOAT3& GetEye() { return camera->GetEye(); }
 	const XMFLOAT3& GetTarget() { return camera->GetTarget(); }
@@ -258,7 +258,7 @@ private: // メンバ変数
 	// 色
 	XMFLOAT4 color = { 1,1,1,1 };
 
-	XMMATRIX matCameraWorld;
+	//XMMATRIX matCameraWorld;
 	//model
 	Model* model = nullptr;
 };

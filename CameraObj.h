@@ -38,6 +38,8 @@ public:
 	const XMFLOAT3& GetTarget() { return XMFLOAT3{ target.m128_f32[0],target.m128_f32[1] ,target.m128_f32[2] }; }
 	const XMFLOAT3& GetUp() { return up; }
 
+	const XMFLOAT3& GetEyeVec() { return eyeVec; }
+
 	const float& GetpositionX() { return cameraObj->position.z; }
 
 
@@ -115,7 +117,9 @@ private:
 	XMVECTOR targetEnd{};
 	float maxTime = 5.0f;
 	float timeRate = 0.0f;
-
+	
+	XMFLOAT3 eyeVecTemp = { 0.0f,0.0f,0.0f };
+	XMFLOAT3 eyeVec = { 0.0f,0.0f,0.0f };
 	bool pointsLast = false;
 
 	std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,p6,p7,end,end };

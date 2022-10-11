@@ -160,7 +160,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma region シェーダーの色,初期化
 	char moji[64];
 	
-	float secound_x = 150;
+	float secound_x = 0;
 	float secound_y = 0;
 
 	sprite->SetPosition({ 0.0f,0.0f,0.0f });
@@ -197,54 +197,55 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		gameScene->SetViewPort(dxcommon->GetViewPort());
 		
 		sprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
-	
-		
-		
+		//デバッグテキスト
 		debugtext_minute->Print(gameScene->moji, secound_x, secound_y, 1.0f);
 		debugtext_minute2->Print(gameScene->moji2, secound_x, secound_y + 100, 1.0f);
-			XMVECTOR moveZ = XMVectorSet(0, 0, 1.0f, 0);//z speed
 
-			XMVECTOR moveX2 = XMVectorSet(1.0f, 0, 0, 0);//debug
+
+			//XMVECTOR moveZ = XMVectorSet(0, 0, 1.0f, 0);//z speed
+
+			//XMVECTOR moveX2 = XMVectorSet(1.0f, 0, 0, 0);//debug
 
 		
-			XMFLOAT3 xCamera = { 1,0,0 };
+			//XMFLOAT3 xCamera = { 1,0,0 };
 		
-			XMFLOAT3 yCamera = { 0,1,0 };
+			//XMFLOAT3 yCamera = { 0,1,0 };
+			//
+			//XMFLOAT3 zCamera = { 0,0,1 };
 			
-			XMFLOAT3 zCamera = { 0,0,1 };
+
+
+			//if (input->isKey(DIK_W))
+			//{
+			//	camera->CameraMoveVector(yCamera,true);//カメラを動かす
+			//}
+			//if (input->isKey(DIK_D))
+			//{
+			//	camera->CameraMoveVector(xCamera,true);//カメラを動かす
+			//}
+			//if (input->isKey(DIK_A))
+			//{
+			//	camera->CameraMoveVector(xCamera,false);//カメラを動かす
+			//}
+			//if (input->isKey(DIK_S))
+			//{
+			//	camera->CameraMoveVector(yCamera,false);//カメラを動かす
+			//}
+			//if (input->isKey(DIK_Q))
+			//{
+			//	camera->CameraMoveVector(zCamera,false);
+			//}
+			//if (input->isKey(DIK_E))
+			//{
+			//	camera->CameraMoveVector(zCamera,true);
+			//}
+
+			//if (input->isKey(DIK_UP))
+			//{
+			//	camera->CameraRot(0.0f, 0.1f);
+			//}
 			
-
-
-			if (input->isKey(DIK_W))
-			{
-				camera->CameraMoveVector(yCamera,true);//カメラを動かす
-			}
-			if (input->isKey(DIK_D))
-			{
-				camera->CameraMoveVector(xCamera,true);//カメラを動かす
-			}
-			if (input->isKey(DIK_A))
-			{
-				camera->CameraMoveVector(xCamera,false);//カメラを動かす
-			}
-			if (input->isKey(DIK_S))
-			{
-				camera->CameraMoveVector(yCamera,false);//カメラを動かす
-			}
-			if (input->isKey(DIK_Q))
-			{
-				camera->CameraMoveVector(zCamera,false);
-			}
-			if (input->isKey(DIK_E))
-			{
-				camera->CameraMoveVector(zCamera,true);
-			}
-
-			if (input->isKey(DIK_UP))
-			{
-				camera->CameraRot(0.0f, 0.1f);
-			}
-		
+//更新	
 		gameScene->Update();
 
 		skydome->Update();
@@ -252,7 +253,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		object1->Update();
 		
-		
+//描画
 		//ポストエフェクト
 
 		//postEffect->PreDrawScene(dxcommon->GetCmdlist());
@@ -278,7 +279,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		spriteCommon->PreDraw();
 		sprite->Draw();
 		debugtext_minute->DrawAll();
-		//debugtext_minute2->DrawAll();
+		debugtext_minute2->DrawAll();
 		// ４．描画コマンドここまで
 		
 		// ５．リソースバリアを戻す
@@ -289,6 +290,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// ウィンドウクラスを登録解除
 	win->WinFinalize();
 
+//解放
 	delete modelFbx;
 	delete object1;
 

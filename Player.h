@@ -32,8 +32,14 @@ private:
 	XMVECTOR reticleWorldPos;
 	XMMATRIX viewPortMatrix;
 	XMMATRIX cameraMatViewProjection;
-	XMVECTOR positionReticle = {0,0,0};
-	XMFLOAT3 cameraPos = { 0.0f,0,0 };
+	XMVECTOR positionReticle = { 0.0f,0.0f,0.0f };
+	XMFLOAT3 cameraPos = { 0.0f,0.0f,0.0f };
+
+	XMFLOAT3 cameraEyeVec = { 0.0f,0.0f,0.0f };
+
+	
+	XMVECTOR posNear = { 0.0f };
+	XMVECTOR posFar = { 0.0f };
 
 	HWND hwnd;
 	XMMATRIX viewPort;
@@ -52,6 +58,7 @@ public:
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
 	
 	void Init(Model* model, Model* bulletModel);
+
 	void Attack();
 
 	void Update();
@@ -76,9 +83,16 @@ public:
 
 	void SetCameraPos(XMFLOAT3 cameraPos) { this->cameraPos = cameraPos; }
 
+	void SetCameraEyeVec(XMFLOAT3 cameraEyeV) { this->cameraEyeVec = cameraEyeV; }
+
+
 	XMFLOAT3 GetWorldPosition();
 	XMFLOAT3 GetReticleWorldPosition();
+	XMFLOAT3 GetReticleNear();
+	XMFLOAT3 GetReticleFar();
 	XMFLOAT3 GetSpriteReticle();
+	
+	//マウス座標
 	FLOAT GetMouseX(){return  mouseX;}
 	FLOAT GetMouseY() { return  mouseY; }
 

@@ -40,7 +40,7 @@ void CameraObj::UpdateCamera()
 
 	timeRate = elapsedTime / maxTime;
 
-	if (pointsLast == false)
+	if (pointsLast == false)//道中　雑魚戦
 	{
 		//前方ベクトル
 		XMVECTOR forward({ 0, 0, 1 });
@@ -71,20 +71,28 @@ void CameraObj::UpdateCamera()
 		}
 		eye = splinePosition(points, startIndex, timeRate);
 		//target = splinePosition(points, targetIndex, timeRate);
+		
+		//カメラの移動量
+		eyeVec.x = eye.m128_f32[0] - eyeVecTemp.x;
+		eyeVec.y = eye.m128_f32[1] - eyeVecTemp.y;
+		eyeVec.z = eye.m128_f32[2] - eyeVecTemp.z;
+
+		eyeVecTemp.x = eye.m128_f32[0];
+		eyeVecTemp.y = eye.m128_f32[1];
+		eyeVecTemp.z = eye.m128_f32[2];
+
+
 
 		target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
 		target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
 		target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
 	}
-	else
+	else//最後まで行ったら視点を固定　ボス戦
 	{
 		//cameraObj->position.z+= 0.1f;
 	//cameraObj->rotation.z++;
 	//eye = { cameraObj->matWorld.r[3].m128_f32[0],cameraObj->matWorld.r[3].m128_f32[1],cameraObj->matWorld.r[3].m128_f32[2] };
 
-
-
-		
 			eye = { end };
 			//前方ベクトル
 			XMVECTOR forward({ 0, 0, 1 });
@@ -112,12 +120,14 @@ void CameraObj::UpdateCamera()
 	up.y = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[1];
 	up.z = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[2];
 
+	//カメラオブジェクトの位置
 	cameraObj->matWorld.r[3].m128_f32[0] = eye.m128_f32[0];
 	cameraObj->matWorld.r[3].m128_f32[1] = eye.m128_f32[1];
 	cameraObj->matWorld.r[3].m128_f32[2] = eye.m128_f32[2];
 
 	worldTransform = cameraObj->matWorld;
 
+	//ビュー行列用に変換
 	eyeView.x = eye.m128_f32[0];
 	eyeView.y = eye.m128_f32[1];
 	eyeView.z = eye.m128_f32[2];

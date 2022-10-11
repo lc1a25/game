@@ -859,7 +859,7 @@ bool Object3d::Initialize()
 	return true;
 }
 
-void Object3d::Update(bool parent)
+void Object3d::Update()
 {
 
 	HRESULT result;
@@ -880,10 +880,10 @@ void Object3d::Update(bool parent)
 	matWorld *= matTrans; // ワールド行列に平行移動を反映
 
 	// 親オブジェクトがあれば
-	if (parent == true) {
-		// 親オブジェクトのワールド行列を掛ける
-		matWorld *= matCameraWorld;
-	}
+	//if (parent == true) {
+	//	// 親オブジェクトのワールド行列を掛ける
+	//	matWorld *= matCameraWorld;
+	//}
 
 	// 定数バッファへデータ転送
 	ConstBufferDataB0* constMap = nullptr;

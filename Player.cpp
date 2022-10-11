@@ -9,19 +9,25 @@ void Player::Init(Model* model,Model* bulletModel)
 	player->SetPosition({ 0,0,0 });
 	player->scale = { 1,1,1 };
 
+	reticle->matWorld.r[3].m128_f32[0] = player->matWorld.r[3].m128_f32[0];
+	reticle->matWorld.r[3].m128_f32[1] = player->matWorld.r[3].m128_f32[1];
+	reticle->matWorld.r[3].m128_f32[2] = player->matWorld.r[3].m128_f32[2] + 30;
+
 	reticle->SetModel(model_);
-	reticle->SetPosition({ reticle->matWorld.r[3].m128_f32[0], reticle->matWorld.r[3].m128_f32[1], player->matWorld.r[3].m128_f32[2] + 100 });
+	reticle->SetPosition({ reticle->matWorld.r[3].m128_f32[0], reticle->matWorld.r[3].m128_f32[1], reticle->matWorld.r[3].m128_f32[2]});
 	reticle->scale = { 1,1,1 }; 
 
 	//playerの座標をワールド座標に カメラの前に
 	player->matWorld.r[3].m128_f32[0] = cameraPos.x;
 	player->matWorld.r[3].m128_f32[1] = cameraPos.y;
-	player->matWorld.r[3].m128_f32[2] = cameraPos.z + 10;
+	player->matWorld.r[3].m128_f32[2] = cameraPos.z + 30;
 }
 
 
 void Player::Update()
 {
+	
+
 //2dレティクル
 	POINT mousePosition;
 	GetCursorPos(&mousePosition);
@@ -31,59 +37,61 @@ void Player::Update()
 
 	//ビュープロジェクションビューポート行列
 	viewPort = {
-	 1280.0f / 2,0.0f				   ,0.0f,0.0f,
-	  0.0f				   ,-720/ 2,0.0f,0.0f,
-	  0.0f				   ,0.0f				   ,1.0f,0.0f,
-	 1280.0f / 2,720 / 2 ,0.0f,1.0f
+	 1280.0f / 2 ,0.0f    ,0.0f, 0.0f,
+	  0.0f		 ,-720/ 2 ,0.0f, 0.0f,
+	  0.0f		 ,0.0f	  ,1.0f, 0.0f,
+	 1280.0f / 2 ,720 / 2 ,0.0f, 1.0f
 	};
+
+	//XMMATRIX invmatVPV = XMMatrixIdentity();
+	//invmatVPV.r[0].m128_f32[0] = 2 / 1280.0f;
+	//invmatVPV.r[1].m128_f32[1] = -2 / 720.0f;
+	//invmatVPV.r[3].m128_f32[0] = -1;
+	//invmatVPV.r[3].m128_f32[1] = 1;
+
+	//XMMATRIX invmatVPV2 = XMMatrixInverse(nullptr, viewPort);
+
 	XMMATRIX matVPV = cameraMatViewProjection * viewPort;
+	//XMMATRIX matVPV = viewPort;
 	//逆行列を計算
 	XMMATRIX matInverse = XMMatrixInverse(nullptr, matVPV);
 	//XMMATRIX matInverse = Matrix4::matrixInverse(matVPV);
+
 	
 	//スクリーン座標
-	XMVECTOR posNear = XMVECTOR{ mouseX, mouseY, 0 };
-	XMVECTOR posFar = XMVECTOR{ mouseX, mouseY, 1 };
+	posNear = XMVECTOR{ mouseX, mouseY, 0 };
+	posFar = XMVECTOR{ mouseX, mouseY, 1 };
 
 	//スクリーンからワールド座標に
-	posNear = Matrix4::transformScreenToWorld(posNear, matInverse);
-	posFar = Matrix4::transformScreenToWorld(posFar, matInverse);
+	posNear = XMVector3TransformCoord(posNear, matInverse);
+	posFar = XMVector3TransformCoord(posFar, matInverse);
+	//posNear = Matrix4::transformScreenToWorld(posNear, matInverse);
+	//posFar = Matrix4::transformScreenToWorld(posFar, matInverse);
 
 	//マウスレイの方向
 	XMVECTOR mouseDirection;
 	mouseDirection = posFar - posNear;
 	mouseDirection = XMVector3Normalize(mouseDirection);
 
-
-
-	////カメラから3dレティクルの距離
-	//const float distanceObject = 500.0f;
-	////near から far に　distanceObject 分進んだ距離
-	//reticle->matWorld.r[3].m128_f32[0] = (mouseDirection - posNear).m128_f32[0] * distanceObject;
-	//reticle->matWorld.r[3].m128_f32[1] = (mouseDirection - posNear).m128_f32[1] * distanceObject;
-	//reticle->matWorld.r[3].m128_f32[2] = (mouseDirection - posNear).m128_f32[2] * distanceObject/500;
-
-
 	//カメラから3dレティクルの距離
 	//const float distanceObject = 280.0f;
-	//near から far に　distanceObject 分進んだ距離
-	reticle->matWorld.r[3].m128_f32[0] = (mouseDirection - posNear).m128_f32[0] * 100;
-	reticle->matWorld.r[3].m128_f32[1] = (mouseDirection - posNear).m128_f32[1] * 100;
-	reticle->matWorld.r[3].m128_f32[2] = cameraObj.r[3].m128_f32[2] + 100;//player->matWorld.r[3].m128_f32[2] + 100;//(mouseDirection - posNear).m128_f32[2] * 10;
+	//near から mouseDirection(near->far) に　distanceObject 分進んだ距離
+	reticle->matWorld.r[3].m128_f32[0] = posNear.m128_f32[0] + mouseDirection.m128_f32[0] * 100;
+	reticle->matWorld.r[3].m128_f32[1] = posNear.m128_f32[1] + mouseDirection.m128_f32[1] * 100;
+	reticle->matWorld.r[3].m128_f32[2] = posNear.m128_f32[2] + mouseDirection.m128_f32[2] * 100;
+	//reticle->matWorld.r[3].m128_f32[0] = (mouseDirection - posNear).m128_f32[0] * 100;
+	//reticle->matWorld.r[3].m128_f32[1] = (mouseDirection - posNear).m128_f32[1] * 100;
+	//reticle->matWorld.r[3].m128_f32[2] = cameraObj.r[3].m128_f32[2] + 100;//player->matWorld.r[3].m128_f32[2] + 100;//(mouseDirection - posNear).m128_f32[2] * 10;
 
-	//reticle->SetPosition({ reticle->matWorld.r[3].m128_f32[0], reticle->matWorld.r[3].m128_f32[1], reticle->matWorld.r[3].m128_f32[2] });
-	
-
+	//ワールド座標に
 	reticle->position.x = reticle->matWorld.r[3].m128_f32[0];
 	reticle->position.y = reticle->matWorld.r[3].m128_f32[1];
 	reticle->position.z = reticle->matWorld.r[3].m128_f32[2];
 
-	//reticle->matWorld *= player->matWorld;
-
 	player->matWorld.r[3].m128_f32[2] = cameraPos.z +	30;
 
-	player->position.x = player->matWorld.r[3].m128_f32[0];
-	player->position.y = player->matWorld.r[3].m128_f32[1];
+	player->position.x = player->matWorld.r[3].m128_f32[0] + cameraEyeVec.x;
+	player->position.y = player->matWorld.r[3].m128_f32[1] + cameraEyeVec.y;
 	player->position.z = player->matWorld.r[3].m128_f32[2];
 
 
@@ -92,29 +100,31 @@ void Player::Update()
 		{
 			return bullet->IsDead();
 		});
-//移動処理
-	/*if (player->position.x <= -50)
-	{
-		player->position.x += playerVelocity;
-		player->rotation.y += playerVelocity / 2;
-	}
-	if (player->position.x >= +40)
+
+//移動制御(画面外に行かないように)
+	//if (cameraPos.x <= -0.1)
+	//{
+	//	player->position.x += playerVelocity;
+	//	player->rotation.y += playerVelocity / 2;
+	//}
+	/*if (player->position.x - cameraEyeVec.x >= +30)
 	{
 		player->position.x -= playerVelocity;
 		player->rotation.y -= playerVelocity / 2;
 	}
 
-	if (player->position.y <= -30)
+	if (player->position.y - cameraEyeVec.y <= -15)
 	{
 		player->position.y += playerVelocity;
-		player->rotation.x -= playerVelocity / 2;
+		player->rotation.x -= playerVelocity / 4;
 	}
-	if (player->position.y >= 20)
+	if (player->position.y - cameraEyeVec.y >= 15)
 	{
 		player->position.y -= playerVelocity;
-		player->rotation.x += playerVelocity / 2;
+		player->rotation.x += playerVelocity / 4;
 	}*/
 
+//移動処理
 	if (input->isKey(DIK_W))
 	{
 		player->position.y+= playerVelocity;
@@ -137,7 +147,6 @@ void Player::Update()
 		player->rotation.x += playerVelocity / 4;
 	}
 
-
 //攻撃
 	Attack();
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
@@ -146,15 +155,16 @@ void Player::Update()
 		//bullet->SetLockOnPosition(enemyWorldPos,isDeadEnemy);	
 		bullet->Update();
 	}
+
 //更新
-	player->SetCameraMatWorld(cameraObj);
-	player->Update(true);
+	player->Update();
 	reticle->Update();
 }
 
+//描画
 void Player::Draw()
 {
-	player->Draw();
+	//player->Draw();
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
 	{
 		bullet->Draw();
@@ -195,6 +205,24 @@ XMFLOAT3 Player::GetReticleWorldPosition()
 	return worldPos;
 }
 
+XMFLOAT3 Player::GetReticleNear()
+{
+	XMFLOAT3 worldPos;
+	worldPos.x = posNear.m128_f32[0];
+	worldPos.y = posNear.m128_f32[1];
+	worldPos.z = posNear.m128_f32[2];
+	return worldPos;
+}
+
+XMFLOAT3 Player::GetReticleFar()
+{
+	XMFLOAT3 worldPos;
+	worldPos.x = posFar.m128_f32[0];
+	worldPos.y = posFar.m128_f32[1];
+	worldPos.z = posFar.m128_f32[2];
+	return worldPos;
+}
+
 void Player::OnCollision()
 {
 }
@@ -215,9 +243,13 @@ void Player::Attack()
 			XMVECTOR velocity = { 0,0,1 };
 			velocity = transform(velocity, player->matWorld);
 			//レティクルに向かって飛ぶ
-			velocity.m128_f32[0] = reticle->matWorld.r[3].m128_f32[0] - player->matWorld.r[3].m128_f32[0];
+		  /*velocity.m128_f32[0] = reticle->matWorld.r[3].m128_f32[0] - player->matWorld.r[3].m128_f32[0];
 			velocity.m128_f32[1] = reticle->matWorld.r[3].m128_f32[1] - player->matWorld.r[3].m128_f32[1];
-			velocity.m128_f32[2] = reticle->matWorld.r[3].m128_f32[2] - player->matWorld.r[3].m128_f32[2];
+			velocity.m128_f32[2] = reticle->matWorld.r[3].m128_f32[2] - player->matWorld.r[3].m128_f32[2];*/
+			velocity.m128_f32[0] = reticle->position.x - player->position.x;
+			velocity.m128_f32[1] = reticle->position.y - player->position.y;
+			velocity.m128_f32[2] = reticle->position.z - player->position.z;
+
 			velocity = XMVector3Normalize(velocity) * 3.0f;
 
 			//弾生成

@@ -33,7 +33,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	enemyL->Init(enemyModel, { -30.0f, 0.0f, 150.0f }, false);
 
 	enemyCircle = new EnemyCircle();
-	enemyCircle->Init(enemyModel, { -80.0f, 0.0f, 150.0f }, false);
+	enemyCircle->Init(enemyModel, { 0.0f, 0.0f, 200.0f }, false);
 
 	enemyOneWay = new EnemyOneWay();
 	enemyOneWay->Init(enemyModel, { 100.0f,20.0f,150.0f }, true);
@@ -50,17 +50,13 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 void GameScene::Update()
 {
-
-
-	
-
 	//2dレティクルスプライトの座標
 	mouseX = player->GetMouseX();
 	mouseY = player->GetMouseY();
 
 	//デバッグ用
-	sprintf_s(moji, "%f", player->GetReticleWorldPosition().z);
-	sprintf_s(moji2, "%f", player->GetWorldPosition().x);
+	sprintf_s(moji, "%0.3f", player->GetReticleWorldPosition().x);
+	sprintf_s(moji2, "%0.3f", player->GetReticleWorldPosition().y);
 
 //カメラ
 	cameraObj->UpdateCamera();
@@ -92,13 +88,14 @@ void GameScene::Update()
 	player->SetHwnd(hwnd);
 	player->SetViewPort(viewPort);
 	player->SetCameraMatViewProjection(cameraObj->GetMatViewProjection());
+
 //自機
 	player->SetEnemyFlag(enemyL->IsDead());
 	player->SetCameraObj(cameraObj->GetWorldTransform());
 	player->SetCameraPos(cameraObj->GetEye());
+	player->SetCameraEyeVec(cameraObj->GetEyeVec());
 	player->Update();
-	
-	
+
 }
 
 void GameScene::Draw()
@@ -107,8 +104,8 @@ void GameScene::Draw()
 
 	player->Draw();
 
-	enemyCircle->Draw();
-	enemyOneWay->Draw();
+	/*enemyCircle->Draw();
+	enemyOneWay->Draw();*/
 
 	Object3d::PostDraw();
 }
