@@ -55,8 +55,8 @@ void GameScene::Update()
 	mouseY = player->GetMouseY();
 
 	//デバッグ用
-	sprintf_s(moji, "%0.3f", player->GetReticleWorldPosition().x);
-	sprintf_s(moji2, "%0.3f", player->GetReticleWorldPosition().y);
+	sprintf_s(moji, "%0.3f",player->GetWorldPosition().x);
+	sprintf_s(moji2, "%0.3f", player->GetWorldPosition().y);
 
 //カメラ
 	cameraObj->UpdateCamera();
@@ -93,6 +93,7 @@ void GameScene::Update()
 	player->SetEnemyFlag(enemyL->IsDead());
 	player->SetCameraObj(cameraObj->GetWorldTransform());
 	player->SetCameraPos(cameraObj->GetEye());
+	player->SetCameraTargetVec(cameraObj->GetTargetVec());
 	player->SetCameraEyeVec(cameraObj->GetEyeVec());
 	player->Update();
 
@@ -104,8 +105,8 @@ void GameScene::Draw()
 
 	player->Draw();
 
-	/*enemyCircle->Draw();
-	enemyOneWay->Draw();*/
+	enemyCircle->Draw();
+	enemyOneWay->Draw();
 
 	Object3d::PostDraw();
 }

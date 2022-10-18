@@ -27,6 +27,11 @@ public:
 	ComPtr<IDirectInput8> dinput;
 	ComPtr<IDirectInputDevice8> devkeyboard;
 
+	ComPtr<IDirectInputDevice8> Devmouse;
+
+	DIMOUSESTATE2 mouseState = {};
+	DIMOUSESTATE2 beforeMouse = {};
+
 
 bool isKey(int keyIndex) {
 		if (keyIndex < 0 || keyIndex > 255)return false;
@@ -38,6 +43,16 @@ bool isKey(int keyIndex) {
 		return keys[keyIndex] && !oldkeys[keyIndex];
 	}
 
+	bool isMouseKey() {
+		if (!beforeMouse.rgbButtons[0] && mouseState.rgbButtons[0])
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+
 
 	void Initialize(Win*win);
 
@@ -47,6 +62,7 @@ bool isKey(int keyIndex) {
 
 	void Finalize();
 
+	
 	
 };
 

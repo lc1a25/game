@@ -158,6 +158,7 @@ void Enemy::Shot()
 	//íeê∂ê¨
 	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
 	newBullet->Init(bulletModel_, enemy->position,lockOn);
+	newBullet->SetDiffVec(GetWorldPosition(), playerWorldPos);
 
 
 	//íeìoò^

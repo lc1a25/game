@@ -143,12 +143,35 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	object1->Init();
 	object1->SetModelFbx(modelFbx);
 
+	Model * model1 = Model::LoadFromOBJ("box");
+	Object3d* box = box->Create();
+	box->SetModel(model1);
+	box->scale = { 1,1,1, };
+	box->SetPosition({ -100.0f, 0.0f, +200.0f });
+
+	Object3d* box2 = box2->Create();
+	box2->SetModel(model1);
+	box2->scale = { 1,1,1, };
+	box2->SetPosition({ 50.0f, 100.0f, +400.0f });
+
+
+	Object3d* box3 = box3->Create();
+	box3->SetModel(model1);
+	box3->scale = { 1,1,1, };
+	box3->SetPosition({ 50.0f, -100.0f, +600.0f });
+
+
+	Object3d* box4 = box4->Create();
+	box4->SetModel(model1);
+	box4->scale = { 1,1,1, };
+	box4->SetPosition({ 10.0f, -30.0f, +800.0f });
+	
 	Model* skydome_model = Model::LoadFromOBJ("skydome");
 
 	Object3d* skydome = skydome->Create();
 
 	skydome->SetModel(skydome_model);
-	skydome->scale = { 3,3,3 };
+	skydome->scale = { 8,8,8 };
 	skydome->SetPosition({ 0,0,0 });
 
 
@@ -247,7 +270,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			
 //XV	
 		gameScene->Update();
-
+		box->Update();
+		box2->Update();
+		box3->Update();
+		box4->Update();
 		skydome->Update();
 		camera->UpdateCamera();
 
@@ -271,6 +297,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		////obj•`‰æ
 		gameScene->Draw();
 		Object3d::PreDraw(dxcommon->GetCmdlist());
+
+		box->Draw();
+		box2->Draw();
+		box3->Draw();
+		box4->Draw();
 		skydome->Draw();
 		Object3d::PostDraw();
 

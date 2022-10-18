@@ -26,10 +26,17 @@ void Input::Initialize(Win*win)
 	//入力データの形式セット
 	result = devkeyboard->SetDataFormat(&c_dfDIKeyboard);
 
+	result = dinput->CreateDevice(GUID_SysMouse, &Devmouse, NULL);
+	result = Devmouse->SetDataFormat(&c_dfDIMouse2);
+
 	//排他制御レベルのセット
 	result = devkeyboard->SetCooperativeLevel(
 		win->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	/*//画面が手前にある場合のみ入力を受け付ける　//デバイスをこのアプリだけで占有しない//Windowsキーを無効にする*/
+
+
+
+
 }
 
 void Input::Update()
@@ -40,6 +47,12 @@ void Input::Update()
 	}
 	result = devkeyboard->Acquire();
 	result = devkeyboard->GetDeviceState(sizeof(keys), keys);
+
+	result = Devmouse->Acquire();
+
+	beforeMouse = mouseState;
+
+	result = Devmouse->GetDeviceState(sizeof(mouseState), &mouseState);
 }
 
 

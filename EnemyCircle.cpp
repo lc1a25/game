@@ -13,7 +13,6 @@ void EnemyCircle::Update()
 {
 	position = enemy->GetPosition();
 
-	
 	enemy->SetPlayerPosition(playerWorldPos);
 	enemy->SetPosition(position);
 	enemy->Update();

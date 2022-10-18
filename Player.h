@@ -36,6 +36,7 @@ private:
 	XMFLOAT3 cameraPos = { 0.0f,0.0f,0.0f };
 
 	XMFLOAT3 cameraEyeVec = { 0.0f,0.0f,0.0f };
+	XMVECTOR cameraTargetVec = { 0.0f,0.0f,0.0f };
 
 	
 	XMVECTOR posNear = { 0.0f };
@@ -53,6 +54,8 @@ private:
 	int32_t bulletCoolTimer = 5;
 
 	bool rockOn = false;
+
+	XMFLOAT2 playerMoveRange = { 50,80 };
 
 public:
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
@@ -84,6 +87,10 @@ public:
 	void SetCameraPos(XMFLOAT3 cameraPos) { this->cameraPos = cameraPos; }
 
 	void SetCameraEyeVec(XMFLOAT3 cameraEyeV) { this->cameraEyeVec = cameraEyeV; }
+	void SetCameraTargetVec(XMFLOAT3 cameraTargetV) { this->cameraTargetVec.m128_f32[0] = cameraTargetV.x; 
+	this->cameraTargetVec.m128_f32[1] = cameraTargetV.y;
+	this->cameraTargetVec.m128_f32[2] = cameraTargetV.z;
+	}
 
 
 	XMFLOAT3 GetWorldPosition();
@@ -95,8 +102,6 @@ public:
 	//マウス座標
 	FLOAT GetMouseX(){return  mouseX;}
 	FLOAT GetMouseY() { return  mouseY; }
-
-
 
 	void OnCollision();
 };

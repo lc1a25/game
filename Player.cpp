@@ -7,7 +7,7 @@ void Player::Init(Model* model,Model* bulletModel)
 	reticleModel_ = model;
 	player->SetModel(model_);
 	player->SetPosition({ 0,0,0 });
-	player->scale = { 1,1,1 };
+	player->scale = { 0.3,0.3,0.3 };
 
 	reticle->matWorld.r[3].m128_f32[0] = player->matWorld.r[3].m128_f32[0];
 	reticle->matWorld.r[3].m128_f32[1] = player->matWorld.r[3].m128_f32[1];
@@ -21,12 +21,14 @@ void Player::Init(Model* model,Model* bulletModel)
 	player->matWorld.r[3].m128_f32[0] = cameraPos.x;
 	player->matWorld.r[3].m128_f32[1] = cameraPos.y;
 	player->matWorld.r[3].m128_f32[2] = cameraPos.z + 30;
+
+
+
 }
 
 
 void Player::Update()
 {
-	
 
 //2dレティクル
 	POINT mousePosition;
@@ -42,14 +44,6 @@ void Player::Update()
 	  0.0f		 ,0.0f	  ,1.0f, 0.0f,
 	 1280.0f / 2 ,720 / 2 ,0.0f, 1.0f
 	};
-
-	//XMMATRIX invmatVPV = XMMatrixIdentity();
-	//invmatVPV.r[0].m128_f32[0] = 2 / 1280.0f;
-	//invmatVPV.r[1].m128_f32[1] = -2 / 720.0f;
-	//invmatVPV.r[3].m128_f32[0] = -1;
-	//invmatVPV.r[3].m128_f32[1] = 1;
-
-	//XMMATRIX invmatVPV2 = XMMatrixInverse(nullptr, viewPort);
 
 	XMMATRIX matVPV = cameraMatViewProjection * viewPort;
 	//XMMATRIX matVPV = viewPort;
@@ -88,13 +82,17 @@ void Player::Update()
 	reticle->position.y = reticle->matWorld.r[3].m128_f32[1];
 	reticle->position.z = reticle->matWorld.r[3].m128_f32[2];
 
-	player->matWorld.r[3].m128_f32[2] = cameraPos.z +	30;
+	//player->matWorld.r[3].m128_f32[2] = cameraPos.z +	30;
 
-	player->position.x = player->matWorld.r[3].m128_f32[0] + cameraEyeVec.x;
-	player->position.y = player->matWorld.r[3].m128_f32[1] + cameraEyeVec.y;
-	player->position.z = player->matWorld.r[3].m128_f32[2];
+	//player->position.x = player->matWorld.r[3].m128_f32[0] + cameraEyeVec.x;
+	//player->position.y = player->matWorld.r[3].m128_f32[1] + cameraEyeVec.y;
+	//player->position.z = player->matWorld.r[3].m128_f32[2];
 
-
+	cameraTargetVec = XMVector3Normalize(cameraTargetVec);
+	player->position.x = cameraPos.x + cameraTargetVec.m128_f32[0] * 10;
+	player->position.y = cameraPos.y + cameraTargetVec.m128_f32[1] * 10;
+	player->position.z = cameraPos.z + cameraTargetVec.m128_f32[2] * 10;
+												
 //デスフラグが立っている弾を消す
 	bullets_.remove_if([](std::unique_ptr<PlayerBullet>& bullet)
 		{
@@ -102,23 +100,23 @@ void Player::Update()
 		});
 
 //移動制御(画面外に行かないように)
-	//if (cameraPos.x <= -0.1)
-	//{
-	//	player->position.x += playerVelocity;
-	//	player->rotation.y += playerVelocity / 2;
-	//}
-	/*if (player->position.x - cameraEyeVec.x >= +30)
+	/*if (player->position.x <= cameraPos.x - playerMoveRange.x)
+	{
+		player->position.x += playerVelocity;
+		player->rotation.y += playerVelocity / 2;
+	}
+	if (player->position.x >= cameraPos.x + playerMoveRange.x)
 	{
 		player->position.x -= playerVelocity;
 		player->rotation.y -= playerVelocity / 2;
 	}
 
-	if (player->position.y - cameraEyeVec.y <= -15)
+	if (player->position.y <= cameraPos.y - playerMoveRange.y)
 	{
 		player->position.y += playerVelocity;
 		player->rotation.x -= playerVelocity / 4;
 	}
-	if (player->position.y - cameraEyeVec.y >= 15)
+	if (player->position.y >= cameraPos.y + playerMoveRange.y)
 	{
 		player->position.y -= playerVelocity;
 		player->rotation.x += playerVelocity / 4;
@@ -127,23 +125,23 @@ void Player::Update()
 //移動処理
 	if (input->isKey(DIK_W))
 	{
-		player->position.y+= playerVelocity;
+		player->position.y += playerVelocity;
 		player->rotation.x -= playerVelocity / 4;
 	}
 	if (input->isKey(DIK_D))
 	{
-		player->position.x+= playerVelocity;
+		player->position.x += playerVelocity;
 		player->rotation.y += playerVelocity / 2;
 	
 	}
 	if (input->isKey(DIK_A))
 	{
-		player->position.x-= playerVelocity;
+		player->position.x -= playerVelocity;
 		player->rotation.y -= playerVelocity / 2;
 	}
 	if (input->isKey(DIK_S))
 	{
-		player->position.y-= playerVelocity;
+		player->position.y -= playerVelocity;
 		player->rotation.x += playerVelocity / 4;
 	}
 
@@ -151,12 +149,12 @@ void Player::Update()
 	Attack();
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
 	{
-
 		//bullet->SetLockOnPosition(enemyWorldPos,isDeadEnemy);	
 		bullet->Update();
 	}
 
 //更新
+	
 	player->Update();
 	reticle->Update();
 }
@@ -164,12 +162,12 @@ void Player::Update()
 //描画
 void Player::Draw()
 {
-	//player->Draw();
+	player->Draw();
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
 	{
 		bullet->Draw();
 	}
-	reticle->Draw();
+	//reticle->Draw();
 
 }
 

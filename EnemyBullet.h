@@ -17,6 +17,8 @@ private:
 	bool isDead = false;
 
 	XMVECTOR lockOn = { 0,0,0 };
+
+	XMVECTOR diff = { 0,0,0 };
 public:
 	XMVECTOR velocity_ = { 0,0,0 };
 
@@ -33,5 +35,7 @@ public:
 	XMFLOAT3 GetWorldPosition();
 
 	void SetLockOnPosition(XMFLOAT3 enemyPosition, XMFLOAT3 playerPosition);
+
+	void SetDiffVec(XMFLOAT3 enemyPosition, XMFLOAT3 playerPosition);
 
 };
