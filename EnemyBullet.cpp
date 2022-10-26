@@ -6,7 +6,7 @@ void EnemyBullet::Init(Model* model, XMFLOAT3 enemyPosition, XMVECTOR velocity)
 	velocity_ = velocity;
 	enemyBullet->SetPosition({ enemyPosition });
 	enemyBullet->SetModel(bulletModel_);
-	enemyBullet->scale = { 0.5,0.5,1.0 };
+	enemyBullet->scale = { 0.5,0.5,0.5 };
 	enemyBullet->position.x += velocity_.m128_f32[0];
 	enemyBullet->position.y += velocity_.m128_f32[1];
 	enemyBullet->position.z += velocity_.m128_f32[2];
@@ -20,10 +20,9 @@ void EnemyBullet::Update()
 		isDead = true;
 	}
 	
-	enemyBullet->rotation.y = atan2(diff.m128_f32[2], diff.m128_f32[0]);
-
-	//enemyBullet->rotation.y *= -enemyBullet->rotation.y;
-	enemyBullet->rotation.x = atan2( diff.m128_f32[1], diff.m128_f32[0] * diff.m128_f32[0] + diff.m128_f32[2] * diff.m128_f32[2]);
+	//enemyBullet->rotation.y = atan2(diff.m128_f32[2], diff.m128_f32[0]);
+	////enemyBullet->rotation.y *= -enemyBullet->rotation.y;
+	//enemyBullet->rotation.x = atan2( diff.m128_f32[1], diff.m128_f32[0] * diff.m128_f32[0] + diff.m128_f32[2] * diff.m128_f32[2]);
 
 	enemyBullet->position.x += velocity_.m128_f32[0];
 	enemyBullet->position.y += velocity_.m128_f32[1];
@@ -54,7 +53,7 @@ XMFLOAT3 EnemyBullet::GetWorldPosition()
 void EnemyBullet::SetLockOnPosition(XMFLOAT3 enemyPosition, XMFLOAT3 playerPosition)
 {
 	//assert(player_);
-	const float speed = 1.0f;//1フレーム進む距離
+	const float speed = 2.0f;//1フレーム進む距離
 
 	//差分ベクトル
 	velocity_.m128_f32[0] = playerPosition.x - enemyPosition.x;

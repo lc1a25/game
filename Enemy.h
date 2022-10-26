@@ -15,6 +15,7 @@ enum class Phase
 	Stop,  //é~Ç‹ÇÈ
 	CircleR,//â~â^ìÆâEÇ©ÇÁÇ≠ÇÈ
 	CircleL,//ç∂Ç©ÇÁÇ≠ÇÈ
+	CircleInfinity,//Åáè„Ç…Ç‹ÇÌÇÈ
 	OneWayR,//âEÇ©ÇÁç∂Ç…çsÇ≠
 	OneWayL,//ç∂Ç©ÇÁâEÇ…çsÇ≠
 };
@@ -28,7 +29,8 @@ private:
 	Object3d* enemy = enemy->Create();
 	std::list<std::unique_ptr<EnemyBullet>> bullets_;
 	//Player* player_ = nullptr;
-
+	float OWRbulletSpeed = 0.5f;
+	float OWLbulletSpeed = 0.5f;
 
 	XMFLOAT3 playerWorldPos;
 	XMVECTOR lockOn;
@@ -41,18 +43,27 @@ private:
 	float length = 0.3f;//â~ÇÃîºåa
 	float addCircleX = cos(radius) * length;//â~è„ÇÃà íu x
 	float addCircleY = sin(radius) * length;//â~è„ÇÃà íu y
+	float angleVec = 0.5f;
 
 	bool isDead = false;
+
+	bool isL = false;
+
+	float cameraZ = 0.0f;
+
+	void CircleR();
+
+	void CircleL();
 public:
 
 
-	Phase phase;
+	Phase phase = Phase::Stop;
 	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; }
 
 	//î≠éÀä‘äu
 	static const int shotInterval = 60;
 
-	void Init(Model* enemyModel,XMFLOAT3 position, bool rightMoveTrue);
+	void Init(Model* enemyModel,XMFLOAT3 position);
 
 	void Update();
 
@@ -67,6 +78,8 @@ public:
 	void SetPlayerPosition(XMFLOAT3 position) { playerWorldPos = position; }
 
 	void SetPosition(XMFLOAT3 position) { enemy->position = position; }
+
+	void SetCameraZ(float z) { cameraZ = z; }
 
 	XMFLOAT3 GetWorldPosition();
 

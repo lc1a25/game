@@ -19,24 +19,34 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	this->input = input;
 	this->audio = audio;
 
-	playerModel = Model::LoadFromOBJ("box");
+	playerModel = Model::LoadFromOBJ("boxplayer-0");
 	bulletModel = Model::LoadFromOBJ("ene-0");
 	enemyModel = Model::LoadFromOBJ("box");
+	bossModel = Model::LoadFromOBJ("boss");
 
 	player = new Player();
 	player->Init(playerModel, bulletModel);
 
 	enemy = new Enemy();
-	enemy->Init(enemyModel,{ 30.0f, 0.0f, 150.0f },true);//30,0,100
+	enemy->Init(enemyModel, { 30.0f, -80.0f, 700.0f });//30,0,100
 
 	enemyL = new Enemy();
-	enemyL->Init(enemyModel, { -30.0f, 0.0f, 150.0f }, false);
+	enemyL->Init(enemyModel, { 50.0f, 50.0f, 500.0f });
 
 	enemyCircle = new EnemyCircle();
-	enemyCircle->Init(enemyModel, { 0.0f, 0.0f, 200.0f }, false);
+	enemyCircle->Init(enemyModel, { -50.0f, 50.0f, 400.0f }, false);
+
+	enemyCircle2 = new EnemyCircle();
+	enemyCircle2->Init(enemyModel, { 30.0f, -10.0f, 200.0f }, true);
 
 	enemyOneWay = new EnemyOneWay();
-	enemyOneWay->Init(enemyModel, { 100.0f,20.0f,150.0f }, true);
+	enemyOneWay->Init(enemyModel, { -150.0f,0.0f,300.0f }, false);
+
+	enemyOneWay2 = new EnemyOneWay();
+	enemyOneWay2->Init(enemyModel, { 30.0f,-100.0f,650.0f }, true);
+
+	boss = new Boss();
+	boss->Init(bossModel, { 0,0,950.0f });
 
 	camera = new Camera();
 	camera->Init();
@@ -56,7 +66,7 @@ void GameScene::Update()
 
 	//デバッグ用
 	sprintf_s(moji, "%0.3f",player->GetWorldPosition().x);
-	sprintf_s(moji2, "%0.3f", player->GetWorldPosition().y);
+	sprintf_s(moji2, "%0.3f", cameraObj->GetTimerate());
 
 //カメラ
 	cameraObj->UpdateCamera();
@@ -68,21 +78,11 @@ void GameScene::Update()
 
 //当たり判定
 	CheckAllCollision(enemyCircle->GetEnemy());
+	CheckAllCollision(enemyCircle2->GetEnemy());
+	CheckAllCollision(enemy);
 	CheckAllCollision(enemyL);
-
-//敵
-	/*enemy->SetPlayerPosition(player->GetWorldPosition());
-	player->SetEnemyPosition(enemy->GetWorldPosition());
-	enemy->Update();
-
-	enemyL->SetPlayerPosition(player->GetWorldPosition());
-	player->SetEnemyPosition(enemyL->GetWorldPosition());
-	enemyL->Update();*/
-	
-	enemyCircle->SetPlayerPosition(player->GetWorldPosition());
-	enemyCircle->Update();
-
-	enemyOneWay->Update();
+	CheckAllCollision(enemyOneWay->GetEnemy());
+	CheckAllCollision(enemyOneWay2->GetEnemy());
 
 //レティクルのため
 	player->SetHwnd(hwnd);
@@ -97,6 +97,29 @@ void GameScene::Update()
 	player->SetCameraEyeVec(cameraObj->GetEyeVec());
 	player->Update();
 
+	enemy->SetCameraZ(cameraObj->GetEye().z);
+
+// 敵
+	enemy->SetPlayerPosition(player->GetWorldPosition());
+	player->SetEnemyPosition(enemy->GetWorldPosition());
+	enemy->Update();
+
+	enemyL->SetPlayerPosition(player->GetWorldPosition());
+	player->SetEnemyPosition(enemyL->GetWorldPosition());
+	enemyL->Update();
+
+	enemyCircle->SetPlayerPosition(player->GetWorldPosition());
+	enemyCircle->Update();
+
+	enemyCircle2->SetPlayerPosition(player->GetWorldPosition());
+	enemyCircle2->Update();
+
+	enemyOneWay->Update();
+	enemyOneWay2->Update();
+
+	boss->Update();
+
+	//pointsLast = cameraObj->GetEndFlag();
 }
 
 void GameScene::Draw()
@@ -104,9 +127,14 @@ void GameScene::Draw()
 	Object3d::PreDraw(dxcommon->GetCmdlist());
 
 	player->Draw();
-
+	
+	enemy->Draw();
+	enemyL->Draw();
 	enemyCircle->Draw();
+	enemyCircle2->Draw();
 	enemyOneWay->Draw();
+	enemyOneWay2->Draw();
+	boss->Draw();
 
 	Object3d::PostDraw();
 }

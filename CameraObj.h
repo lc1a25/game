@@ -44,7 +44,10 @@ public:
 	const float& GetpositionX() { return cameraObj->position.z; }
 
 
-	const FLOAT& GetTimerate() { return points.size(); }
+	const FLOAT& GetTimerate() { return  startIndex; }
+
+	const BOOL& GetEndFlag() { return pointsLast; }
+
 
 	//setter
 	/*void SetEye(XMFLOAT3 eye)
@@ -114,7 +117,7 @@ private:
 	XMVECTOR p6{ 10.0f, -30.0f, +800.0f };
 	XMVECTOR p7{ 0.0f, 0.0f, +850.0f };
 
-	XMVECTOR end{ 0.0f, 0.0f, 350.0f };
+	XMVECTOR end{ 0.0f, 0.0f, 850.0f };
 	XMVECTOR targetEnd{};
 	float maxTime = 10.0f;
 	float timeRate = 0.0f;
@@ -126,7 +129,8 @@ private:
 	XMFLOAT3 targetVec = { 0.0f,0.0f,0.0f };
 	bool pointsLast = false;
 
-	std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,p6,p7,end,end };
+	//std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,p6,p7,end,end };
+	std::vector<XMVECTOR>points{ start,start,start,start,start,start,start,start,start,start };
 
 	int startIndex = 1;
 	int targetIndex = 2;

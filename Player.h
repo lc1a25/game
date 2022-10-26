@@ -55,7 +55,7 @@ private:
 
 	bool rockOn = false;
 
-	XMFLOAT2 playerMoveRange = { 50,80 };
+	XMFLOAT2 playerMoveRange = { 25,15 };
 
 public:
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }

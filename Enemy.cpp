@@ -1,6 +1,66 @@
 #include "Enemy.h"
 
-void Enemy::Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue)
+void Enemy::CircleR()
+{
+	//‰~‚ÌŠp“x
+	radius = angle * 3.14f / 180.0f;
+
+	//‰~ó‚ÌêŠ
+	addCircleX = cos(radius) * length;
+	addCircleY = sin(radius) * length;
+
+	//“G‚ÌÀ•W‚É‘«‚·
+	enemy->position.x += addCircleX;
+	enemy->position.y += addCircleY;
+
+	//Šp“x‚ğ‚½‚µ‚Ä‰~ó‚É“®‚©‚·
+	angle += angleVec;
+	if (angle >= 460.0f)
+	{
+		shotTimer;
+		//enemy->position.z -= 0.5;
+	}
+
+	//’e‚ğŒ‚‚Â
+	shotTimer--;
+	if (shotTimer <= 0)
+	{
+		Shot();
+		shotTimer = shotInterval;
+	}
+}
+
+void Enemy::CircleL()
+{
+	//‰~‚ÌŠp“x
+	radius = angle * 3.14f / 180.0f;
+
+	//‰~ó‚ÌêŠ
+	addCircleX = cos(radius) * length;
+	addCircleY = sin(radius) * length;
+
+	//“G‚ÌÀ•W‚É‘«‚·
+	enemy->position.x += addCircleX;
+	enemy->position.y += addCircleY;
+
+	//Šp“x‚ğ‚½‚µ‚Ä‰~ó‚É“®‚©‚·
+	angle -= angleVec;
+	if (angle <= -270.0f)
+	{
+		shotTimer = shotInterval;
+		//enemy->position.z -= 0.5;
+	}
+
+	//’e‚ğŒ‚‚Â
+	shotTimer--;
+	if (shotTimer <= 0)
+	{
+		Shot();
+		shotTimer = shotInterval;
+	}
+}
+
+void Enemy::Init(Model* enemyModel, XMFLOAT3 position)
 {
 	enemyModel_ = enemyModel;
 	bulletModel_ = enemyModel;
@@ -52,72 +112,67 @@ void Enemy::Update()
 			Shot();
 			shotTimer = shotInterval;
 		}
+		else if (enemy->position.z <= playerWorldPos.z)
+		{
+			phase = Phase::Leave;
+		}
 		break;
 	case Phase::CircleR://‰E‚©‚ç—ˆ‚½ver 90‚Ç
-		//‰~‚ÌŠp“x
-		radius = angle * 3.14f / 180.0f;
-
-		//‰~ó‚ÌêŠ
-		addCircleX = cos(radius) * length;
-		addCircleY = sin(radius) * length;
-
-		//“G‚ÌÀ•W‚É‘«‚·
-		enemy->position.x += addCircleX;
-		enemy->position.y += addCircleY;
-
-		//Šp“x‚ğ‚½‚µ‚Ä‰~ó‚É“®‚©‚·
-		angle += 0.5f;
-		if (angle >= 460.0f)
+		CircleR();
+		if (enemy->position.z <= playerWorldPos.z)
 		{
-			shotTimer = shotInterval;
-			enemy->position.z -= 0.5;
-		}
-
-		//’e‚ğŒ‚‚Â
-		shotTimer--;
-		if (shotTimer <= 0)
-		{
-			Shot();
-			shotTimer = shotInterval;
+			phase = Phase::Leave;
 		}
 		
 		break;
 	case Phase::CircleL://¶‚©‚ç—ˆ‚½ver 270‚Ç
-	//‰~‚ÌŠp“x
-		radius = angle * 3.14f / 180.0f;
-
-		//‰~ó‚ÌêŠ
-		addCircleX = cos(radius) * length;
-		addCircleY = sin(radius) * length;
-
-		//“G‚ÌÀ•W‚É‘«‚·
-		enemy->position.x += addCircleX;
-		enemy->position.y += addCircleY;
-
-		//Šp“x‚ğ‚½‚µ‚Ä‰~ó‚É“®‚©‚·
-		angle -= 0.5f;
-		if (angle <= -270.0f)
+		CircleL();
+		if (enemy->position.z <= playerWorldPos.z)
 		{
-			shotTimer = shotInterval;
-			enemy->position.z -= 0.5;
+			phase = Phase::Leave;
+		}
+		break;
+
+	case Phase::CircleInfinity:
+
+		CircleR();
+		
+		if (angle >= 450)
+		{
+			angleVec = -2;
+			isL = true;
+		}
+		if (angle <= 90 && isL == true)
+		{
+			angleVec = 2;
+			isL = false;
 		}
 
-		//’e‚ğŒ‚‚Â
-		shotTimer--;
-		if (shotTimer <= 0)
-		{
-			Shot();
-			shotTimer = shotInterval;
-		}
+		
 		break;
 
 	case Phase::OneWayL:
-		enemy->position.x++;
-
+		enemy->position.x += OWLbulletSpeed;
+		if (enemy->position.x <= -200)
+		{
+			OWLbulletSpeed *= -1;
+		}
+		if (enemy->position.x >= 50)
+		{
+			OWLbulletSpeed *= -1;
+		}
 		break;
 
 	case Phase::OneWayR:
-		enemy->position.x--;
+		enemy->position.x -= OWRbulletSpeed;
+		if (enemy->position.x <= -100)
+		{
+			OWRbulletSpeed *= -1;
+		}
+		if (enemy->position.x >= 100)
+		{
+			OWRbulletSpeed *= -1;
+		}
 		break;
 
 	default:
@@ -143,7 +198,7 @@ void Enemy::Draw()
 void Enemy::Shot()
 {
 	//assert(player_);
-	const float speed = 2.0f;//1ƒtƒŒ[ƒ€i‚Ş‹——£
+	const float speed = 3.0f;//1ƒtƒŒ[ƒ€i‚Ş‹——£
 
 	//·•ªƒxƒNƒgƒ‹
 	lockOn.m128_f32[0] = playerWorldPos.x - GetWorldPosition().x;

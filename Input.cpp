@@ -9,6 +9,9 @@
 
 BYTE Input::keys[ALL_KEYS] = { 0 };
 BYTE Input::oldkeys[ALL_KEYS] = { 0 };
+DIMOUSESTATE2 Input::beforeMouse = {};
+DIMOUSESTATE2 Input::mouseState = {};
+
 
 void Input::Initialize(Win*win)
 {
@@ -26,6 +29,7 @@ void Input::Initialize(Win*win)
 	//入力データの形式セット
 	result = devkeyboard->SetDataFormat(&c_dfDIKeyboard);
 
+	//マウス生成　形式セット
 	result = dinput->CreateDevice(GUID_SysMouse, &Devmouse, NULL);
 	result = Devmouse->SetDataFormat(&c_dfDIMouse2);
 
@@ -42,16 +46,17 @@ void Input::Initialize(Win*win)
 void Input::Update()
 {
 	HRESULT result;
+	//キーボード
 	for (int i = 0; i < ALL_KEYS; ++i) {
 		oldkeys[i] = keys[i];
 	}
 	result = devkeyboard->Acquire();
 	result = devkeyboard->GetDeviceState(sizeof(keys), keys);
 
+
+	//マウス
 	result = Devmouse->Acquire();
-
 	beforeMouse = mouseState;
-
 	result = Devmouse->GetDeviceState(sizeof(mouseState), &mouseState);
 }
 

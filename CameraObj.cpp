@@ -24,6 +24,17 @@ void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
 	time = timeGetTime();
 
 	start = this->worldPos;
+
+	startIndex = 1;
+	targetIndex = 2;
+	pointsLast = false;
+
+	eyeVecTemp = { 0.0f,0.0f,0.0f };
+	eyeVec = { 0.0f,0.0f,0.0f };
+
+	targetVecTemp = { 0.0f,0.0f,0.0f };
+	targetVec = { 0.0f,0.0f,0.0f };
+
 }
 
 void CameraObj::UpdateCamera()
@@ -60,6 +71,7 @@ void CameraObj::UpdateCamera()
 			{
 				/*startIndex = 0;
 				timeRate = 0.0f;*/
+				startIndex++;
 				pointsLast = true;
 			}
 			if (targetIndex > points.size() - 3)
@@ -70,7 +82,7 @@ void CameraObj::UpdateCamera()
 
 		}
 		eye = splinePosition(points, startIndex, timeRate);
-		target = splinePosition(points, targetIndex, timeRate);
+		//target = splinePosition(points, targetIndex, timeRate);
 		
 		//カメラの移動量
 		eyeVec.x = eye.m128_f32[0] - eyeVecTemp.x;
@@ -86,17 +98,15 @@ void CameraObj::UpdateCamera()
 		targetVec.y = target.m128_f32[1] - eye.m128_f32[1];
 		targetVec.z = target.m128_f32[2] - eye.m128_f32[2];
 
-
-
 		targetVecTemp.x = target.m128_f32[0];
 		targetVecTemp.y = target.m128_f32[1];
 		targetVecTemp.z = target.m128_f32[2];
 
 
 
-		//target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
-		//target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
-		//target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
+		target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
+		target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
+		target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
 	}
 	else//最後まで行ったら視点を固定　ボス戦
 	{

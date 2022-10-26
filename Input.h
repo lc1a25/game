@@ -29,8 +29,8 @@ public:
 
 	ComPtr<IDirectInputDevice8> Devmouse;
 
-	DIMOUSESTATE2 mouseState = {};
-	DIMOUSESTATE2 beforeMouse = {};
+	static DIMOUSESTATE2 mouseState;
+	static DIMOUSESTATE2 beforeMouse;
 
 
 bool isKey(int keyIndex) {
@@ -44,11 +44,10 @@ bool isKey(int keyIndex) {
 	}
 
 	bool isMouseKey() {
-		if (!beforeMouse.rgbButtons[0] && mouseState.rgbButtons[0])
+		if (mouseState.rgbButtons[0])
 		{
 			return true;
 		}
-
 		return false;
 	}
 

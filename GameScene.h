@@ -12,9 +12,11 @@
 #include "EnemyCircle.h"
 #include "EnemyOneWay.h"
 #include "CameraObj.h"
+#include "Boss.h"
 
 class GameScene
 {
+
 private: // エイリアス
 // Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
@@ -65,6 +67,8 @@ public: // メンバ関数
 	float mouseY;
 	char moji[64];
 	char moji2[64];
+
+	bool pointsLast = false;
 private: // メンバ変数
 	HWND hwnd;
 	XMMATRIX viewPort;
@@ -82,7 +86,11 @@ private: // メンバ変数
 	Enemy* enemy = nullptr;
 	Enemy* enemyL = nullptr;
 	EnemyCircle* enemyCircle = nullptr;
+	EnemyCircle* enemyCircle2 = nullptr;
 	EnemyOneWay* enemyOneWay = nullptr;
+	EnemyOneWay* enemyOneWay2 = nullptr;
+	Boss* boss = nullptr;
+	
 
 	XMVECTOR reticlePos;//レティクル用変数
 
@@ -90,6 +98,7 @@ private: // メンバ変数
 	Model* playerModel = nullptr;
 	Model* bulletModel = nullptr;
 	Model* enemyModel = nullptr;
+	Model* bossModel = nullptr;
 
 
 	//当たり判定用変数

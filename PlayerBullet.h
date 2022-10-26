@@ -10,7 +10,7 @@ private:
 	XMVECTOR velocity_ = { 0,0,0 };
 
 	//生存時間
-	static const int32_t lifeTime = 60 * 5;
+	static const int32_t lifeTime = 60 * 1.5;
 	//デスタイマー
 	int32_t deathTimer = lifeTime;
 	//デスフラグ

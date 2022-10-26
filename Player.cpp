@@ -7,7 +7,7 @@ void Player::Init(Model* model,Model* bulletModel)
 	reticleModel_ = model;
 	player->SetModel(model_);
 	player->SetPosition({ 0,0,0 });
-	player->scale = { 0.3,0.3,0.3 };
+	player->scale = { 1,1,1 };
 
 	reticle->matWorld.r[3].m128_f32[0] = player->matWorld.r[3].m128_f32[0];
 	reticle->matWorld.r[3].m128_f32[1] = player->matWorld.r[3].m128_f32[1];
@@ -21,9 +21,6 @@ void Player::Init(Model* model,Model* bulletModel)
 	player->matWorld.r[3].m128_f32[0] = cameraPos.x;
 	player->matWorld.r[3].m128_f32[1] = cameraPos.y;
 	player->matWorld.r[3].m128_f32[2] = cameraPos.z + 30;
-
-
-
 }
 
 
@@ -83,15 +80,19 @@ void Player::Update()
 	reticle->position.z = reticle->matWorld.r[3].m128_f32[2];
 
 	//player->matWorld.r[3].m128_f32[2] = cameraPos.z +	30;
+	player->matWorld.r[3].m128_f32[0] += cameraEyeVec.x;
+	player->matWorld.r[3].m128_f32[1] += cameraEyeVec.y;
+	player->matWorld.r[3].m128_f32[2] += cameraEyeVec.z;
 
-	//player->position.x = player->matWorld.r[3].m128_f32[0] + cameraEyeVec.x;
-	//player->position.y = player->matWorld.r[3].m128_f32[1] + cameraEyeVec.y;
-	//player->position.z = player->matWorld.r[3].m128_f32[2];
+
+	player->position.x = player->matWorld.r[3].m128_f32[0];
+	player->position.y = player->matWorld.r[3].m128_f32[1];
+	player->position.z = player->matWorld.r[3].m128_f32[2];
 
 	cameraTargetVec = XMVector3Normalize(cameraTargetVec);
-	player->position.x = cameraPos.x + cameraTargetVec.m128_f32[0] * 10;
-	player->position.y = cameraPos.y + cameraTargetVec.m128_f32[1] * 10;
-	player->position.z = cameraPos.z + cameraTargetVec.m128_f32[2] * 10;
+	//player->position.x = cameraPos.x + cameraTargetVec.m128_f32[0] * 10;
+	//player->position.y = cameraPos.y + cameraTargetVec.m128_f32[1] * 10;
+	//player->position.z = cameraPos.z + cameraTargetVec.m128_f32[2] * 10;
 												
 //デスフラグが立っている弾を消す
 	bullets_.remove_if([](std::unique_ptr<PlayerBullet>& bullet)
@@ -100,7 +101,7 @@ void Player::Update()
 		});
 
 //移動制御(画面外に行かないように)
-	/*if (player->position.x <= cameraPos.x - playerMoveRange.x)
+	if (player->position.x <= cameraPos.x - playerMoveRange.x)
 	{
 		player->position.x += playerVelocity;
 		player->rotation.y += playerVelocity / 2;
@@ -120,7 +121,7 @@ void Player::Update()
 	{
 		player->position.y -= playerVelocity;
 		player->rotation.x += playerVelocity / 4;
-	}*/
+	}
 
 //移動処理
 	if (input->isKey(DIK_W))
@@ -232,7 +233,7 @@ XMFLOAT3 Player::GetSpriteReticle()
 
 void Player::Attack()
 {
-	if (input->isKey(DIK_SPACE))
+	if (input->isMouseKey())
 	{
 		coolTimer--;
 		if (coolTimer <= 0)

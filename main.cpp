@@ -113,6 +113,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	Sprite *sprite = Sprite::Create(spriteCommon,0);
 
+	spriteCommon->LoadTexture(1, L"Resource/setu.png");
+
+	Sprite* sprite2 = Sprite::Create(spriteCommon, 1);
+
+	spriteCommon->LoadTexture(2, L"Resource/title.png");
+
+	Sprite* titleSprite = Sprite::Create(spriteCommon, 2);
+
+	spriteCommon->LoadTexture(3, L"Resource/end.png");
+
+	Sprite* endSprite = Sprite::Create(spriteCommon, 3);
+
 	const int debugTextTexNumber3 = 4;
 
 	spriteCommon->LoadTexture(debugTextTexNumber3, L"Resource/ASC_White.png");
@@ -143,7 +155,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	object1->Init();
 	object1->SetModelFbx(modelFbx);
 
-	Model * model1 = Model::LoadFromOBJ("box");
+	Model * model1 = Model::LoadFromOBJ("bullet");
 	Object3d* box = box->Create();
 	box->SetModel(model1);
 	box->scale = { 1,1,1, };
@@ -171,8 +183,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Object3d* skydome = skydome->Create();
 
 	skydome->SetModel(skydome_model);
-	skydome->scale = { 8,8,8 };
+	skydome->scale = { 11,11,11 };
 	skydome->SetPosition({ 0,0,0 });
+
+	Model* goalmodel = Model::LoadFromOBJ("go");
+
+	Object3d* goal = goal->Create();
+
+	goal->SetModel(goalmodel);
+	goal->scale = { 1,1,1 };
+	goal->SetPosition({ 0,0,900 });
 
 
 #pragma endregion
@@ -188,11 +208,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	sprite->SetPosition({ 0.0f,0.0f,0.0f });
 	sprite->SetSize({ 100,100 });
-	//sprite->SetTexsize({100.0f,100.0f });
-
 	sprite->TransVertexBuffer();
 
+	sprite2->SetPosition({ 640.0f,360.0f,0.0f });
+	sprite2->SetSize({ 1280,720 });
+	sprite2->TransVertexBuffer();
+
+	titleSprite->SetPosition({ 640.0f,360.0f,0.0f });
+	titleSprite->SetSize({ 1280,720 });
+	titleSprite->TransVertexBuffer();
+
+	endSprite->SetPosition({ 640.0f,360.0f,0.0f });
+	endSprite->SetSize({ 1280,720 });
+	endSprite->TransVertexBuffer();
+
 	XMFLOAT3 eye = camera->GetEye();
+
+	int gameflag = 0;
 	
 #pragma endregion
 
@@ -214,70 +246,59 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//全キーの入力状態を取得する
 		input->Update();
 
-		sprite->Update();
-
-		gameScene->SetHwnd(win->GetHwnd());
-		gameScene->SetViewPort(dxcommon->GetViewPort());
 		
-		sprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
-		//デバッグテキスト
-		debugtext_minute->Print(gameScene->moji, secound_x, secound_y, 1.0f);
-		debugtext_minute2->Print(gameScene->moji2, secound_x, secound_y + 100, 1.0f);
+		sprite2->Update();
+		titleSprite->Update();
+		endSprite->Update();
+		if (gameflag == 0)
+		{
+			if (input->isKeyTrigger(DIK_SPACE))
+			{
+				gameflag = 1;
+			}
+		}
+		if (gameflag == 1)
+		{
+			gameScene->SetHwnd(win->GetHwnd());
+			gameScene->SetViewPort(dxcommon->GetViewPort());
 
+			gameScene->Update();
 
-			//XMVECTOR moveZ = XMVectorSet(0, 0, 1.0f, 0);//z speed
+			//spline 曲線　通り道
+			box->Update();
+			box2->Update();
+			box3->Update();
+			box4->Update();
+			goal->Update();
 
-			//XMVECTOR moveX2 = XMVectorSet(1.0f, 0, 0, 0);//debug
+			//スカイドーム
+			skydome->Update();
 
+			object1->Update();
+			//照準
+			sprite->Update();
+			sprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
+			//デバッグテキスト
+			debugtext_minute->Print(gameScene->moji, secound_x, secound_y, 1.0f);
+			debugtext_minute2->Print(gameScene->moji2, secound_x, secound_y + 100, 1.0f);
+
+			if (gameScene->pointsLast == true)
+			{
+				gameflag = 2;
+			}
+		}
+		else if (gameflag == 2)
+		{
+			if (input->isKeyTrigger(DIK_SPACE))
+			{
+				gameflag = 0;
+				gameScene->Init(dxcommon, input, audio);
+			}
+		}
 		
-			//XMFLOAT3 xCamera = { 1,0,0 };
 		
-			//XMFLOAT3 yCamera = { 0,1,0 };
-			//
-			//XMFLOAT3 zCamera = { 0,0,1 };
-			
-
-
-			//if (input->isKey(DIK_W))
-			//{
-			//	camera->CameraMoveVector(yCamera,true);//カメラを動かす
-			//}
-			//if (input->isKey(DIK_D))
-			//{
-			//	camera->CameraMoveVector(xCamera,true);//カメラを動かす
-			//}
-			//if (input->isKey(DIK_A))
-			//{
-			//	camera->CameraMoveVector(xCamera,false);//カメラを動かす
-			//}
-			//if (input->isKey(DIK_S))
-			//{
-			//	camera->CameraMoveVector(yCamera,false);//カメラを動かす
-			//}
-			//if (input->isKey(DIK_Q))
-			//{
-			//	camera->CameraMoveVector(zCamera,false);
-			//}
-			//if (input->isKey(DIK_E))
-			//{
-			//	camera->CameraMoveVector(zCamera,true);
-			//}
-
-			//if (input->isKey(DIK_UP))
-			//{
-			//	camera->CameraRot(0.0f, 0.1f);
-			//}
-			
-//更新	
-		gameScene->Update();
-		box->Update();
-		box2->Update();
-		box3->Update();
-		box4->Update();
-		skydome->Update();
 		camera->UpdateCamera();
-
-		object1->Update();
+		
 		
 //描画
 		//ポストエフェクト
@@ -303,14 +324,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		box3->Draw();
 		box4->Draw();
 		skydome->Draw();
+		//goal->Draw();
 		Object3d::PostDraw();
 
 		////スプライト共通コマンド
 		// スプライト
 		spriteCommon->PreDraw();
-		sprite->Draw();
-		debugtext_minute->DrawAll();
-		debugtext_minute2->DrawAll();
+		if (gameflag == 0)
+		{
+			titleSprite->Draw();
+		}
+		else if (gameflag == 1)
+		{
+			sprite->Draw();
+			sprite2->Draw();
+
+			/*debugtext_minute->DrawAll();
+			debugtext_minute2->DrawAll();*/
+			
+		}
+		else if (gameflag == 2)
+		{
+			endSprite->Draw();
+		}
+
 		// ４．描画コマンドここまで
 		
 		// ５．リソースバリアを戻す

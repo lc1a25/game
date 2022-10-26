@@ -26,6 +26,7 @@ class EnemyCircle
 	float length = 0.3f;//â~ÇÃîºåa
 	float addCircleX = cos(radius) * length;//â~è„ÇÃà íu x
 	float addCircleY = sin(radius) * length;//â~è„ÇÃà íu y
+
 public:
 
 	void Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue);
