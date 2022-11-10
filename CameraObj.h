@@ -44,7 +44,7 @@ public:
 	const float& GetpositionX() { return cameraObj->position.z; }
 
 
-	const FLOAT& GetTimerate() { return  startIndex; }
+	const INT& GetRaleIndex() { return  startIndex; }
 
 	const BOOL& GetEndFlag() { return pointsLast; }
 
@@ -110,12 +110,19 @@ private:
 	long long elapsedCount = 0;
 
 	XMVECTOR start{ 0.0f, 0.0f, 0.0f };
-	XMVECTOR p2{ 10.0f, 0.0f, 0.0f };
-	XMVECTOR p3{ -100.0f, 0.0f, +200.0f };
-	XMVECTOR p4{ 50.0f, 100.0f, +400.0f };
-	XMVECTOR p5{ 50.0f, -100.0f, +600.0f };
-	XMVECTOR p6{ 10.0f, -30.0f, +800.0f };
+	XMVECTOR p2{ 0.0f, 0.0f, 0.0f };
+	XMVECTOR p3{ 0.0f, 0.0f, +200.0f };
+	XMVECTOR p4{ 0.0f, 0.0f, +400.0f };
+	XMVECTOR p5{ 0.0f, 0.0f, +600.0f };
+	XMVECTOR p6{ 0.0f, 0.0f, +800.0f };
 	XMVECTOR p7{ 0.0f, 0.0f, +850.0f };
+
+	//p2{ 10.0f, 0.0f, 0.0f };
+	//p3{ -100.0f, 0.0f, +200.0f };
+	//p4{ 50.0f, 100.0f, +400.0f };
+	//p5{ 50.0f, -100.0f, +600.0f };
+	//p6{ 10.0f, -30.0f, +800.0f };
+	//p7{ 0.0f, 0.0f, +850.0f };
 
 	XMVECTOR end{ 0.0f, 0.0f, 850.0f };
 	XMVECTOR targetEnd{};
@@ -129,8 +136,9 @@ private:
 	XMFLOAT3 targetVec = { 0.0f,0.0f,0.0f };
 	bool pointsLast = false;
 
-	//std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,p6,p7,end,end };
-	std::vector<XMVECTOR>points{ start,start,start,start,start,start,start,start,start,start };
+	std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,p6,p7,end,end };
+	//std::vector<XMVECTOR>points{ start,start,start,start,start,start,start,start,start,start };
+	//std::vector<XMVECTOR>points{ end,end,end,end,end,end,end,end,end,end };
 
 	int startIndex = 1;
 	int targetIndex = 2;

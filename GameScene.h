@@ -14,6 +14,8 @@
 #include "CameraObj.h"
 #include "Boss.h"
 
+#include <sstream>
+
 class GameScene
 {
 
@@ -55,12 +57,19 @@ public: // メンバ関数
 
 	//当たり判定
 	void CheckAllCollision(Enemy* enemy);
+	void CheckPillarCollision();
 
 	//hwndの取得
 	void SetHwnd(HWND winHwnd) { hwnd = winHwnd; }
 
 	//ビューポート行列の取得
 	void SetViewPort(XMMATRIX winViewPort) { viewPort = winViewPort; }
+
+	void AddEnemyBullet(std::unique_ptr<EnemyBullet> enemyBullet);
+
+	void EnemyPopLoadData();
+
+	void UpdateEnemyPop();
 
 
 	float mouseX;
@@ -69,7 +78,23 @@ public: // メンバ関数
 	char moji2[64];
 
 	bool pointsLast = false;
+
+	//コマンド用
+	bool waitCommand = false;
+	int waitTimer = 0;
+	//コマンド用
+	bool waitRaleIndexCommand = false;
+	int waitRale = 0;
+
+	//ボス倒した後
+	int bossDieTimer = 120;
+
+	int  coll = 0;
+
+	std::list<std::unique_ptr<EnemyBullet>> enemyBullets_;
 private: // メンバ変数
+	std::stringstream enemyPopCommands;
+
 	HWND hwnd;
 	XMMATRIX viewPort;
 	DirectXCommon* dxcommon = nullptr;
@@ -81,6 +106,10 @@ private: // メンバ変数
 	Camera* camera = nullptr;
 
 	CameraObj* cameraObj = nullptr;//カメラオブジェクト
+
+	Object3d* wall = wall->Create();
+	Object3d* pillar = pillar->Create();
+	Object3d* pillar2 = pillar2->Create();
 
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
@@ -99,11 +128,15 @@ private: // メンバ変数
 	Model* bulletModel = nullptr;
 	Model* enemyModel = nullptr;
 	Model* bossModel = nullptr;
+	Model* bossMiniModel = nullptr;
+	Model* wallModel = nullptr;
+	Model* wallFlatModel = nullptr;
 
 
 	//当たり判定用変数
 	float length = 0.0f;
 	float size = 2.0f;
+	float wallColliLength = 0.0f;
 	//std::unique_ptr<Enemy> enemy(new Enemy());
 
 };

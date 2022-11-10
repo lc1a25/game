@@ -1,6 +1,6 @@
 #include "Enemy.h"
 
-void Enemy::CircleR()
+void Enemy::PCircleR()
 {
 	//â~ÇÃäpìx
 	radius = angle * 3.14f / 180.0f;
@@ -15,22 +15,16 @@ void Enemy::CircleR()
 
 	//äpìxÇÇΩÇµÇƒâ~èÛÇ…ìÆÇ©Ç∑
 	angle += angleVec;
-	if (angle >= 460.0f)
-	{
-		shotTimer;
-		//enemy->position.z -= 0.5;
-	}
 
-	//íeÇåÇÇ¬
-	shotTimer--;
-	if (shotTimer <= 0)
-	{
-		Shot();
-		shotTimer = shotInterval;
-	}
+	//if (angle >= 460.0f)
+	//{
+	//	shotTimer;
+	//	//enemy->position.z -= 0.5;
+	//}
+	
 }
 
-void Enemy::CircleL()
+void Enemy::PCircleL()
 {
 	//â~ÇÃäpìx
 	radius = angle * 3.14f / 180.0f;
@@ -45,32 +39,69 @@ void Enemy::CircleL()
 
 	//äpìxÇÇΩÇµÇƒâ~èÛÇ…ìÆÇ©Ç∑
 	angle -= angleVec;
-	if (angle <= -270.0f)
-	{
-		shotTimer = shotInterval;
-		//enemy->position.z -= 0.5;
-	}
 
+	//if (angle <= -270.0f)
+	//{
+	//	shotTimer = shotInterval;
+	//	//enemy->position.z -= 0.5;
+	//}
+	
+
+	
+}
+
+void Enemy::PShot()
+{
 	//íeÇåÇÇ¬
 	shotTimer--;
 	if (shotTimer <= 0)
 	{
-		Shot();
+		FrontShot();
 		shotTimer = shotInterval;
 	}
 }
 
-void Enemy::Init(Model* enemyModel, XMFLOAT3 position)
+void Enemy::PHoming()
+{
+	//íeÇåÇÇ¬
+	shotTimer--;
+	if (shotTimer <= 0)
+	{
+		Homing();
+		shotTimer = shotInterval;
+	}
+}
+
+XMVECTOR Enemy::ease_in(const XMVECTOR& start, const XMVECTOR& end, float t)
+{
+	t = t * t;
+	return start * (1.0f - t) + end * t;
+}
+
+void Enemy::Init(Model* enemyModel, XMFLOAT3 position, XMFLOAT3 scale)
 {
 	enemyModel_ = enemyModel;
 	bulletModel_ = enemyModel;
 	enemy->SetModel(enemyModel);
-	enemy->SetPosition({ position });
-	enemy->scale = { 2,2,2 };
+	enemy->scale = { scale };
 
+	enemy->matWorld.r[3].m128_f32[0] = position.x;
+	enemy->matWorld.r[3].m128_f32[1] = position.y;
+	enemy->matWorld.r[3].m128_f32[2] = position.z;
+
+	enemy->SetPosition({ enemy->matWorld.r[3].m128_f32[0] ,enemy->matWorld.r[3].m128_f32[1] ,enemy->matWorld.r[3].m128_f32[2] });
+ 
 	ShotInit();
 	//PhaseInit(rightMoveTrue);
+	OneWayPos.m128_f32[0] = enemy->position.x;
+	OneWayPos.m128_f32[1] = enemy->position.y;
+	OneWayPos.m128_f32[2] = enemy->position.z;
+
+	MiniPosLUF.m128_f32[0] = enemy->position.x;
+	MiniPosLUF.m128_f32[1] = enemy->position.y;
+	MiniPosLUF.m128_f32[2] = enemy->position.z;
 }
+
 
 void Enemy::Update()
 {
@@ -79,13 +110,12 @@ void Enemy::Update()
 		{
 			return bullet->IsDead();
 		});
-
-	
 	switch (phase)
 	{
 	case Phase::Approach:
-		//ä÷êîÇ…Ç∑ÇÈ
-		enemy->position.x -= 0.5;
+
+		enemy->position.x -= ApproachSpeed;
+
 		if (enemy->position.x <= 0)
 		{
 			phase = Phase::CircleR;
@@ -93,8 +123,9 @@ void Enemy::Update()
 		
 		break;
 	case Phase::ApproachL:
-		//ä÷êîÇ…Ç∑ÇÈ
-		enemy->position.x += 0.5;
+
+		enemy->position.x += ApproachSpeed;
+
 		if (enemy->position.x >= 0 )
 		{
 			phase = Phase::CircleL;
@@ -102,40 +133,47 @@ void Enemy::Update()
 
 		break;
 	case Phase::Leave:
-		//ä÷êîÇ…Ç∑ÇÈ
-		enemy->position.z -= 0.5;
+
+
 		break;
+
 	case Phase::Stop:
-		shotTimer--;
-		if (shotTimer <= 0)
-		{
-			Shot();
-			shotTimer = shotInterval;
-		}
-		else if (enemy->position.z <= playerWorldPos.z)
+
+		PHoming();
+
+		if (enemy->position.z <= playerWorldPos.z)
 		{
 			phase = Phase::Leave;
 		}
+
 		break;
 	case Phase::CircleR://âEÇ©ÇÁóàÇΩver 90Ç«
-		CircleR();
+
+		PCircleR();
+		PShot();
+		
+		if (enemy->position.z <= playerWorldPos.z)
+		{
+			phase = Phase::Leave;//Ç∆Ç«Ç‹ÇÁÇπÇƒÇ«Ç¡Ç©Ç…çsÇ©ÇπÇΩÇ¢
+		}
+		
+		break;
+	case Phase::CircleL://ç∂Ç©ÇÁóàÇΩver 270Ç«
+
+		PCircleL();
+		PShot();
+		
 		if (enemy->position.z <= playerWorldPos.z)
 		{
 			phase = Phase::Leave;
 		}
 		
 		break;
-	case Phase::CircleL://ç∂Ç©ÇÁóàÇΩver 270Ç«
-		CircleL();
-		if (enemy->position.z <= playerWorldPos.z)
-		{
-			phase = Phase::Leave;
-		}
-		break;
 
 	case Phase::CircleInfinity:
-
-		CircleR();
+		time++;
+		PCircleR();
+		PShot();
 		
 		if (angle >= 450)
 		{
@@ -148,41 +186,123 @@ void Enemy::Update()
 			isL = false;
 		}
 
-		
+		if (time >= 600)
+		{
+			/*EasingTime();
+			enemy->position.x = ease_in({ enemy->position.x,enemy->position.y,enemy->position.z },
+				{ 0,0,enemy->position.z }, timeRate).m128_f32[0];
+			enemy->position.x = ease_in({ enemy->position.x,enemy->position.y,enemy->position.z },
+				{ 0,0,enemy->position.z }, timeRate).m128_f32[1];
+			enemy->position.x = ease_in({ enemy->position.x,enemy->position.y,enemy->position.z },
+				{ 0,0,enemy->position.z }, timeRate).m128_f32[2];*/
+			//phase = Phase::BossMiniVertical;
+		}
 		break;
 
 	case Phase::OneWayL:
-		enemy->position.x += OWLbulletSpeed;
-		if (enemy->position.x <= -200)
-		{
-			OWLbulletSpeed *= -1;
-		}
-		if (enemy->position.x >= 50)
-		{
-			OWLbulletSpeed *= -1;
-		}
-		break;
+		EasingTime();
 
-	case Phase::OneWayR:
-		enemy->position.x -= OWRbulletSpeed;
+		//OneWayPos = ease_in(OneWayPos, { -200,OneWayPos.m128_f32[1] ,OneWayPos.m128_f32[2]  },timeRate);
+		//
+		//enemy->position.x = OneWayPos.m128_f32[0];
+		//enemy->position.y = OneWayPos.m128_f32[1];
+		//enemy->position.z = OneWayPos.m128_f32[2];
+		
+		enemy->position.x -= OWRSpeed;
+
+		enemy->position.z += cameraZ;
+
 		if (enemy->position.x <= -100)
 		{
-			OWRbulletSpeed *= -1;
+			OWRSpeed *= -1;
 		}
 		if (enemy->position.x >= 100)
 		{
-			OWRbulletSpeed *= -1;
+			OWRSpeed *= -1;
 		}
+
 		break;
 
+	case Phase::OneWayR:
+
+		enemy->position.x += OWRSpeed;
+
+		enemy->position.z += cameraZ;
+
+		if (enemy->position.x <= -100)
+		{
+			OWRSpeed *= -1;
+		}
+		if (enemy->position.x >= 100)
+		{
+			OWRSpeed *= -1;
+		}
+
+		break;
+
+	case Phase::BossMiniVertical:
+		
+		
 	default:
 		break;
 	}
+
+	switch (phaseMini)
+	{
+
+
+	case BossPhase::MiniStop:
+		break;
+	case BossPhase::MiniVerticalLUF:
+		EasingTime();
+		MiniPosLUF = ease_in(MiniPosLUF, { -20, MiniPosLUF.m128_f32[1], playerWorldPos.z }, timeRate);
+
+		enemy->position.x = MiniPosLUF.m128_f32[0];
+		enemy->position.y = MiniPosLUF.m128_f32[1];
+		enemy->position.z = MiniPosLUF.m128_f32[2];
+
+		break;
+	case BossPhase::MiniVerticalLUB:
+		break;
+	case BossPhase::MiniVerticalRUF:
+		break;
+	case BossPhase::MiniVerticalRUB:
+		break;
+	case BossPhase::MiniVerticalLDF:
+		break;
+	case BossPhase::MiniVerticalLDB:
+		break;
+	case BossPhase::MiniVerticalRDF:
+		break;
+	case BossPhase::MiniVerticalRDB:
+		break;
+	case BossPhase::MiniSideLUF:
+		break;
+	case BossPhase::MiniSideLUB:
+		break;
+	case BossPhase::MiniSideRUF:
+		break;
+	case BossPhase::MiniSideRUB:
+		break;
+	case BossPhase::MiniSideLDF:
+		break;
+	case BossPhase::MiniSideLDB:
+		break;
+	case BossPhase::MiniSideRDF:
+		break;
+	case BossPhase::MiniSideRDB:
+		break;
+	default:
+		break;
+	}
+
+	//íeÇÃçXêV
 	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
 	{
 		//bullet->SetLockOnPosition(GetWorldPosition(), playerWorldPos);
 		bullet->Update();
 	}
+
 	enemy->Update();
 }
 
@@ -195,7 +315,7 @@ void Enemy::Draw()
 	}
 }
 
-void Enemy::Shot()
+void Enemy::Homing()
 {
 	//assert(player_);
 	const float speed = 3.0f;//1ÉtÉåÅ[ÉÄêiÇﬁãóó£
@@ -213,7 +333,20 @@ void Enemy::Shot()
 	//íeê∂ê¨
 	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
 	newBullet->Init(bulletModel_, enemy->position,lockOn);
-	newBullet->SetDiffVec(GetWorldPosition(), playerWorldPos);
+	//newBullet->SetDiffVec(GetWorldPosition(), playerWorldPos);
+
+
+	//íeìoò^
+	bullets_.push_back(std::move(newBullet));//move ÇÕÉÜÉjÅ[ÉNÇ©ÇÁè˜ìnÇ∑ÇÈÇΩÇﬂ
+}
+
+void Enemy::FrontShot()
+{
+	
+	//íeê∂ê¨
+	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
+	newBullet->Init(bulletModel_, enemy->position,{0,0,-2});
+	//newBullet->SetDiffVec(GetWorldPosition(), playerWorldPos);
 
 
 	//íeìoò^
@@ -226,6 +359,17 @@ void Enemy::PhaseInit(bool rightMoveTrue)
 	{
 		phase = Phase::CircleR;
 	}
+}
+
+void Enemy::EasingTime()
+{
+	float elapsedTime = static_cast<float> (elapsedCount) / 1000000.0f;
+
+	nowCount = timeGetTime();
+
+	elapsedCount = nowCount - startCount;
+
+	timeRate = elapsedTime / maxTime;
 }
 
 XMFLOAT3 Enemy::GetWorldPosition()
@@ -242,6 +386,16 @@ void Enemy::OnCollision()
 	isDead = true;
 	enemy->position.z -= 350;
 	phase = Phase::Leave;
+}
+
+void Enemy::OnBossCollision()
+{
+	bossHp--;
+	if (bossHp <= 0)
+	{
+		isDead = true;
+		enemy->position.z -= 350;
+	}
 }
 
 void Enemy::ShotInit()

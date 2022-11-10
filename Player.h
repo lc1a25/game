@@ -8,6 +8,7 @@
 #include <list>
 
 
+
 class Player
 {
 private:
@@ -58,6 +59,7 @@ private:
 	XMFLOAT2 playerMoveRange = { 25,15 };
 
 public:
+
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
 	
 	void Init(Model* model, Model* bulletModel);

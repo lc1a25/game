@@ -30,4 +30,5 @@ float4 main(VSOutput input) : SV_TARGET
 	//return float4(brightness, brightness, brightness, 1);
 
 	//return float4(input.normal,1);//RGB‚ğ‚»‚ê‚¼‚ê‚Ì–@üxyz A‚ğ1‚Åo—Í
+
 }

@@ -194,6 +194,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	goal->scale = { 1,1,1 };
 	goal->SetPosition({ 0,0,900 });
 
+	
+
+
 
 #pragma endregion
 	//描画初期化処理　ここまで
@@ -270,7 +273,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			box3->Update();
 			box4->Update();
 			goal->Update();
-
+			
 			//スカイドーム
 			skydome->Update();
 
@@ -319,12 +322,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		gameScene->Draw();
 		Object3d::PreDraw(dxcommon->GetCmdlist());
 
-		box->Draw();
-		box2->Draw();
-		box3->Draw();
-		box4->Draw();
+		//box->Draw();
+		//box2->Draw();
+		//box3->Draw();
+		//box4->Draw();
 		skydome->Draw();
-		//goal->Draw();
+	
+		
 		Object3d::PostDraw();
 
 		////スプライト共通コマンド
@@ -337,15 +341,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		else if (gameflag == 1)
 		{
 			sprite->Draw();
-			sprite2->Draw();
+			//sprite2->Draw();
 
-			/*debugtext_minute->DrawAll();
-			debugtext_minute2->DrawAll();*/
+			debugtext_minute->DrawAll();
+			debugtext_minute2->DrawAll();
 			
 		}
 		else if (gameflag == 2)
 		{
 			endSprite->Draw();
+
 		}
 
 		// ４．描画コマンドここまで
