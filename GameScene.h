@@ -92,8 +92,9 @@ public: // メンバ関数
 	int  coll = 0;
 
 	std::list<std::unique_ptr<EnemyBullet>> enemyBullets_;
-private: // メンバ変数
+
 	std::stringstream enemyPopCommands;
+private: // メンバ変数
 
 	HWND hwnd;
 	XMMATRIX viewPort;
@@ -108,8 +109,13 @@ private: // メンバ変数
 	CameraObj* cameraObj = nullptr;//カメラオブジェクト
 
 	Object3d* wall = wall->Create();
+	Object3d* wallBoss = wallBoss->Create();
+	Object3d* wallBossBack = wallBossBack->Create();
 	Object3d* pillar = pillar->Create();
 	Object3d* pillar2 = pillar2->Create();
+
+	Object3d* pillar3 = pillar3->Create();
+	Object3d* pillar4 = pillar4->Create();
 
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
@@ -130,7 +136,9 @@ private: // メンバ変数
 	Model* bossModel = nullptr;
 	Model* bossMiniModel = nullptr;
 	Model* wallModel = nullptr;
+	Model* wallBossModel = nullptr;
 	Model* wallFlatModel = nullptr;
+	Model* pillarModel = nullptr;
 
 
 	//当たり判定用変数

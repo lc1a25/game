@@ -224,6 +224,7 @@ XMFLOAT3 Player::GetReticleFar()
 
 void Player::OnCollision()
 {
+	
 }
 
 XMFLOAT3 Player::GetSpriteReticle()

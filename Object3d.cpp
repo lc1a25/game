@@ -890,7 +890,6 @@ void Object3d::Update( bool flag)
 	result = constBuffB0->Map(0, nullptr, (void**)&constMap);
 	//constMap->color = color;
 	
-	
 	constMap->mat = matWorld * camera->GetMatViewProjection();	// 行列の合成
 	constBuffB0->Unmap(0, nullptr);
 	

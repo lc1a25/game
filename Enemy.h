@@ -12,7 +12,10 @@ enum class Phase
 {
 	Approach,//接近
 	ApproachL,
-	Leave,	//離脱
+	OutApproach,
+	LeaveL,	//離脱
+	LeaveR,
+	LeaveF,
 	Stop,  //止まる
 	CircleR,//円運動右からくる
 	CircleL,//左からくる
@@ -68,6 +71,9 @@ private:
 	XMVECTOR LUFPosVertical = { -40, MiniPosLUF.m128_f32[1], MiniPosLUF.m128_f32[2] };
 	
 	int time = 0;
+	int leaveTimeInit = 300;
+	int leaveTime = leaveTimeInit;
+	
 
 	long long startCount = 0;
 	long long nowCount = 0;
@@ -78,6 +84,9 @@ private:
 
 	//別Phaseに移行するまでに移動しているスピード
 	float ApproachSpeed = 0.5f;
+
+	bool shotEndFlag = false;
+	float outApproachSpeed = 1.0f;
 
 	//自機の座標(ホーミング用)
 	XMFLOAT3 playerWorldPos;
@@ -115,10 +124,16 @@ private:
 
 	void PHoming();
 
+	void PLeaveL();
+
+	void PLeaveR();
+
+	void PLeaveF();
+
 	XMVECTOR ease_in(const XMVECTOR& start, const XMVECTOR& end, float t);
 public:
 
-	Phase phase = Phase::Stop;
+	Phase phase = Phase::OutApproach;
 	BossPhase phaseMini = BossPhase::MiniStop;
 
 	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; }

@@ -296,6 +296,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			{
 				gameflag = 0;
 				gameScene->Init(dxcommon, input, audio);
+				gameScene->pointsLast = false;
 			}
 		}
 		
@@ -341,10 +342,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		else if (gameflag == 1)
 		{
 			sprite->Draw();
-			//sprite2->Draw();
+			sprite2->Draw();
 
-			debugtext_minute->DrawAll();
-			debugtext_minute2->DrawAll();
+		/*	debugtext_minute->DrawAll();
+			debugtext_minute2->DrawAll();*/
 			
 		}
 		else if (gameflag == 2)

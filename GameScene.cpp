@@ -26,16 +26,18 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	bossModel = Model::LoadFromOBJ("boss");
 	bossMiniModel = Model::LoadFromOBJ("bossMini");
 	wallModel = Model::LoadFromOBJ("wallBig");
-	wallFlatModel = Model::LoadFromOBJ("boxGreen");
+	wallBossModel = Model::LoadFromOBJ("wallBoss");
+	wallFlatModel = Model::LoadFromOBJ("wall");
+	pillarModel = Model::LoadFromOBJ("boxGreen");
 
 	player = new Player();
 	player->Init(playerModel, bulletModel);
 
 	enemy = new Enemy();
-	enemy->Init(enemyModel, { 30.0f, -80.0f, 700.0f });//30,0,100
+	enemy->Init(enemyModel, { 30.0f, -300.0f, -100.0f });//30,0,100
 
 	enemyL = new Enemy();
-	enemyL->Init(enemyModel, { 50.0f, 50.0f, 500.0f });
+	enemyL->Init(enemyModel, { 50.0f, 50.0f, -500.0f });
 
 	enemyCircle = new EnemyCircle();
 	enemyCircle->Init(enemyModel, { -50.0f, 50.0f, -200.0f }, false);//-50.0f, 50.0f, 400.0f
@@ -44,10 +46,10 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	enemyCircle2->Init(enemyModel, { 30.0f, -10.0f, -200.0f }, true);
 
 	enemyOneWay = new EnemyOneWay();
-	enemyOneWay->Init(enemyModel, { 0.0f,0.0f,-200.0f }, false);
+	enemyOneWay->Init(enemyModel, { 0.0f,0.0f,-300.0f }, false);
 
 	enemyOneWay2 = new EnemyOneWay();
-	enemyOneWay2->Init(enemyModel, { 30.0f,-100.0f,-200.0f }, true);//30.0f,-100.0f,650.0f
+	enemyOneWay2->Init(enemyModel, { 30.0f,-300.0f,-200.0f }, true);//30.0f,-100.0f,650.0f
 
 	boss = new Boss();
 	boss->Init(bossModel,bossMiniModel, { 0,0,-100.0f });
@@ -62,13 +64,30 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	wall->scale = { 10,7,70 };
 	wall->SetPosition({ 0,-64,50 });
 
-	pillar->SetModel(wallFlatModel);
+	wallBoss->SetModel(wallModel);
+	wallBoss->scale = { 15,7,7 };
+	wallBoss->SetPosition({ 0,-64,1000 });
+
+	wallBossBack->SetModel(wallFlatModel);
+	wallBossBack->scale = { 92,48,1 };
+	wallBossBack->SetPosition({ 0,-65,1045 });
+	
+			
+	pillar->SetModel(pillarModel);
 	pillar->scale = { 2,15,1 };
 	pillar->SetPosition({ -30,-32,180 });
 
-	pillar2->SetModel(wallFlatModel);
+	pillar2->SetModel(pillarModel);
 	pillar2->scale = { 2,20,1 };
-	pillar2->SetPosition({ 30,-32,180 });
+	pillar2->SetPosition({ 40,-32,180 });
+
+	pillar3->SetModel(pillarModel);
+	pillar3->scale = { 2,20,1 };
+	pillar3->SetPosition({ -50,-32,530 });
+
+	pillar4->SetModel(pillarModel);
+	pillar4->scale = { 2,18,1 };
+	pillar4->SetPosition({ 40,-32,530 });
 	
 	Object3d::SetCamera(camera);
 
@@ -82,8 +101,12 @@ void GameScene::Update()
 
 	//設置物
 	wall->Update();
+	wallBoss->Update();
+	wallBossBack->Update();
 	pillar->Update();
 	pillar2->Update();
+	pillar3->Update();
+	pillar4->Update();
 
 	//2dレティクルスプライトの座標
 	mouseX = player->GetMouseX();
@@ -92,7 +115,7 @@ void GameScene::Update()
 	//デバッグ用
 	sprintf_s(moji, "%d", cameraObj->GetRaleIndex());
 	//sprintf_s(moji2, "%d", waitRale);
-	sprintf_s(moji2, "%d", coll);
+	sprintf_s(moji2, "%0.3f",cameraObj->GetEye().z);
 
 //カメラ
 	cameraObj->UpdateCamera();
@@ -117,8 +140,9 @@ void GameScene::Update()
 	player->SetCameraEyeVec(cameraObj->GetEyeVec());
 	player->Update();
 
+	enemy->SetCameraZ(cameraObj->GetEyeVec().z);
 	enemyOneWay->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
-
+	enemyCircle->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
 // 敵
 	enemy->SetPlayerPosition(player->GetWorldPosition());
 	player->SetEnemyPosition(enemy->GetWorldPosition());
@@ -134,6 +158,7 @@ void GameScene::Update()
 	enemyCircle2->SetPlayerPosition(player->GetWorldPosition());
 	enemyCircle2->Update();
 
+	enemyOneWay->SetPlayerPosition(player->GetWorldPosition());
 	enemyOneWay->Update();
 	enemyOneWay2->Update();
 
@@ -155,6 +180,9 @@ void GameScene::Update()
 		if (bossDieTimer <= 0)
 		{
 			pointsLast = true;
+			enemyPopCommands.str("");
+			enemyPopCommands.clear(std::stringstream::goodbit);
+			bossDieTimer = 120;
 		}
 	}
 	
@@ -163,14 +191,18 @@ void GameScene::Update()
 void GameScene::Draw()
 {
 	Object3d::PreDraw(dxcommon->GetCmdlist());
+	wallBoss->Draw();
+	wallBossBack->Draw();
 	wall->Draw();
 	pillar->Draw();
 	pillar2->Draw();
+	pillar3->Draw();
+	pillar4->Draw();
 
 	player->Draw();
 	
-	/*enemy->Draw();
-	enemyL->Draw();*/
+	enemy->Draw();
+	//enemyL->Draw();
 	enemyCircle->Draw();
 	//enemyCircle2->Draw();
 	enemyOneWay->Draw();
@@ -292,6 +324,7 @@ void GameScene::EnemyPopLoadData()
 
 	//ファイルを閉じる
 	file.close();
+
 }
 
 void GameScene::UpdateEnemyPop()
@@ -379,6 +412,29 @@ void GameScene::UpdateEnemyPop()
 
 			enemyCircle = new EnemyCircle();
 			enemyCircle->Init(enemyModel, { x, y, z }, LorR);
+		}
+		else if (word.find("OUTWAY") == 0)
+		{
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			int LR = std::atof(word.c_str());
+			bool LorR = false;
+
+			if (LR == 1)
+			{
+				LorR = true;
+			}
+
+			enemy = new Enemy();
+			enemy->Init(enemyModel, { x, y, z });
 		}
 		else if (word.find("BOSS") == 0)
 		{

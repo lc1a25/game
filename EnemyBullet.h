@@ -10,7 +10,7 @@ private:
 	
 
 	//生存時間
-	static const int32_t lifeTime = 45;
+	static const int32_t lifeTime = 55;
 	//デスタイマー
 	int32_t deathTimer = lifeTime;
 	//デスフラグ

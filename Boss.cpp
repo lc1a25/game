@@ -15,7 +15,7 @@ void Boss::Init(Model* enemyModel, Model* enemyModelMini, XMFLOAT3 position)
 
 	boss->phase = Phase::CircleInfinity;
 	bossMiniLUF->phaseMini = BossPhase::MiniStop;
-	bossMiniLUF->phase = Phase::Leave;
+	//bossMiniLUF->phase = Phase::Stop;
 }
 
 void Boss::Update()

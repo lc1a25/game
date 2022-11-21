@@ -56,6 +56,7 @@ void Enemy::PShot()
 	shotTimer--;
 	if (shotTimer <= 0)
 	{
+		shotEndFlag = true;
 		FrontShot();
 		shotTimer = shotInterval;
 	}
@@ -67,10 +68,39 @@ void Enemy::PHoming()
 	shotTimer--;
 	if (shotTimer <= 0)
 	{
+		shotEndFlag = true;
 		Homing();
 		shotTimer = shotInterval;
 	}
 }
+
+void Enemy::PLeaveL()
+{
+	leaveTime--;
+	if (leaveTime <= 0 && shotEndFlag == true)
+	{
+		phase = Phase::LeaveL;//とどまらせてどっかに行かせたい
+	}
+}
+
+void Enemy::PLeaveR()
+{
+	leaveTime--;
+	if (leaveTime <= 0 && shotEndFlag == true)
+	{
+		phase = Phase::LeaveR;//とどまらせてどっかに行かせたい
+	}
+}
+
+void Enemy::PLeaveF()
+{
+	leaveTime--;
+	if (leaveTime <= 0 && shotEndFlag == true)
+	{
+		phase = Phase::LeaveF;//とどまらせてどっかに行かせたい
+	}
+}
+
 
 XMVECTOR Enemy::ease_in(const XMVECTOR& start, const XMVECTOR& end, float t)
 {
@@ -113,17 +143,17 @@ void Enemy::Update()
 	switch (phase)
 	{
 	case Phase::Approach:
-
+		leaveTime = leaveTimeInit;
 		enemy->position.x -= ApproachSpeed;
 
-		if (enemy->position.x <= 0)
+		if (enemy->position.x >= 0)
 		{
 			phase = Phase::CircleR;
 		}
 		
 		break;
 	case Phase::ApproachL:
-
+		leaveTime = leaveTimeInit;
 		enemy->position.x += ApproachSpeed;
 
 		if (enemy->position.x >= 0 )
@@ -132,18 +162,33 @@ void Enemy::Update()
 		}
 
 		break;
-	case Phase::Leave:
+	case Phase::OutApproach:
+		enemy->position.z += outApproachSpeed;
 
-
+		if (enemy->position.z >= playerWorldPos.z + 100)
+		{
+			phase = Phase::ApproachL;
+		}
+		break;
+	case Phase::LeaveL:
+		enemy->position.x -= outApproachSpeed;
 		break;
 
+	case Phase::LeaveR:
+		enemy->position.x += outApproachSpeed;
+
+		break;
+	case Phase::LeaveF:
+		enemy->position.z -= outApproachSpeed;
+
+		break;
 	case Phase::Stop:
 
 		PHoming();
 
 		if (enemy->position.z <= playerWorldPos.z)
 		{
-			phase = Phase::Leave;
+			phase = Phase::LeaveL;
 		}
 
 		break;
@@ -151,22 +196,17 @@ void Enemy::Update()
 
 		PCircleR();
 		PShot();
+		enemy->position.z += cameraZ;
+		PLeaveR();
 		
-		if (enemy->position.z <= playerWorldPos.z)
-		{
-			phase = Phase::Leave;//とどまらせてどっかに行かせたい
-		}
 		
 		break;
 	case Phase::CircleL://左から来たver 270ど
 
 		PCircleL();
 		PShot();
-		
-		if (enemy->position.z <= playerWorldPos.z)
-		{
-			phase = Phase::Leave;
-		}
+		enemy->position.z += cameraZ;
+		PLeaveR();
 		
 		break;
 
@@ -220,6 +260,9 @@ void Enemy::Update()
 		{
 			OWRSpeed *= -1;
 		}
+		//shotEndFlag = true;
+		PHoming();
+		PLeaveF();
 
 		break;
 
@@ -237,6 +280,9 @@ void Enemy::Update()
 		{
 			OWRSpeed *= -1;
 		}
+		//shotEndFlag = true;
+		PHoming();
+		PLeaveF();
 
 		break;
 
@@ -385,7 +431,7 @@ void Enemy::OnCollision()
 {
 	isDead = true;
 	enemy->position.z -= 350;
-	phase = Phase::Leave;
+	//phase = Phase::Leave;
 }
 
 void Enemy::OnBossCollision()
