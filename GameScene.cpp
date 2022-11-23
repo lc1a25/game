@@ -163,6 +163,7 @@ void GameScene::Update()
 	enemyOneWay2->Update();
 
 	boss->SetPlayerWorldPos(player->GetWorldPosition());
+	boss->GetEnemy()->SetBossHpBar(bossHpBar,bossHpBarMax);
 	boss->Update();
 
 	//“–‚½‚è”»’è
@@ -174,6 +175,7 @@ void GameScene::Update()
 	CheckAllCollision(enemyOneWay2->GetEnemy());
 	CheckAllCollision(boss->GetEnemy());
 
+	bossHpBar = boss->GetEnemy()->GetHpBarX();
 	if (boss->GetEnemy()->IsDead() == true)
 	{
 		bossDieTimer--;
@@ -260,6 +262,11 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 
 				bullet->OnCollision();
 			}
+			
+		}
+		else
+		{
+			enemy->bossDamage = false;
 		}
 	}
 

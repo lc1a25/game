@@ -437,6 +437,8 @@ void Enemy::OnCollision()
 void Enemy::OnBossCollision()
 {
 	bossHp--;
+	bossDamage = true;
+	hpBar -= hpBarMax / 50;
 	if (bossHp <= 0)
 	{
 		isDead = true;

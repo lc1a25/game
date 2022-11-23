@@ -107,6 +107,8 @@ private:
 	bool isDead = false;
 
 	int bossHp = 50;
+	float hpBar = 0;
+	float hpBarMax = 0;
 
 	//∞の形の動く用
 	bool isL = false;
@@ -136,6 +138,8 @@ public:
 	Phase phase = Phase::OutApproach;
 	BossPhase phaseMini = BossPhase::MiniStop;
 
+	bool bossDamage = false;
+
 	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; }
 
 	//発射間隔
@@ -162,6 +166,13 @@ public:
 	void SetCameraZ(float z) { cameraZ = z; }
 
 	void SetGameScene(GameScene* gameScene) { this->gameScene = gameScene; }
+
+	//スプライトhpバー用
+	void SetBossHpBar(float bossHpBar,float bossHpBarMax) {
+		hpBar = bossHpBar;
+		hpBarMax = bossHpBarMax;
+	}
+	FLOAT GetHpBarX() { return hpBar; }
 
 	void EasingTime();
 

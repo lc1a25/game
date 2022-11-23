@@ -71,6 +71,10 @@ public: // メンバ関数
 
 	void UpdateEnemyPop();
 
+	void SetBossHp(FLOAT bossHpX) { bossHpBar = bossHpX; }
+
+	FLOAT GetbossHpBar() { return bossHpBar; }
+
 
 	float mouseX;
 	float mouseY;
@@ -86,7 +90,9 @@ public: // メンバ関数
 	bool waitRaleIndexCommand = false;
 	int waitRale = 0;
 
-	//ボス倒した後
+	//ボス系
+	float bossHpBar = 733;
+	float bossHpBarMax = 733;
 	int bossDieTimer = 120;
 
 	int  coll = 0;

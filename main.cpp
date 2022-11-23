@@ -102,7 +102,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	PostEffect* postEffect = nullptr;
 
-	// ゲームシーンの初期化
 	gameScene = new GameScene();
 	gameScene->Init(dxcommon, input, audio);
 
@@ -116,7 +115,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	spriteCommon->LoadTexture(1, L"Resource/setu.png");
 
 	Sprite* sprite2 = Sprite::Create(spriteCommon, 1);
-
+	
 	spriteCommon->LoadTexture(2, L"Resource/title.png");
 
 	Sprite* titleSprite = Sprite::Create(spriteCommon, 2);
@@ -125,7 +124,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	Sprite* endSprite = Sprite::Create(spriteCommon, 3);
 
-	const int debugTextTexNumber3 = 4;
+	spriteCommon->LoadTexture(4, L"Resource/hpWaku.png");
+
+	Sprite* bossHpWakuSprite = Sprite::Create(spriteCommon, 4);
+
+	spriteCommon->LoadTexture(5, L"Resource/hpBar.png");
+
+	Sprite* bossHpBarSprite = Sprite::Create(spriteCommon, 5,{0,0});
+
+	const int debugTextTexNumber3 = 8;
 
 	spriteCommon->LoadTexture(debugTextTexNumber3, L"Resource/ASC_White.png");
 
@@ -134,7 +141,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	DebugText* debugtext_minute2 = nullptr;
 	debugtext_minute2 = new DebugText();
 
-	const int debugTextTexNumber4 = 5;
+	const int debugTextTexNumber4 = 9;
 
 	spriteCommon->LoadTexture(debugTextTexNumber4, L"Resource/ASC_White.png");
 	debugtext_minute2->debugTextInit(spriteCommon, debugTextTexNumber4);
@@ -150,10 +157,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ModelFbx* modelFbx = nullptr;
 	Object3dFbx* object1 = nullptr;
 
-	modelFbx = LoadFbx::GetInstance()->LoadModelFile("boneTest");
-	object1 = new Object3dFbx;
-	object1->Init();
-	object1->SetModelFbx(modelFbx);
 
 	Model * model1 = Model::LoadFromOBJ("bullet");
 	Object3d* box = box->Create();
@@ -186,14 +189,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	skydome->scale = { 11,11,11 };
 	skydome->SetPosition({ 0,0,0 });
 
-	Model* goalmodel = Model::LoadFromOBJ("go");
-
-	Object3d* goal = goal->Create();
-
-	goal->SetModel(goalmodel);
-	goal->scale = { 1,1,1 };
-	goal->SetPosition({ 0,0,900 });
-
 	
 
 
@@ -225,17 +220,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	endSprite->SetSize({ 1280,720 });
 	endSprite->TransVertexBuffer();
 
+	bossHpWakuSprite->SetPosition({ 640.0f,50.0f,0.0f });
+	bossHpWakuSprite->SetSize({ 769,38 });
+	bossHpWakuSprite->TransVertexBuffer();
+
+	float bossHpX = 733.0f;
+
+	bossHpBarSprite->SetPosition({ 273.0f,34.0f,0.0f });
+	//bossHpBarSprite->SetTexLeftTop({ 0,0 });
+	//bossHpBarSprite->TransVertexBuffer();
+	
+
 	XMFLOAT3 eye = camera->GetEye();
 
 	int gameflag = 0;
 	
 #pragma endregion
 
-	object1->PlayAnimation();
 	while (true)  // ゲームループ
 	{
 		//// メッセージがある？
-		
 
 		//// ?ボタンで終了メッセージが来たらゲームループを抜ける
 
@@ -248,11 +252,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//キーボード情報の取得開始
 		//全キーの入力状態を取得する
 		input->Update();
+		bossHpX = gameScene->GetbossHpBar();
 
-		
+		bossHpBarSprite->SetSize({ bossHpX,32 });
+		bossHpBarSprite->TransVertexBuffer();
+
 		sprite2->Update();
 		titleSprite->Update();
 		endSprite->Update();
+		bossHpBarSprite->Update();
+		bossHpWakuSprite->Update();
 		if (gameflag == 0)
 		{
 			if (input->isKeyTrigger(DIK_SPACE))
@@ -272,12 +281,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			box2->Update();
 			box3->Update();
 			box4->Update();
-			goal->Update();
 			
 			//スカイドーム
 			skydome->Update();
 
-			object1->Update();
 			//照準
 			sprite->Update();
 			sprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
@@ -343,6 +350,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{
 			sprite->Draw();
 			sprite2->Draw();
+
+			bossHpBarSprite->Draw();
+			bossHpWakuSprite->Draw();
 
 		/*	debugtext_minute->DrawAll();
 			debugtext_minute2->DrawAll();*/
