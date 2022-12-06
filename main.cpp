@@ -354,8 +354,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			bossHpBarSprite->Draw();
 			bossHpWakuSprite->Draw();
 
-		/*	debugtext_minute->DrawAll();
-			debugtext_minute2->DrawAll();*/
+			debugtext_minute->DrawAll();
+			debugtext_minute2->DrawAll();
 			
 		}
 		else if (gameflag == 2)

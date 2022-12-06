@@ -25,10 +25,12 @@ enum class Phase
 	BossMiniVertical,//bossのミニが縦方向に動く
 	BossMiniSide,//bossのミニが横方向に動く
 	BossStop,
+	None,
 };
 
 enum class BossPhase
 {
+	None,
 	MiniStop,
 	MiniVerticalLUF,
 	MiniVerticalLUB,
@@ -101,6 +103,7 @@ private:
 	float length = 0.3f;//円の半径
 	float addCircleX = cos(radius) * length;//円上の位置 x
 	float addCircleY = sin(radius) * length;//円上の位置 y
+	float addCircleZ = sin(radius) * length;//円上の位置 y
 	float angleVec = 1.5f;
 
 
@@ -112,6 +115,14 @@ private:
 
 	//∞の形の動く用
 	bool isL = false;
+
+	int childNumber;
+	XMFLOAT3 bossVec;
+	float waitTimer = 15;
+
+	const float waitTimerInterval = 15;
+
+	bool circleZFlag = false;
 
 	float cameraZ = 0.0f;
 	XMFLOAT3 cameraVec;
@@ -132,11 +143,23 @@ private:
 
 	void PLeaveF();
 
+	void PCircleZ();
+
+	void PCircleZInverce();
+
+	void PChild();
+
+	void PWait();
+
+	void PWaitR();
+
+	
+
 	XMVECTOR ease_in(const XMVECTOR& start, const XMVECTOR& end, float t);
 public:
 
 	Phase phase = Phase::OutApproach;
-	BossPhase phaseMini = BossPhase::MiniStop;
+	BossPhase phaseMini = BossPhase::None;
 
 	bool bossDamage = false;
 
@@ -166,6 +189,10 @@ public:
 	void SetCameraZ(float z) { cameraZ = z; }
 
 	void SetGameScene(GameScene* gameScene) { this->gameScene = gameScene; }
+
+	void SetChildNumber(int childNumber) { this->childNumber = childNumber; }
+
+	void SetBossVec(XMFLOAT3 bossVec) { this->bossVec = bossVec; }
 
 	//スプライトhpバー用
 	void SetBossHpBar(float bossHpBar,float bossHpBarMax) {

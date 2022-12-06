@@ -13,6 +13,7 @@
 #include "EnemyOneWay.h"
 #include "CameraObj.h"
 #include "Boss.h"
+#include "BossChild.h"
 
 #include <sstream>
 
@@ -131,7 +132,14 @@ private: // メンバ変数
 	EnemyOneWay* enemyOneWay = nullptr;
 	EnemyOneWay* enemyOneWay2 = nullptr;
 	Boss* boss = nullptr;
-	
+	BossChild* bossChildLUF = nullptr;
+	BossChild* bossChildLUB = nullptr;
+	BossChild* bossChildRUF = nullptr;
+	BossChild* bossChildRUB = nullptr;
+	BossChild* bossChildLDF = nullptr;
+	BossChild* bossChildLDB = nullptr;
+	BossChild* bossChildRDF = nullptr;
+	BossChild* bossChildRDB = nullptr;
 
 	XMVECTOR reticlePos;//レティクル用変数
 

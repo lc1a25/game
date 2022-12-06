@@ -8,13 +8,17 @@ void Boss::Init(Model* enemyModel, Model* enemyModelMini, XMFLOAT3 position)
 	this->position = position;
 	boss->Init(enemyModel_, this->position,{4,4,4});
 
-	bossMiniLUF = new Enemy();
+	boss->phase = Phase::None;
+
+	bossVec = this->position;
+	bossVecTemp = this->position;
+	/*bossMiniLUF = new Enemy();
 	this->position = position;
 	bossMiniLUF->Init(enemyModelMini_,this->position);
 
 
-	boss->phase = Phase::CircleInfinity;
-	bossMiniLUF->phaseMini = BossPhase::MiniStop;
+	
+	bossMiniLUF->phaseMini = BossPhase::MiniStop;*/
 	//bossMiniLUF->phase = Phase::Stop;
 }
 
@@ -22,22 +26,31 @@ void Boss::Update()
 {
 
 	position = boss->GetPosition();
+	bossVec.x = boss->GetPosition().x - bossVecTemp.x;
+	bossVec.y = boss->GetPosition().y - bossVecTemp.y;
+	bossVec.z = boss->GetPosition().z - bossVecTemp.z;
+
+	bossVecTemp.x = boss->GetPosition().x;
+	bossVecTemp.y = boss->GetPosition().y;
+	bossVecTemp.z = boss->GetPosition().z;
+
+
 
 	boss->SetPlayerPosition(playerWorldPos);
 	boss->SetPosition(position);
 	boss->Update();
 
-	bossMiniLUF->SetPlayerPosition(playerWorldPos);
+	//bossMiniLUF->SetPlayerPosition(playerWorldPos);
 
-	if (boss->phase == Phase::BossMiniVertical)
-	{
-		bossDrawFlag = false;
-		//bossMiniLUF->phaseMini = BossPhase::MiniVerticalLUF;
-	}
-	if (bossDrawFlag == false)
-	{
-		bossMiniLUF->Update();
-	}
+	//if (boss->phase == Phase::BossMiniVertical)
+	//{
+	//	bossDrawFlag = false;
+	//	//bossMiniLUF->phaseMini = BossPhase::MiniVerticalLUF;
+	//}
+	//if (bossDrawFlag == false)
+	//{
+	//	bossMiniLUF->Update();
+	//}
 	
 }
 

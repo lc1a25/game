@@ -52,7 +52,26 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	enemyOneWay2->Init(enemyModel, { 30.0f,-300.0f,-200.0f }, true);//30.0f,-100.0f,650.0f
 
 	boss = new Boss();
-	boss->Init(bossModel,bossMiniModel, { 0,0,-100.0f });
+	boss->Init(bossModel, bossMiniModel, { 0,0,-100.0f });
+
+	bossChildLUF = new BossChild();
+	bossChildLUF->Init(bossModel,{ 0, 0, -100.0f}, 1);
+
+	bossChildLUB = new BossChild();
+	bossChildLUB->Init(bossModel, { 0, 0, -100.0f }, 2);
+	bossChildRUF = new BossChild();
+	bossChildRUF->Init(bossModel, { 0, 0, -100.0f }, 3);
+	bossChildRUB = new BossChild();
+	bossChildRUB->Init(bossModel, { 0, 0, -100.0f }, 4);
+	bossChildLDF = new BossChild();
+	bossChildLDF->Init(bossModel, { 0, 0, -100.0f }, 5);
+	bossChildLDB = new BossChild();
+	bossChildLDB->Init(bossModel, { 0, 0, -100.0f }, 6);
+	bossChildRDF = new BossChild();
+	bossChildRDF->Init(bossModel, { 0, 0, -100.0f }, 7);
+	bossChildRDB = new BossChild();
+	bossChildRDB->Init(bossModel, { 0, 0, -100.0f }, 8);
+
 
 	camera = new Camera();
 	camera->Init();
@@ -113,9 +132,10 @@ void GameScene::Update()
 	mouseY = player->GetMouseY();
 
 	//デバッグ用
-	sprintf_s(moji, "%d", cameraObj->GetRaleIndex());
+	//sprintf_s(moji, "%d", cameraObj->GetRaleIndex());
 	//sprintf_s(moji2, "%d", waitRale);
-	sprintf_s(moji2, "%0.3f",cameraObj->GetEye().z);
+	sprintf_s(moji2, "%0.3f",bossChildLUF->GetEnemy()->GetPosition().x);
+	sprintf_s(moji, "%0.3f", boss->GetBossVec().x);
 
 //カメラ
 	cameraObj->UpdateCamera();
@@ -166,6 +186,32 @@ void GameScene::Update()
 	boss->GetEnemy()->SetBossHpBar(bossHpBar,bossHpBarMax);
 	boss->Update();
 
+	bossChildLUF->SetBossVec(boss->GetBossVec());
+	bossChildLUF->Update();
+
+	bossChildLUB->SetBossVec(boss->GetBossVec());
+	bossChildLUB->Update();
+
+	bossChildRUF->SetBossVec(boss->GetBossVec());
+	bossChildRUF->Update();
+
+	bossChildRUB->SetBossVec(boss->GetBossVec());
+	bossChildRUB->Update();
+
+	bossChildLDF->SetBossVec(boss->GetBossVec());
+	bossChildLDF->Update();
+
+	bossChildLDB->SetBossVec(boss->GetBossVec());
+	bossChildLDB->Update();
+
+	bossChildRDF->SetBossVec(boss->GetBossVec());
+	bossChildRDF->Update();
+
+	bossChildRDB->SetBossVec(boss->GetBossVec());
+	bossChildRDB->Update();
+
+
+
 	//当たり判定
 	CheckAllCollision(enemyCircle->GetEnemy());
 	CheckAllCollision(enemyCircle2->GetEnemy());
@@ -210,6 +256,15 @@ void GameScene::Draw()
 	enemyOneWay->Draw();
 	//enemyOneWay2->Draw();
 	boss->Draw();
+	bossChildLUF->Draw();
+	bossChildLUB->Draw();
+	bossChildRUF->Draw();
+	bossChildRUB->Draw();
+	bossChildLDF->Draw();
+	bossChildLDB->Draw();
+	bossChildRDF->Draw();
+	bossChildRDB->Draw();
+
 
 	Object3d::PostDraw();
 }
@@ -456,6 +511,142 @@ void GameScene::UpdateEnemyPop()
 
 			boss = new Boss();
 			boss->Init(bossModel,bulletModel, { x, y, z });
+		}
+		else if (word.find("CHILDLUF") == 0)
+		{
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			int32_t number = (int32_t)std::atof(word.c_str());
+
+			bossChildLUF = new BossChild();
+			bossChildLUF->Init(bossModel,  { x, y, z },number);
+		}
+		else if (word.find("CHILDLUB") == 0)
+		{
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			int32_t number = (int32_t)std::atof(word.c_str());
+
+			bossChildLUB = new BossChild();
+			bossChildLUB->Init(bossModel, { x, y, z }, number);
+		}
+		else if (word.find("CHILDRUF") == 0)
+		{
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			int32_t number = (int32_t)std::atof(word.c_str());
+
+			bossChildRUF = new BossChild();
+			bossChildRUF->Init(bossModel, { x, y, z }, number);
+		}
+		else if (word.find("CHILDRUB") == 0)
+		{
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			int32_t number = (int32_t)std::atof(word.c_str());
+
+			bossChildRUB = new BossChild();
+			bossChildRUB->Init(bossModel, { x, y, z }, number);
+		}
+		else if (word.find("CHILDLDF") == 0)
+		{
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			int32_t number = (int32_t)std::atof(word.c_str());
+
+			bossChildLDF = new BossChild();
+			bossChildLDF->Init(bossModel, { x, y, z }, number);
+		}
+		else if (word.find("CHILDLDB") == 0)
+		{
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			int32_t number = (int32_t)std::atof(word.c_str());
+
+			bossChildLDB = new BossChild();
+			bossChildLDB->Init(bossModel, { x, y, z }, number);
+		}
+		else if (word.find("CHILDRDF") == 0)
+		{
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			int32_t number = (int32_t)std::atof(word.c_str());
+
+			bossChildRDF = new BossChild();
+			bossChildRDF->Init(bossModel, { x, y, z }, number);
+		}
+		else if (word.find("CHILDRDB") == 0)
+		{
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+			getline(line_stream, word, ',');
+			int32_t number = (int32_t)std::atof(word.c_str());
+
+			bossChildRDB = new BossChild();
+			bossChildRDB->Init(bossModel, { x, y, z }, number);
 		}
 		else if (word.find("RALE") == 0)
 		{

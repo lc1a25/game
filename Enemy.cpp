@@ -101,6 +101,50 @@ void Enemy::PLeaveF()
 	}
 }
 
+void Enemy::PCircleZ()
+{
+	//円の角度
+	radius = angle * 3.14f / 180.0f;
+
+	//円状の場所
+	addCircleX = cos(radius) * (length + 0.7);
+	addCircleZ = sin(radius) * (length + 0.7);
+
+	//敵の座標に足す
+	enemy->position.x -= addCircleX;
+	enemy->position.z -= addCircleZ;
+
+	//角度をたして円状に動かす
+	angle += angleVec;
+}
+
+void Enemy::PChild()
+{
+	enemy->position.x += bossVec.x /= 1.2;
+	enemy->position.y += bossVec.y /= 1.2;
+	enemy->position.z += bossVec.z /= 1.2;
+}
+
+void Enemy::PWait()
+{
+	waitTimer--;
+	if (waitTimer <= 0)
+	{
+		phaseMini = BossPhase::MiniVerticalLUF;
+	}
+}
+
+void Enemy::PWaitR()
+{
+	waitTimer--;
+	if (waitTimer <= 0)
+	{
+		phaseMini = BossPhase::MiniVerticalRUF;
+	}
+}
+
+
+
 
 XMVECTOR Enemy::ease_in(const XMVECTOR& start, const XMVECTOR& end, float t)
 {
@@ -240,7 +284,7 @@ void Enemy::Update()
 		break;
 
 	case Phase::OneWayL:
-		EasingTime();
+		//EasingTime();
 
 		//OneWayPos = ease_in(OneWayPos, { -200,OneWayPos.m128_f32[1] ,OneWayPos.m128_f32[2]  },timeRate);
 		//
@@ -286,9 +330,14 @@ void Enemy::Update()
 
 		break;
 
+
 	case Phase::BossMiniVertical:
 		
-		
+		break;
+	
+	case Phase::None:
+
+		break;
 	default:
 		break;
 	}
@@ -296,21 +345,92 @@ void Enemy::Update()
 	switch (phaseMini)
 	{
 
-
+	case BossPhase::None:
+		break;
 	case BossPhase::MiniStop:
+		//PChild();
+		//PCircleZ();
+		if (childNumber == 1)
+		{
+			angle = 90;
+			PWait();
+		}
+		else if(childNumber == 2)
+		{
+			angle = 45;
+			PWait();
+		}
+		else if (childNumber == 3)
+		{
+			angle = -90;
+			PWaitR();
+		}
+		else if (childNumber == 4)
+		{
+			angle = -45;
+			PWaitR();
+		}
+		else if (childNumber == 5)
+		{
+			angle = 90;
+			PWait();
+		}
+		else if (childNumber == 6)
+		{
+			angle = 45;
+			PWait();
+		}
+		else if (childNumber == 7)
+		{
+			angle = -90;
+			PWaitR();
+		}
+		else if (childNumber == 8)
+		{
+			angle = -45;
+			PWaitR();
+		}
+
 		break;
 	case BossPhase::MiniVerticalLUF:
-		EasingTime();
-		MiniPosLUF = ease_in(MiniPosLUF, { -20, MiniPosLUF.m128_f32[1], playerWorldPos.z }, timeRate);
+	
+		//EasingTime();
+		//MiniPosLUF = ease_in({ MiniPosLUF }, { -15,MiniPosLUF.m128_f32[1], MiniPosLUF.m128_f32[2] }, timeRate);
 
-		enemy->position.x = MiniPosLUF.m128_f32[0];
-		enemy->position.y = MiniPosLUF.m128_f32[1];
-		enemy->position.z = MiniPosLUF.m128_f32[2];
+		//enemy->position.x = MiniPosLUF.m128_f32[0];
+		//enemy->position.y = MiniPosLUF.m128_f32[1];
+		//enemy->position.z = MiniPosLUF.m128_f32[2];
+
+		
+		if (circleZFlag == true)
+		{
+			PCircleZ();
+		}
+		else
+		{
+			enemy->position.x = -30;
+			circleZFlag = true;
+		}
+		//flag	wo tatete PcircleZ wo tukau
+
+	/*	enemy->position.y = MiniPosLUF.m128_f32[1];
+		enemy->position.z = MiniPosLUF.m128_f32[2];*/
 
 		break;
 	case BossPhase::MiniVerticalLUB:
+
+		
 		break;
 	case BossPhase::MiniVerticalRUF:
+		if (circleZFlag == true)
+		{
+			PCircleZ();
+		}
+		else
+		{
+			enemy->position.x = 30;
+			circleZFlag = true;
+		}
 		break;
 	case BossPhase::MiniVerticalRUB:
 		break;
@@ -364,7 +484,7 @@ void Enemy::Draw()
 void Enemy::Homing()
 {
 	//assert(player_);
-	const float speed = 3.0f;//1フレーム進む距離
+	const float speed = 2.0f;//1フレーム進む距離
 
 	//差分ベクトル
 	lockOn.m128_f32[0] = playerWorldPos.x - GetWorldPosition().x;
@@ -409,11 +529,13 @@ void Enemy::PhaseInit(bool rightMoveTrue)
 
 void Enemy::EasingTime()
 {
-	float elapsedTime = static_cast<float> (elapsedCount) / 1000000.0f;
+	
 
 	nowCount = timeGetTime();
 
 	elapsedCount = nowCount - startCount;
+
+	float elapsedTime = static_cast<float> (elapsedCount) / 1000000.0f;
 
 	timeRate = elapsedTime / maxTime;
 }
