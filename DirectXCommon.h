@@ -7,9 +7,12 @@
 #include "Win.h"
 #include <DirectXMath.h>
 #include <cassert>
+#include <chrono>
+#include<thread>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "winmm.lib")
 //#pragma comment(lib, "dxguid.lib")
 
 using namespace Microsoft::WRL;
@@ -57,6 +60,13 @@ public:
 	
 
 private:
+
+	//fpsŒÅ’è
+	void InitFixFPS();
+	void UpdateFixFPS();
+
+	//‹L˜^ŽžŠÔ
+	std::chrono::steady_clock::time_point reference_;
 	XMMATRIX viewPort;
 	Win* win = nullptr;
 };

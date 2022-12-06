@@ -2,7 +2,10 @@
 
 void DirectXCommon::Init(Win* win)
 {
-
+	//システムタイマーの精度をあげる
+	timeBeginPeriod(1);
+	//fps固定
+	InitFixFPS();
 	ID3D12Debug1* debugController;
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
 	{
@@ -400,9 +403,51 @@ void DirectXCommon::EndDraw()
 		WaitForSingleObject(event, INFINITE);
 		CloseHandle(event);
 	}
+
+	//fps固定
+	UpdateFixFPS();
+
 	cmdAllocator->Reset(); // キューをクリア
 	cmdList->Reset(cmdAllocator.Get(), nullptr);  // 再びコマンドリストを貯める準備
 
 	
+}
+
+void DirectXCommon::InitFixFPS()
+{
+	//現在時間を記録
+	reference_ = std::chrono::steady_clock::now();
+}
+
+void DirectXCommon::UpdateFixFPS()
+{
+	// 1 / 60 ぴったり　マイクロ秒だから1000 / 1 の　1000　/ 1
+	const std::chrono::microseconds kMinTime(uint64_t(1000000.0f / 60.0f));
+
+	//　1 / 60 より　少し短い時間
+	const std::chrono::microseconds kMinCheckTime(uint64_t(1000000.0f / 65.0f));
+
+	//現在時間を記録
+	std::chrono::steady_clock::time_point now = 
+		std::chrono::steady_clock::now();
+
+	std::chrono::microseconds elapsed =
+		std::chrono::duration_cast<std::chrono::microseconds>(now - reference_);
+
+	//1/60秒 (より少し短い時間)経っていない場合
+	if (elapsed < kMinTime)
+	{
+		//1/60秒経過するまで　微小なスリープを繰り返す
+		while (std::chrono::steady_clock::now() - reference_ < kMinTime)
+		{
+			//1マイクロ秒スリープ
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+		}
+	}
+	//現在の時間の記録
+	reference_ = std::chrono::steady_clock::now();
+
+
+
 }
 
