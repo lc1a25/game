@@ -9,7 +9,9 @@ class BossChild
 
 	XMFLOAT3 bossVec;
 
-	XMFLOAT3 playerWorldPos;
+	XMFLOAT3 bossPos;
+
+	XMFLOAT3 shotRange;
 
 	int childNumber;
 
@@ -22,7 +24,9 @@ public:
 
 	void Draw();
 
-	void SetPlayerWorldPos(XMFLOAT3 playerPos) { playerWorldPos = playerPos; }
+	void SetChildShotRange(XMFLOAT3 shotRange) { this->shotRange = shotRange; }
+
+	void SetBossPos(XMFLOAT3 bossPos) { this->bossPos = bossPos; }
 
 	void SetBossVec(XMFLOAT3 bossVec) { this->bossVec = bossVec; }
 

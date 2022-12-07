@@ -58,6 +58,7 @@ public: // ƒƒ“ƒoŠÖ”
 
 	//“–‚½‚è”»’è
 	void CheckAllCollision(Enemy* enemy);
+	void CheckBossANDChildCollision(Enemy* bossChild);
 	void CheckPillarCollision();
 
 	//hwnd‚Ìæ“¾

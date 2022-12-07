@@ -15,7 +15,8 @@ void BossChild::Init(Model* enemyModel, XMFLOAT3 position, int childNumber)
 
 void BossChild::Update()
 {
-	
+	bossChild->SetChildShotRange(shotRange);
+	bossChild->SetBossPos(bossPos);
 	bossChild->SetBossVec(bossVec);
 	bossChild->SetChildNumber(childNumber);
 	bossChild->Update();

@@ -27,7 +27,7 @@ public:
 
 	void Draw();
 
-	void SetPlayerWorldPos(XMFLOAT3 playerPos) { playerWorldPos = playerPos; }
+	void SetPlayerWorldPos(XMFLOAT3 playerPos) { this->playerWorldPos = playerPos; }
 
 	XMFLOAT3 GetBossVec() { return bossVec; }
 

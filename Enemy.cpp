@@ -107,8 +107,8 @@ void Enemy::PCircleZ()
 	radius = angle * 3.14f / 180.0f;
 
 	//円状の場所
-	addCircleX = cos(radius) * (length + 0.7);
-	addCircleZ = sin(radius) * (length + 0.7);
+	addCircleX = cos(radius) * (length + 1.2);
+	addCircleZ = sin(radius) * (length + 1.2);
 
 	//敵の座標に足す
 	enemy->position.x -= addCircleX;
@@ -140,6 +140,18 @@ void Enemy::PWaitR()
 	if (waitTimer <= 0)
 	{
 		phaseMini = BossPhase::MiniVerticalRUF;
+	}
+}
+
+void Enemy::PChildHoming()
+{
+	//弾を撃つ
+	shotTimer--;
+	if (shotTimer <= 0)
+	{
+		shotEndFlag = true;
+		ChildHoming();
+		shotTimer = shotInterval;
 	}
 }
 
@@ -352,7 +364,7 @@ void Enemy::Update()
 		//PCircleZ();
 		if (childNumber == 1)
 		{
-			angle = 90;
+			angle = 60;
 			PWait();
 		}
 		else if(childNumber == 2)
@@ -362,7 +374,7 @@ void Enemy::Update()
 		}
 		else if (childNumber == 3)
 		{
-			angle = -90;
+			angle = -60;
 			PWaitR();
 		}
 		else if (childNumber == 4)
@@ -372,7 +384,7 @@ void Enemy::Update()
 		}
 		else if (childNumber == 5)
 		{
-			angle = 90;
+			angle = 60;
 			PWait();
 		}
 		else if (childNumber == 6)
@@ -382,7 +394,7 @@ void Enemy::Update()
 		}
 		else if (childNumber == 7)
 		{
-			angle = -90;
+			angle = -60;
 			PWaitR();
 		}
 		else if (childNumber == 8)
@@ -405,6 +417,14 @@ void Enemy::Update()
 		if (circleZFlag == true)
 		{
 			PCircleZ();
+			if (childShotRange.x - 25 <= enemy->position.x && childShotRange.x + 25 >= enemy->position.x
+				&& childShotRange.z >= enemy->position.z)
+			{
+			}
+			else
+			{
+				PChildHoming();
+			}
 		}
 		else
 		{
@@ -425,6 +445,14 @@ void Enemy::Update()
 		if (circleZFlag == true)
 		{
 			PCircleZ();
+			if (childShotRange.x - 25 <= enemy->position.x && childShotRange.x + 25 >= enemy->position.x
+				&& childShotRange.z >= enemy->position.z)
+			{
+			}
+			else
+			{
+				PChildHoming();
+			}
 		}
 		else
 		{
@@ -484,7 +512,7 @@ void Enemy::Draw()
 void Enemy::Homing()
 {
 	//assert(player_);
-	const float speed = 2.0f;//1フレーム進む距離
+	const float speed = 1.5f;//1フレーム進む距離
 
 	//差分ベクトル
 	lockOn.m128_f32[0] = playerWorldPos.x - GetWorldPosition().x;
@@ -512,6 +540,31 @@ void Enemy::FrontShot()
 	//弾生成
 	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
 	newBullet->Init(bulletModel_, enemy->position,{0,0,-2});
+	//newBullet->SetDiffVec(GetWorldPosition(), playerWorldPos);
+
+
+	//弾登録
+	bullets_.push_back(std::move(newBullet));//move はユニークから譲渡するため
+}
+
+void Enemy::ChildHoming()
+{
+	//assert(player_);
+	const float speed = 2.0f;//1フレーム進む距離
+
+	//差分ベクトル
+	lockOn.m128_f32[0] = bossPos.x - GetWorldPosition().x;
+	lockOn.m128_f32[1] = bossPos.y - GetWorldPosition().y;
+	lockOn.m128_f32[2] = bossPos.z - GetWorldPosition().z;
+
+	//正規化
+	lockOn = XMVector3Normalize(lockOn);
+
+	//正規化ベクトルと1フレーム進む距離をかける
+	lockOn *= speed;
+	//弾生成
+	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
+	newBullet->Init(bulletModel_, enemy->position, lockOn);
 	//newBullet->SetDiffVec(GetWorldPosition(), playerWorldPos);
 
 

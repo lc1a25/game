@@ -94,6 +94,9 @@ private:
 	XMFLOAT3 playerWorldPos;
 	XMVECTOR lockOn;
 
+	XMFLOAT3 bossPos;
+	XMFLOAT3 childShotRange;
+
 	//発射タイマー
 	int32_t shotTimer = 0;
 
@@ -104,7 +107,7 @@ private:
 	float addCircleX = cos(radius) * length;//円上の位置 x
 	float addCircleY = sin(radius) * length;//円上の位置 y
 	float addCircleZ = sin(radius) * length;//円上の位置 y
-	float angleVec = 1.5f;
+	float angleVec = 1.0f;
 
 
 	bool isDead = false;
@@ -153,7 +156,7 @@ private:
 
 	void PWaitR();
 
-	
+	void PChildHoming();
 
 	XMVECTOR ease_in(const XMVECTOR& start, const XMVECTOR& end, float t);
 public:
@@ -176,6 +179,8 @@ public:
 
 	void Homing();
 
+	void ChildHoming();
+
 	void FrontShot();
 
 	void PhaseInit(bool rightMoveTrue);
@@ -193,6 +198,10 @@ public:
 	void SetChildNumber(int childNumber) { this->childNumber = childNumber; }
 
 	void SetBossVec(XMFLOAT3 bossVec) { this->bossVec = bossVec; }
+
+	void SetBossPos(XMFLOAT3 bossPos) { this->bossPos = bossPos; }
+
+	void SetChildShotRange(XMFLOAT3 childShotRange) { this->childShotRange = childShotRange; }
 
 	//スプライトhpバー用
 	void SetBossHpBar(float bossHpBar,float bossHpBarMax) {

@@ -54,9 +54,10 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	boss = new Boss();
 	boss->Init(bossModel, bossMiniModel, { 0,0,-100.0f });
 
+
+
 	bossChildLUF = new BossChild();
 	bossChildLUF->Init(bossModel,{ 0, 0, -100.0f}, 1);
-
 	bossChildLUB = new BossChild();
 	bossChildLUB->Init(bossModel, { 0, 0, -100.0f }, 2);
 	bossChildRUF = new BossChild();
@@ -134,8 +135,8 @@ void GameScene::Update()
 	//デバッグ用
 	//sprintf_s(moji, "%d", cameraObj->GetRaleIndex());
 	//sprintf_s(moji2, "%d", waitRale);
-	sprintf_s(moji2, "%0.3f",bossChildLUF->GetEnemy()->GetPosition().x);
-	sprintf_s(moji, "%0.3f", boss->GetBossVec().x);
+	sprintf_s(moji2, "%0.3f", boss->GetEnemy()->GetWorldPosition().x);
+	sprintf_s(moji, "%0.3f", boss->GetEnemy()->GetWorldPosition().z);
 
 //カメラ
 	cameraObj->UpdateCamera();
@@ -186,29 +187,47 @@ void GameScene::Update()
 	boss->GetEnemy()->SetBossHpBar(bossHpBar,bossHpBarMax);
 	boss->Update();
 
+
+	bossChildLUF->SetBossPos(boss->GetEnemy()->GetWorldPosition());
 	bossChildLUF->SetBossVec(boss->GetBossVec());
 	bossChildLUF->Update();
 
+	bossChildLUB->SetBossPos(boss->GetEnemy()->GetWorldPosition());
 	bossChildLUB->SetBossVec(boss->GetBossVec());
 	bossChildLUB->Update();
 
+	bossChildRUF->SetBossPos(boss->GetEnemy()->GetWorldPosition());
 	bossChildRUF->SetBossVec(boss->GetBossVec());
 	bossChildRUF->Update();
 
+	bossChildRUB->SetBossPos(boss->GetEnemy()->GetWorldPosition());
 	bossChildRUB->SetBossVec(boss->GetBossVec());
 	bossChildRUB->Update();
 
+	bossChildLDF->SetBossPos(boss->GetEnemy()->GetWorldPosition());
 	bossChildLDF->SetBossVec(boss->GetBossVec());
 	bossChildLDF->Update();
 
+	bossChildLDB->SetBossPos(boss->GetEnemy()->GetWorldPosition());
 	bossChildLDB->SetBossVec(boss->GetBossVec());
 	bossChildLDB->Update();
 
+	bossChildRDF->SetBossPos(boss->GetEnemy()->GetWorldPosition());
 	bossChildRDF->SetBossVec(boss->GetBossVec());
 	bossChildRDF->Update();
 
+	bossChildRDB->SetBossPos(boss->GetEnemy()->GetWorldPosition());
 	bossChildRDB->SetBossVec(boss->GetBossVec());
 	bossChildRDB->Update();
+
+	bossChildLUF->SetChildShotRange(cameraObj->GetEye());
+	bossChildLUB->SetChildShotRange(cameraObj->GetEye());
+	bossChildRUF->SetChildShotRange(cameraObj->GetEye());
+	bossChildRUB->SetChildShotRange(cameraObj->GetEye());
+	bossChildLDF->SetChildShotRange(cameraObj->GetEye());
+	bossChildLDB->SetChildShotRange(cameraObj->GetEye());
+	bossChildRDF->SetChildShotRange(cameraObj->GetEye());
+	bossChildRDB->SetChildShotRange(cameraObj->GetEye());
 
 
 
@@ -220,6 +239,23 @@ void GameScene::Update()
 	CheckAllCollision(enemyOneWay->GetEnemy());
 	CheckAllCollision(enemyOneWay2->GetEnemy());
 	CheckAllCollision(boss->GetEnemy());
+	CheckBossANDChildCollision(bossChildLUF->GetEnemy());
+	CheckBossANDChildCollision(bossChildLUB->GetEnemy());
+	CheckBossANDChildCollision(bossChildRUF->GetEnemy());
+	CheckBossANDChildCollision(bossChildRUB->GetEnemy());
+	CheckBossANDChildCollision(bossChildLDF->GetEnemy());
+	CheckBossANDChildCollision(bossChildLDB->GetEnemy());
+	CheckBossANDChildCollision(bossChildRDF->GetEnemy());
+	CheckBossANDChildCollision(bossChildRDB->GetEnemy());
+
+	
+	
+	
+	
+	
+	
+	
+
 
 	bossHpBar = boss->GetEnemy()->GetHpBarX();
 	if (boss->GetEnemy()->IsDead() == true)
@@ -303,7 +339,7 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 		length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
 			((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
 			((pos2.z - pos1.z) * (pos2.z - pos1.z));
-		if (length <= size + 25)
+		if (length <= size + 15)
 		{
 			if (cameraObj->GetRaleIndex() <= 6)
 			{
@@ -345,6 +381,30 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 				playerBullet->OnCollision();
 				enemyBullet->OnCollision();*/
 			}
+		}
+	}
+}
+
+void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
+{
+	XMFLOAT3 pos1, pos2;
+
+	//敵弾リスト
+	const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = bossChild->GetBullets();
+
+	pos1 = boss->GetEnemy()->GetWorldPosition();
+	//自キャラと敵弾当たり判定
+	for (const std::unique_ptr<EnemyBullet>& bullet : enemyBullets)
+	{
+		pos2 = bullet->GetWorldPosition();
+		length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
+			((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
+			((pos2.z - pos1.z) * (pos2.z - pos1.z));
+		if (length <= size + 25)
+		{
+			//player->OnCollision();
+
+			bullet->OnCollision();
 		}
 	}
 }
