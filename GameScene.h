@@ -73,10 +73,8 @@ public: // メンバ関数
 
 	void UpdateEnemyPop();
 
-	void SetBossHp(FLOAT bossHpX) { bossHpBar = bossHpX; }
-
 	FLOAT GetbossHpBar() { return bossHpBar; }
-
+	FLOAT GetHpBar() { return hpBar; }
 
 	float mouseX;
 	float mouseY;
@@ -84,6 +82,7 @@ public: // メンバ関数
 	char moji2[64];
 
 	bool pointsLast = false;
+	bool bossFlag = false;
 
 	//コマンド用
 	bool waitCommand = false;
@@ -97,11 +96,16 @@ public: // メンバ関数
 	float bossHpBarMax = 733;
 	int bossDieTimer = 120;
 
+
+	float hpBar = 288;
+	float hpBarMax = 288;
+	bool hp0 = false;
 	int  coll = 0;
 
 	std::list<std::unique_ptr<EnemyBullet>> enemyBullets_;
 
 	std::stringstream enemyPopCommands;
+
 private: // メンバ変数
 
 	HWND hwnd;
@@ -119,11 +123,13 @@ private: // メンバ変数
 	Object3d* wall = wall->Create();
 	Object3d* wallBoss = wallBoss->Create();
 	Object3d* wallBossBack = wallBossBack->Create();
+	Object3d *wall2 = wall2->Create();
 	Object3d* pillar = pillar->Create();
 	Object3d* pillar2 = pillar2->Create();
 
 	Object3d* pillar3 = pillar3->Create();
 	Object3d* pillar4 = pillar4->Create();
+	Object3d *pillar5 = pillar5->Create();
 
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
@@ -158,7 +164,7 @@ private: // メンバ変数
 
 	//当たり判定用変数
 	float length = 0.0f;
-	float size = 2.0f;
+	float size = 22.0f;
 	float wallColliLength = 0.0f;
 	//std::unique_ptr<Enemy> enemy(new Enemy());
 

@@ -224,7 +224,12 @@ XMFLOAT3 Player::GetReticleFar()
 
 void Player::OnCollision()
 {
-	
+	playerHp--;
+	hpBar -= 96;
+	if (playerHp <= 0)
+	{
+		hp0 = true;
+	}
 }
 
 XMFLOAT3 Player::GetSpriteReticle()
@@ -250,7 +255,7 @@ void Player::Attack()
 			velocity.m128_f32[1] = reticle->position.y - player->position.y;
 			velocity.m128_f32[2] = reticle->position.z - player->position.z;
 
-			velocity = XMVector3Normalize(velocity) * 3.0f;
+			velocity = XMVector3Normalize(velocity) * 7.0f;
 
 			//íeê∂ê¨
 			std::unique_ptr<PlayerBullet> newBullet = std::make_unique<PlayerBullet>();

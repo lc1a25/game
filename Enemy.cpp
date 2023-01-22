@@ -83,6 +83,18 @@ void Enemy::PLeaveL()
 	}
 }
 
+void Enemy::PShotMinor()
+{
+	//’e‚ðŒ‚‚Â
+	shotMinorTimer--;
+	if (shotMinorTimer <= 0)
+	{
+
+		FrontShot();
+		shotMinorTimer = shotMinorInterval;
+	}
+}
+
 void Enemy::PLeaveR()
 {
 	leaveTime--;
@@ -107,8 +119,8 @@ void Enemy::PCircleZ()
 	radius = angle * 3.14f / 180.0f;
 
 	//‰~ó‚ÌêŠ
-	addCircleX = cos(radius) * (length + 1.2);
-	addCircleZ = sin(radius) * (length + 1.2);
+	addCircleX = cos(radius) * (length + 1.8);
+	addCircleZ = sin(radius) * (length + 1.8);
 
 	//“G‚ÌÀ•W‚É‘«‚·
 	enemy->position.x -= addCircleX;
@@ -120,9 +132,10 @@ void Enemy::PCircleZ()
 
 void Enemy::PChild()
 {
-	enemy->position.x += bossVec.x /= 1.2;
-	enemy->position.y += bossVec.y /= 1.2;
-	enemy->position.z += bossVec.z /= 1.2;
+	enemy->position.x += bossVec.x /= 1.1;
+	enemy->position.y += bossVec.y /= 1.1;
+	enemy->position.z += bossVec.z /= 1.1;
+	PShotMinor();
 }
 
 void Enemy::PWait()
@@ -134,12 +147,30 @@ void Enemy::PWait()
 	}
 }
 
+void Enemy::PWaitLB()
+{
+	waitTimer--;
+	if (waitTimer <= 0)
+	{
+		phaseMini = BossPhase::MiniVerticalLUB;
+	}
+}
+
 void Enemy::PWaitR()
 {
 	waitTimer--;
 	if (waitTimer <= 0)
 	{
 		phaseMini = BossPhase::MiniVerticalRUF;
+	}
+}
+
+void Enemy::PWaitRB()
+{
+	waitTimer--;
+	if (waitTimer <= 0)
+	{
+		phaseMini = BossPhase::MiniVerticalRUB;
 	}
 }
 
@@ -164,10 +195,10 @@ XMVECTOR Enemy::ease_in(const XMVECTOR& start, const XMVECTOR& end, float t)
 	return start * (1.0f - t) + end * t;
 }
 
-void Enemy::Init(Model* enemyModel, XMFLOAT3 position, XMFLOAT3 scale)
+void Enemy::Init(Model* enemyModel, XMFLOAT3 position, Model *bulletModel ,XMFLOAT3 scale)
 {
 	enemyModel_ = enemyModel;
-	bulletModel_ = enemyModel;
+	bulletModel_ = bulletModel;
 	enemy->SetModel(enemyModel);
 	enemy->scale = { scale };
 
@@ -293,6 +324,11 @@ void Enemy::Update()
 				{ 0,0,enemy->position.z }, timeRate).m128_f32[2];*/
 			//phase = Phase::BossMiniVertical;
 		}
+		if (bossHp <= 25)
+		{
+			phase = Phase::BossSide;
+		}
+		
 		break;
 
 	case Phase::OneWayL:
@@ -343,10 +379,40 @@ void Enemy::Update()
 		break;
 
 
-	case Phase::BossMiniVertical:
+	case Phase::BossVertical:
+		enemy->position.y+= 0.8;
+		PHoming();
+		if (enemy->position.y >= 30.4)
+		{
+			phase = Phase::BossSideUp;
+		}
 		
 		break;
-	
+		case Phase::BossVerticalL:
+		enemy->position.y-= 0.8;
+		PHoming();
+		if (enemy->position.y <= -30.4)
+		{
+			phase = Phase::BossSide;
+		}
+
+		break;
+	case Phase::BossSide:
+		enemy->position.x+= 0.8;
+		PHoming();
+		if (enemy->position.x >= 60)
+		{
+			phase = Phase::BossVertical;
+		}
+		break;
+	case Phase::BossSideUp:
+		enemy->position.x-= 0.8;
+		PHoming();
+		if (enemy->position.x <= -60)
+		{
+			phase = Phase::BossVerticalL;
+		}
+		break;
 	case Phase::None:
 
 		break;
@@ -360,27 +426,32 @@ void Enemy::Update()
 	case BossPhase::None:
 		break;
 	case BossPhase::MiniStop:
-		//PChild();
+		PChild();
 		//PCircleZ();
-		if (childNumber == 1)
+		/*if (childNumber == 1)
 		{
-			angle = 60;
+			enemy->position.x = 0;
+			angle = 90;
+
 			PWait();
 		}
-		else if(childNumber == 2)
+		else if (childNumber == 2)
 		{
-			angle = 45;
-			PWait();
+			enemy->position.x = 0;
+			angle = 180;
+			PWaitLB();
 		}
 		else if (childNumber == 3)
 		{
-			angle = -60;
+			enemy->position.x = 0;
+			angle = 270;
 			PWaitR();
 		}
 		else if (childNumber == 4)
 		{
-			angle = -45;
-			PWaitR();
+			enemy->position.x = 0;
+			angle = 0;
+			PWaitRB();
 		}
 		else if (childNumber == 5)
 		{
@@ -389,23 +460,23 @@ void Enemy::Update()
 		}
 		else if (childNumber == 6)
 		{
-			angle = 45;
-			PWait();
+			angle = 60;
+			PWaitLB();
 		}
 		else if (childNumber == 7)
 		{
-			angle = -60;
+			angle = 60;
 			PWaitR();
 		}
 		else if (childNumber == 8)
 		{
-			angle = -45;
-			PWaitR();
-		}
+			angle = 60;
+			PWaitRB();
+		}*/
 
 		break;
 	case BossPhase::MiniVerticalLUF:
-	
+
 		//EasingTime();
 		//MiniPosLUF = ease_in({ MiniPosLUF }, { -15,MiniPosLUF.m128_f32[1], MiniPosLUF.m128_f32[2] }, timeRate);
 
@@ -413,7 +484,7 @@ void Enemy::Update()
 		//enemy->position.y = MiniPosLUF.m128_f32[1];
 		//enemy->position.z = MiniPosLUF.m128_f32[2];
 
-		
+
 		if (circleZFlag == true)
 		{
 			PCircleZ();
@@ -428,7 +499,7 @@ void Enemy::Update()
 		}
 		else
 		{
-			enemy->position.x = -30;
+			enemy->position.x = -90;
 			circleZFlag = true;
 		}
 		//flag	wo tatete PcircleZ wo tukau
@@ -438,8 +509,25 @@ void Enemy::Update()
 
 		break;
 	case BossPhase::MiniVerticalLUB:
+		if (circleZFlag == true)
+		{
+			PCircleZ();
+			if (childShotRange.x - 25 <= enemy->position.x && childShotRange.x + 25 >= enemy->position.x
+				&& childShotRange.z >= enemy->position.z)
+			{
+			}
+			else
+			{
 
-		
+				PChildHoming();
+			}
+		}
+		else
+		{
+			enemy->position.z = 930;
+			circleZFlag = true;
+		}
+
 		break;
 	case BossPhase::MiniVerticalRUF:
 		if (circleZFlag == true)
@@ -451,16 +539,33 @@ void Enemy::Update()
 			}
 			else
 			{
+				//PChildHoming();
+			}
+		}
+		else
+		{
+			enemy->position.x = 90;
+			circleZFlag = true;
+		}
+		break;
+	case BossPhase::MiniVerticalRUB:
+		if (circleZFlag == true)
+		{
+			PCircleZ();
+			if (childShotRange.x - 25 <= enemy->position.x && childShotRange.x + 25 >= enemy->position.x
+				&& childShotRange.z >= enemy->position.z)
+			{
+			}
+			else
+			{
 				PChildHoming();
 			}
 		}
 		else
 		{
-			enemy->position.x = 30;
+			enemy->position.z = 990;
 			circleZFlag = true;
 		}
-		break;
-	case BossPhase::MiniVerticalRUB:
 		break;
 	case BossPhase::MiniVerticalLDF:
 		break;
@@ -605,8 +710,8 @@ XMFLOAT3 Enemy::GetWorldPosition()
 void Enemy::OnCollision()
 {
 	isDead = true;
-	enemy->position.z -= 350;
-	//phase = Phase::Leave;
+	enemy->position.z = -350;
+	phase = Phase::None;
 }
 
 void Enemy::OnBossCollision()

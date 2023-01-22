@@ -6,9 +6,9 @@ void Boss::Init(Model* enemyModel, Model* enemyModelMini, XMFLOAT3 position)
 	enemyModelMini_ = enemyModelMini;
 	boss = new Enemy();
 	this->position = position;
-	boss->Init(enemyModel_, this->position,{4,4,4});
+	boss->Init(enemyModel_, this->position, enemyModelMini_,{4,4,4});
 
-	boss->phase = Phase::Stop;
+	boss->phase = Phase::CircleInfinity;
 
 	bossVec = this->position;
 	bossVecTemp = this->position;

@@ -132,6 +132,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	Sprite* bossHpBarSprite = Sprite::Create(spriteCommon, 5,{0,0});
 
+	spriteCommon->LoadTexture(6, L"Resource/heart.png");
+
+	Sprite *playerHpSprite = Sprite::Create(spriteCommon, 6);
+
+	spriteCommon->LoadTexture(7, L"Resource/gameover.png");
+
+	Sprite *gameOverSprite = Sprite::Create(spriteCommon, 7);
+
 	const int debugTextTexNumber3 = 8;
 
 	spriteCommon->LoadTexture(debugTextTexNumber3, L"Resource/ASC_White.png");
@@ -220,11 +228,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	endSprite->SetSize({ 1280,720 });
 	endSprite->TransVertexBuffer();
 
+	gameOverSprite->SetPosition({ 640.0f,360.0f,0.0f });
+	gameOverSprite->SetSize({ 1280,720 });
+	gameOverSprite->TransVertexBuffer();
+
 	bossHpWakuSprite->SetPosition({ 640.0f,50.0f,0.0f });
 	bossHpWakuSprite->SetSize({ 769,38 });
 	bossHpWakuSprite->TransVertexBuffer();
 
+	
+	playerHpSprite->SetPosition({ 1112.0f,640.0f,0.0f });
+	playerHpSprite->SetSize({ 288,96 });
+	playerHpSprite->SetTexsize({ 288,96 });
+	playerHpSprite->TransVertexBuffer();
+
 	float bossHpX = 733.0f;
+	float hp = 288;
 
 	bossHpBarSprite->SetPosition({ 273.0f,34.0f,0.0f });
 	//bossHpBarSprite->SetTexLeftTop({ 0,0 });
@@ -253,13 +272,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//全キーの入力状態を取得する
 		input->Update();
 		bossHpX = gameScene->GetbossHpBar();
-
+		hp = gameScene->GetHpBar();
+		
 		bossHpBarSprite->SetSize({ bossHpX,32 });
 		bossHpBarSprite->TransVertexBuffer();
+
+		
+		playerHpSprite->SetPosition({ 1112.0f,640.0f,0.0f });
+		playerHpSprite->SetSize({ hp,96 });
+		playerHpSprite->SetTexsize({ hp,96 });
+		playerHpSprite->TransVertexBuffer();
 
 		sprite2->Update();
 		titleSprite->Update();
 		endSprite->Update();
+		gameOverSprite->Update();
 		bossHpBarSprite->Update();
 		bossHpWakuSprite->Update();
 		if (gameflag == 0)
@@ -285,13 +312,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			//スカイドーム
 			skydome->Update();
 
+			playerHpSprite->Update();
 			//照準
 			sprite->Update();
 			sprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
 			//デバッグテキスト
-			debugtext_minute->Print(gameScene->moji, secound_x, secound_y, 1.0f);
-			debugtext_minute2->Print(gameScene->moji2, secound_x, secound_y + 100, 1.0f);
-
+			/*debugtext_minute->Print(gameScene->moji, secound_x, secound_y, 1.0f);
+			debugtext_minute2->Print(gameScene->moji2, secound_x, secound_y + 100, 1.0f);*/
+			if (gameScene->hp0 == true)
+			{
+				gameflag = 3;
+			}
 			if (gameScene->pointsLast == true)
 			{
 				gameflag = 2;
@@ -303,7 +334,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			{
 				gameflag = 0;
 				gameScene->Init(dxcommon, input, audio);
-				gameScene->pointsLast = false;
+				bossHpX = 733.0f;
+				hp = 288;
+			}
+		}
+		else if (gameflag == 3)
+		{
+			if (input->isKeyTrigger(DIK_SPACE))
+			{
+				gameScene->Init(dxcommon, input, audio);
+				gameflag = 0;
+				
+				bossHpX = 733.0f;
+				hp = 288;
 			}
 		}
 		
@@ -350,17 +393,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{
 			sprite->Draw();
 			sprite2->Draw();
+			playerHpSprite->Draw();
+			if (gameScene->bossFlag == true)
+			{
+				bossHpBarSprite->Draw();
+				bossHpWakuSprite->Draw();
+			}
+			
 
-			bossHpBarSprite->Draw();
-			bossHpWakuSprite->Draw();
-
-			debugtext_minute->DrawAll();
-			debugtext_minute2->DrawAll();
+			//debugtext_minute->DrawAll();
+			//debugtext_minute2->DrawAll();
 			
 		}
 		else if (gameflag == 2)
 		{
 			endSprite->Draw();
+
+		}
+		else if (gameflag == 3)
+		{
+			gameOverSprite->Draw();
 
 		}
 

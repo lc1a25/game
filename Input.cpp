@@ -58,6 +58,8 @@ void Input::Update()
 	result = Devmouse->Acquire();
 	beforeMouse = mouseState;
 	result = Devmouse->GetDeviceState(sizeof(mouseState), &mouseState);
+
+	ShowCursor(FALSE);
 }
 
 

@@ -1,11 +1,11 @@
 #include "EnemyBullet.h"
 
-void EnemyBullet::Init(Model* model, XMFLOAT3 enemyPosition, XMVECTOR velocity)
+void EnemyBullet::Init(Model* model, XMFLOAT3 enemyPosition, XMVECTOR velocity,XMFLOAT3 scale)
 {
 	bulletModel_ = model;
 	velocity_ = velocity;
 	enemyBullet->SetModel(bulletModel_);
-	enemyBullet->scale = { 0.5,0.5,0.5 };
+	enemyBullet->scale = { scale };
 
 	enemyBullet->matWorld.r[3].m128_f32[0] = enemyPosition.x;
 	enemyBullet->matWorld.r[3].m128_f32[1] = enemyPosition.y;

@@ -5,7 +5,7 @@ void EnemyCircle::Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue)
 	enemyModel_ = enemyModel;
 	enemy = new Enemy();
 	this->position = position;
-	enemy->Init(enemyModel_, position);
+	enemy->Init(enemyModel_, position, enemyModel_);
 	PhaseInit(rightMoveTrue);
 }
 

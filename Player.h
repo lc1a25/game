@@ -51,13 +51,16 @@ private:
 
 	bool isDeadEnemy = false;
 	//弾のクールタイム
-	int32_t coolTimer = 5;
-	int32_t bulletCoolTimer = 5;
+	int32_t coolTimer = 10;
+	int32_t bulletCoolTimer =10;
 
 	bool rockOn = false;
 
 	XMFLOAT2 playerMoveRange = { 25,15 };
 
+	int playerHp = 3;
+	float hpBar = 0;
+	bool hp0 = false;
 public:
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
@@ -94,6 +97,11 @@ public:
 	this->cameraTargetVec.m128_f32[2] = cameraTargetV.z;
 	}
 
+	void SetPlayerHpBar(float hpBar) { this->hpBar = hpBar; }
+
+	FLOAT GetHpBar() { return hpBar; }
+
+	BOOL GetHp0() { return hp0; }
 
 	XMFLOAT3 GetWorldPosition();
 	XMFLOAT3 GetReticleWorldPosition();

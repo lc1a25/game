@@ -109,8 +109,9 @@ private:
 	long long nowCount = 0;
 	long long elapsedCount = 0;
 
-	XMVECTOR start{ 0.0f, 0.0f, 0.0f };
-	XMVECTOR p2{ 0.0f, 0.0f, 50.0f };
+	XMVECTOR start{ 0.0f, 0.0f, -50.0f };
+	XMVECTOR start2{ 0.0f, 0.0f, 50.0f };
+	XMVECTOR p2{ 0.0f, 0.0f, 100.0f };
 	XMVECTOR p3{ 0.0f, 0.0f, +200.0f };
 	XMVECTOR p4{ 0.0f, 0.0f, +400.0f };
 	XMVECTOR p5{ 0.0f, 0.0f, +600.0f };
@@ -137,7 +138,7 @@ private:
 	XMFLOAT3 targetVec = { 0.0f,0.0f,0.0f };
 	bool pointsLast = false;
 
-	std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,p6,p7,end,end };
+	std::vector<XMVECTOR>points{ start,start2,p2,p3,p4,p5,p6,p7,end,end };
 	//std::vector<XMVECTOR>points{ start,start,start,start,start,start,start,start,start,start };
 	//std::vector<XMVECTOR>points{ end,end,end,end,end,end,end,end,end,end };
 

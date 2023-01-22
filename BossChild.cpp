@@ -6,7 +6,7 @@ void BossChild::Init(Model* enemyModel, XMFLOAT3 position, int childNumber)
 	bossChild = new Enemy();
 	this->position = position;
 	this->childNumber = childNumber;
-	bossChild->Init(enemyModel_, this->position, { 2,2,2 });
+	bossChild->Init(enemyModel_, this->position,  enemyModel_ ,{ 2,2,2 });
 
 
 	bossChild->phase = Phase::None;

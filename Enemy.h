@@ -22,8 +22,10 @@ enum class Phase
 	CircleInfinity,//∞上にまわる
 	OneWayR,//右から左に行く
 	OneWayL,//左から右に行く
-	BossMiniVertical,//bossのミニが縦方向に動く
-	BossMiniSide,//bossのミニが横方向に動く
+	BossVertical,//bossのミニが縦方向に動く
+	BossVerticalL,
+	BossSide,//bossのミニが横方向に動く
+	BossSideUp,
 	BossStop,
 	None,
 };
@@ -99,14 +101,14 @@ private:
 
 	//発射タイマー
 	int32_t shotTimer = 0;
-
+	
 	//円運動
-	float angle = 90.0f;//最初の角度
-	float radius = angle * 3.14f / 180.0f ;//円の角度
+
+	float radius = angle * 3.14f / 180.0f;//円の角度
 	float length = 0.3f;//円の半径
 	float addCircleX = cos(radius) * length;//円上の位置 x
 	float addCircleY = sin(radius) * length;//円上の位置 y
-	float addCircleZ = sin(radius) * length;//円上の位置 y
+	float addCircleZ = sin(radius) * length;//円上の位置 z
 	float angleVec = 1.0f;
 
 
@@ -121,9 +123,12 @@ private:
 
 	int childNumber;
 	XMFLOAT3 bossVec;
-	float waitTimer = 15;
+	float waitTimer = 120;
 
-	const float waitTimerInterval = 15;
+	const float waitTimerInterval = 120;
+
+	int shotMinorTimer = 60;
+	const int shotMinorInterval = 60;
 
 	bool circleZFlag = false;
 
@@ -137,6 +142,8 @@ private:
 	void PCircleL();
 
 	void PShot();
+
+	void PShotMinor();
 
 	void PHoming();
 
@@ -154,13 +161,17 @@ private:
 
 	void PWait();
 
+	void PWaitLB();
+
 	void PWaitR();
+
+	void PWaitRB();
 
 	void PChildHoming();
 
 	XMVECTOR ease_in(const XMVECTOR& start, const XMVECTOR& end, float t);
 public:
-
+	float angle = 90.0f;//最初の角度
 	Phase phase = Phase::OutApproach;
 	BossPhase phaseMini = BossPhase::None;
 
@@ -171,7 +182,7 @@ public:
 	//発射間隔
 	static const int shotInterval = 30;
 
-	void Init(Model* enemyModel,XMFLOAT3 position,XMFLOAT3 scale = {2,2,2});
+	void Init(Model* enemyModel,XMFLOAT3 position, Model *bulletModelXMFLOAT3 , XMFLOAT3 scale = { 2,2,2 });
 
 	void Update();
 

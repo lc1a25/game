@@ -20,7 +20,8 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	this->input = input;
 	this->audio = audio;
 
-	playerModel = Model::LoadFromOBJ("boxplayer-0");
+	/*playerModel = Model::LoadFromOBJ("boxplayer-0");*/
+	playerModel = Model::LoadFromOBJ("zikistar");
 	bulletModel = Model::LoadFromOBJ("ene-0");
 	enemyModel = Model::LoadFromOBJ("box_aka");
 	bossModel = Model::LoadFromOBJ("boss");
@@ -30,14 +31,26 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	wallFlatModel = Model::LoadFromOBJ("wall");
 	pillarModel = Model::LoadFromOBJ("boxGreen");
 
+	bossHpBar = 733;
+	bossHpBarMax = 733;
+	bossDieTimer = 120;
+
+	pointsLast = false; 
+
+	bossFlag = false;
+
+	hpBar = 288;
+	hpBarMax = 288;
+	hp0 = false;
+
 	player = new Player();
 	player->Init(playerModel, bulletModel);
 
 	enemy = new Enemy();
-	enemy->Init(enemyModel, { 30.0f, -300.0f, -100.0f });//30,0,100
+	enemy->Init(enemyModel, { 30.0f, -300.0f, -100.0f }, enemyModel);//30,0,100
 
 	enemyL = new Enemy();
-	enemyL->Init(enemyModel, { 50.0f, 50.0f, -500.0f });
+	enemyL->Init(enemyModel, { 50.0f, 50.0f, -500.0f }, enemyModel);
 
 	enemyCircle = new EnemyCircle();
 	enemyCircle->Init(enemyModel, { -50.0f, 50.0f, -200.0f }, false);//-50.0f, 50.0f, 400.0f
@@ -52,7 +65,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	enemyOneWay2->Init(enemyModel, { 30.0f,-300.0f,-200.0f }, true);//30.0f,-100.0f,650.0f
 
 	boss = new Boss();
-	boss->Init(bossModel, bossMiniModel, { 0,0,-100.0f });
+	boss->Init(bossModel, enemyModel, { 0,0,-100.0f });
 
 
 
@@ -84,6 +97,10 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	wall->scale = { 10,7,70 };
 	wall->SetPosition({ 0,-64,50 });
 
+	wall2->SetModel(wallModel);
+	wall2->scale = { 10,7,70 };
+	wall2->SetPosition({ 0,110,50 });
+
 	wallBoss->SetModel(wallModel);
 	wallBoss->scale = { 15,7,7 };
 	wallBoss->SetPosition({ 0,-64,1000 });
@@ -94,7 +111,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	
 			
 	pillar->SetModel(pillarModel);
-	pillar->scale = { 2,15,1 };
+	pillar->scale = { 2,13,1 };
 	pillar->SetPosition({ -30,-32,180 });
 
 	pillar2->SetModel(pillarModel);
@@ -103,11 +120,15 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 	pillar3->SetModel(pillarModel);
 	pillar3->scale = { 2,20,1 };
-	pillar3->SetPosition({ -50,-32,530 });
+	pillar3->SetPosition({ -50,-32,480 });
 
 	pillar4->SetModel(pillarModel);
 	pillar4->scale = { 2,18,1 };
-	pillar4->SetPosition({ 40,-32,530 });
+	pillar4->SetPosition({ 40,-32,480 });
+
+	pillar5->SetModel(pillarModel);
+	pillar5->scale = { 2,18,1 };
+	pillar5->SetPosition({ -50,-32,680 });
 	
 	Object3d::SetCamera(camera);
 
@@ -119,15 +140,22 @@ void GameScene::Update()
 {
 	UpdateEnemyPop();
 
+	if (player->GetHp0() == true)
+	{
+		enemyPopCommands.str("");
+		enemyPopCommands.clear(std::stringstream::goodbit);
+		hp0 = true;
+	}
 	//設置物
 	wall->Update();
+	wall2->Update();
 	wallBoss->Update();
 	wallBossBack->Update();
 	pillar->Update();
 	pillar2->Update();
 	pillar3->Update();
 	pillar4->Update();
-
+	pillar5->Update();
 	//2dレティクルスプライトの座標
 	mouseX = player->GetMouseX();
 	mouseY = player->GetMouseY();
@@ -135,8 +163,8 @@ void GameScene::Update()
 	//デバッグ用
 	//sprintf_s(moji, "%d", cameraObj->GetRaleIndex());
 	//sprintf_s(moji2, "%d", waitRale);
-	sprintf_s(moji2, "%0.3f", boss->GetEnemy()->GetWorldPosition().x);
-	sprintf_s(moji, "%0.3f", boss->GetEnemy()->GetWorldPosition().z);
+	sprintf_s(moji2, "%0.3f", bossChildRUF->GetEnemy()->angle);
+	sprintf_s(moji, "%0.3f", bossChildLUF->GetEnemy()->angle);
 
 //カメラ
 	cameraObj->UpdateCamera();
@@ -159,6 +187,7 @@ void GameScene::Update()
 	player->SetCameraPos(cameraObj->GetEye());
 	player->SetCameraTargetVec(cameraObj->GetTargetVec());
 	player->SetCameraEyeVec(cameraObj->GetEyeVec());
+	player->SetPlayerHpBar(hpBar);
 	player->Update();
 
 	enemy->SetCameraZ(cameraObj->GetEyeVec().z);
@@ -258,14 +287,20 @@ void GameScene::Update()
 
 
 	bossHpBar = boss->GetEnemy()->GetHpBarX();
+	hpBar = player->GetHpBar();
+
+	
+	if (cameraObj->GetEndFlag() == true)
+	{
+		bossFlag = true;
+	}
 	if (boss->GetEnemy()->IsDead() == true)
 	{
 		bossDieTimer--;
 		if (bossDieTimer <= 0)
 		{
 			pointsLast = true;
-			enemyPopCommands.str("");
-			enemyPopCommands.clear(std::stringstream::goodbit);
+			
 			bossDieTimer = 120;
 		}
 	}
@@ -278,11 +313,13 @@ void GameScene::Draw()
 	wallBoss->Draw();
 	wallBossBack->Draw();
 	wall->Draw();
+	wall2->Draw();
 	pillar->Draw();
 	pillar2->Draw();
 	pillar3->Draw();
 	pillar4->Draw();
-
+	pillar5->Draw();
+	 
 	player->Draw();
 	
 	enemy->Draw();
@@ -291,15 +328,20 @@ void GameScene::Draw()
 	//enemyCircle2->Draw();
 	enemyOneWay->Draw();
 	//enemyOneWay2->Draw();
-	boss->Draw();
-	bossChildLUF->Draw();
-	bossChildLUB->Draw();
-	bossChildRUF->Draw();
-	bossChildRUB->Draw();
-	bossChildLDF->Draw();
-	bossChildLDB->Draw();
-	bossChildRDF->Draw();
-	bossChildRDB->Draw();
+
+	if(cameraObj->GetEndFlag() == true)
+	{ 
+		boss->Draw();
+		bossChildLUF->Draw();
+		bossChildLUB->Draw();
+		bossChildRUF->Draw();
+		bossChildRUB->Draw();
+		bossChildLDF->Draw();
+		bossChildLDB->Draw();
+		bossChildRDF->Draw();
+		bossChildRDB->Draw();
+	}
+	
 
 
 	Object3d::PostDraw();
@@ -324,7 +366,10 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 				 ((pos2.z - pos1.z) * (pos2.z - pos1.z));
 		if (length <= size)
 		{
-			player->OnCollision();
+			if (boss->GetEnemy()->IsDead() == false)
+			{
+				player->OnCollision();
+			}
 
 			bullet->OnCollision();
 		}
@@ -339,7 +384,13 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 		length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
 			((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
 			((pos2.z - pos1.z) * (pos2.z - pos1.z));
-		if (length <= size + 15)
+		if (cameraObj->GetRaleIndex() >= 7)
+		{
+			length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
+				((pos2.y - pos1.y - 8) * (pos2.y - pos1.y - 8)) +
+				((pos2.z - pos1.z) * (pos2.z - pos1.z));
+		}
+		if (length <= size)
 		{
 			if (cameraObj->GetRaleIndex() <= 6)
 			{
@@ -474,6 +525,7 @@ void GameScene::UpdateEnemyPop()
 		return;
 	}
 
+
 	std::string line;
 
 	while (getline(enemyPopCommands, line))
@@ -483,7 +535,7 @@ void GameScene::UpdateEnemyPop()
 		std::string word;
 
 		getline(line_stream, word, ',');
-
+		
 		if (word.find("//") == 0)
 		{
 			continue;
@@ -556,7 +608,7 @@ void GameScene::UpdateEnemyPop()
 			}
 
 			enemy = new Enemy();
-			enemy->Init(enemyModel, { x, y, z });
+			enemy->Init(enemyModel, { x, y, z }, enemyModel);
 		}
 		else if (word.find("BOSS") == 0)
 		{
@@ -570,7 +622,7 @@ void GameScene::UpdateEnemyPop()
 			float z = (float)std::atof(word.c_str());
 
 			boss = new Boss();
-			boss->Init(bossModel,bulletModel, { x, y, z });
+			boss->Init(bossModel, enemyModel, { x, y, z });
 		}
 		else if (word.find("CHILDLUF") == 0)
 		{
