@@ -80,6 +80,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	Object3d::StaticInitialize(dxcommon->GetDev(), win->window_width, win->window_height);
 
+	
+
 	Object3dFbx::SetDevice(dxcommon->GetDev());
 
 	Camera* camera;
@@ -157,16 +159,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//ポストエフェクト
 	//spriteCommon->LoadTexture(100, L"Resource/mimikkyu.jpg");
 
-	postEffect = new PostEffect();
-	postEffect->Init(spriteCommon,100, { 0.5f,0.5f }, false, false);
+	//postEffect = new PostEffect();
+	//postEffect->Init(spriteCommon,100, { 0.5f,0.5f }, false, false);
 
 #pragma region model
 	
-	ModelFbx* modelFbx = nullptr;
-	Object3dFbx* object1 = nullptr;
+	//ModelFbx* modelFbx = nullptr;
+	//Object3dFbx* object1 = nullptr;
 
 
-	Model * model1 = Model::LoadFromOBJ("bullet");
+	/*Model * model1 = Model::LoadFromOBJ("bullet");
 	Object3d* box = box->Create();
 	box->SetModel(model1);
 	box->scale = { 1,1,1, };
@@ -177,29 +179,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	box2->scale = { 1,1,1, };
 	box2->SetPosition({ 50.0f, 100.0f, +400.0f });
 
-
 	Object3d* box3 = box3->Create();
 	box3->SetModel(model1);
 	box3->scale = { 1,1,1, };
 	box3->SetPosition({ 50.0f, -100.0f, +600.0f });
 
-
 	Object3d* box4 = box4->Create();
 	box4->SetModel(model1);
 	box4->scale = { 1,1,1, };
-	box4->SetPosition({ 10.0f, -30.0f, +800.0f });
+	box4->SetPosition({ 10.0f, -30.0f, +800.0f });*/
 	
 	Model* skydome_model = Model::LoadFromOBJ("skydome");
 
 	Object3d* skydome = skydome->Create();
 
 	skydome->SetModel(skydome_model);
-	skydome->scale = { 11,11,11 };
+	skydome->scale = { 11,11,12 };
 	skydome->SetPosition({ 0,0,0 });
-
-	
-
-
 
 #pragma endregion
 	//描画初期化処理　ここまで
@@ -304,10 +300,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			gameScene->Update();
 
 			//spline 曲線　通り道
-			box->Update();
+		/*	box->Update();
 			box2->Update();
 			box3->Update();
-			box4->Update();
+			box4->Update();*/
 			
 			//スカイドーム
 			skydome->Update();
@@ -317,8 +313,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			sprite->Update();
 			sprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
 			//デバッグテキスト
-			/*debugtext_minute->Print(gameScene->moji, secound_x, secound_y, 1.0f);
-			debugtext_minute2->Print(gameScene->moji2, secound_x, secound_y + 100, 1.0f);*/
+			debugtext_minute->Print(gameScene->moji, secound_x, secound_y, 1.0f);
+			debugtext_minute2->Print(gameScene->moji2, secound_x, secound_y + 100, 1.0f);
 			if (gameScene->hp0 == true)
 			{
 				gameflag = 3;
@@ -401,8 +397,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			
 
-			//debugtext_minute->DrawAll();
-			//debugtext_minute2->DrawAll();
+			debugtext_minute->DrawAll();
+			debugtext_minute2->DrawAll();
 			
 		}
 		else if (gameflag == 2)
@@ -427,8 +423,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	win->WinFinalize();
 
 //解放
-	delete modelFbx;
-	delete object1;
+	/*delete modelFbx;
+	delete object1;*/
 
 	//Audio解放
 	audio->Finalize();

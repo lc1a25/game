@@ -52,6 +52,10 @@ void Enemy::PCircleL()
 
 void Enemy::PShot()
 {
+	if (attackFlag == false)
+	{
+		return;
+	}
 	//’e‚ðŒ‚‚Â
 	shotTimer--;
 	if (shotTimer <= 0)
@@ -64,14 +68,19 @@ void Enemy::PShot()
 
 void Enemy::PHoming()
 {
-	//’e‚ðŒ‚‚Â
-	shotTimer--;
-	if (shotTimer <= 0)
+	if (attackFlag == false)
 	{
-		shotEndFlag = true;
-		Homing();
-		shotTimer = shotInterval;
+		return;
 	}
+		//’e‚ðŒ‚‚Â
+		shotTimer--;
+		if (shotTimer <= 0)
+		{
+			shotEndFlag = true;
+			Homing();
+			shotTimer = shotInterval;
+		}
+	
 }
 
 void Enemy::PLeaveL()
@@ -195,12 +204,13 @@ XMVECTOR Enemy::ease_in(const XMVECTOR& start, const XMVECTOR& end, float t)
 	return start * (1.0f - t) + end * t;
 }
 
-void Enemy::Init(Model* enemyModel, XMFLOAT3 position, Model *bulletModel ,XMFLOAT3 scale)
+void Enemy::Init(Model* enemyModel, XMFLOAT3 position, Model *bulletModel ,XMFLOAT3 scale,bool attackFlag)
 {
 	enemyModel_ = enemyModel;
 	bulletModel_ = bulletModel;
 	enemy->SetModel(enemyModel);
 	enemy->scale = { scale };
+	this->attackFlag = attackFlag;
 
 	enemy->matWorld.r[3].m128_f32[0] = position.x;
 	enemy->matWorld.r[3].m128_f32[1] = position.y;
@@ -354,7 +364,10 @@ void Enemy::Update()
 		}
 		//shotEndFlag = true;
 		PHoming();
-		PLeaveF();
+		if (attackFlag == false)
+		{
+			PLeaveF();
+		}
 
 		break;
 
@@ -374,7 +387,10 @@ void Enemy::Update()
 		}
 		//shotEndFlag = true;
 		PHoming();
-		PLeaveF();
+		if (attackFlag == false)
+		{
+			PLeaveF();
+		}
 
 		break;
 
@@ -709,6 +725,7 @@ XMFLOAT3 Enemy::GetWorldPosition()
 
 void Enemy::OnCollision()
 {
+	enemyDown += 1;
 	isDead = true;
 	enemy->position.z = -350;
 	phase = Phase::None;

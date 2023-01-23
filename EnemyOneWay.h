@@ -13,7 +13,7 @@ private:
 
 public:
 
-	void Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue);
+	void Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue,bool attackFlag = true);
 
 	void Update();
 

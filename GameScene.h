@@ -14,7 +14,7 @@
 #include "CameraObj.h"
 #include "Boss.h"
 #include "BossChild.h"
-
+//#include "ParticleManager.h"
 #include <sstream>
 
 class GameScene
@@ -102,6 +102,10 @@ public: // メンバ関数
 	bool hp0 = false;
 	int  coll = 0;
 
+	bool tutorialFlag = true;
+
+	bool tutorialFlag2 = true;
+
 	std::list<std::unique_ptr<EnemyBullet>> enemyBullets_;
 
 	std::stringstream enemyPopCommands;
@@ -154,6 +158,7 @@ private: // メンバ変数
 	Model* playerModel = nullptr;
 	Model* bulletModel = nullptr;
 	Model* enemyModel = nullptr;
+	Model* enemyRotateModel = nullptr;
 	Model* bossModel = nullptr;
 	Model* bossMiniModel = nullptr;
 	Model* wallModel = nullptr;
@@ -161,7 +166,7 @@ private: // メンバ変数
 	Model* wallFlatModel = nullptr;
 	Model* pillarModel = nullptr;
 
-
+	//ParticleManager* Particle = nullptr;
 	//当たり判定用変数
 	float length = 0.0f;
 	float size = 22.0f;

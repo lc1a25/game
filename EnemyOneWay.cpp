@@ -1,11 +1,12 @@
 #include "EnemyOneWay.h"
 
-void EnemyOneWay::Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue)
+void EnemyOneWay::Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue, bool attackFlag)
 {
 	enemyModel_ = enemyModel;
 	enemy = new Enemy();
+	XMFLOAT3 scale{ 2.0f,2.0f,2.0f };
 	this->position = position;
-	enemy->Init(enemyModel_, position, enemyModel_);
+	enemy->Init(enemyModel_, position, enemyModel_,scale,attackFlag);
 	PhaseInit(rightMoveTrue);
 }
 

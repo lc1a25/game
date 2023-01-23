@@ -9,7 +9,7 @@ VSOutput main(float4 pos : POSITION, float3 normal : NORMAL, float2 uv : TEXCOOR
 
 	const float3 eye = float3(0, 0, -20);
 
-	const float shininess = 4.0f;
+	const float shininess = 4000.0f;
 
 	float3 eyedir = normalize(eye - pos.xyz);
 

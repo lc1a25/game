@@ -23,13 +23,17 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	/*playerModel = Model::LoadFromOBJ("boxplayer-0");*/
 	playerModel = Model::LoadFromOBJ("zikistar");
 	bulletModel = Model::LoadFromOBJ("ene-0");
-	enemyModel = Model::LoadFromOBJ("box_aka");
+	enemyModel = Model::LoadFromOBJ("oneWay");
+	enemyRotateModel = Model::LoadFromOBJ("rotate");
 	bossModel = Model::LoadFromOBJ("boss");
 	bossMiniModel = Model::LoadFromOBJ("bossMini");
 	wallModel = Model::LoadFromOBJ("wallBig");
 	wallBossModel = Model::LoadFromOBJ("wallBoss");
-	wallFlatModel = Model::LoadFromOBJ("wall");
+	wallFlatModel = Model::LoadFromOBJ("wallFlat");
 	pillarModel = Model::LoadFromOBJ("boxGreen");
+
+	// 3Dオブジェクト生成
+	//Particle = ParticleManager::Create(dxcommon->GetDev(), cameraObj);
 
 	bossHpBar = 733;
 	bossHpBarMax = 733;
@@ -53,10 +57,10 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	enemyL->Init(enemyModel, { 50.0f, 50.0f, -500.0f }, enemyModel);
 
 	enemyCircle = new EnemyCircle();
-	enemyCircle->Init(enemyModel, { -50.0f, 50.0f, -200.0f }, false);//-50.0f, 50.0f, 400.0f
+	enemyCircle->Init(enemyRotateModel, { -50.0f, 50.0f, -200.0f }, false);//-50.0f, 50.0f, 400.0f
 
 	enemyCircle2 = new EnemyCircle();
-	enemyCircle2->Init(enemyModel, { 30.0f, -10.0f, -200.0f }, true);
+	enemyCircle2->Init(enemyRotateModel, { 30.0f, -10.0f, -200.0f }, true);
 
 	enemyOneWay = new EnemyOneWay();
 	enemyOneWay->Init(enemyModel, { 0.0f,0.0f,-300.0f }, false);
@@ -99,24 +103,24 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 	wall2->SetModel(wallModel);
 	wall2->scale = { 10,7,70 };
-	wall2->SetPosition({ 0,110,50 });
+	wall2->SetPosition({ 0,110,50 });//0,110,50
 
 	wallBoss->SetModel(wallModel);
 	wallBoss->scale = { 15,7,7 };
 	wallBoss->SetPosition({ 0,-64,1000 });
 
 	wallBossBack->SetModel(wallFlatModel);
-	wallBossBack->scale = { 92,48,1 };
-	wallBossBack->SetPosition({ 0,-65,1045 });
+	wallBossBack->scale = { 50,7,170 };
+	wallBossBack->SetPosition({ 0,-65,50 });
 	
 			
 	pillar->SetModel(pillarModel);
 	pillar->scale = { 2,13,1 };
-	pillar->SetPosition({ -30,-32,180 });
+	pillar->SetPosition({ -30,-32,280 });
 
 	pillar2->SetModel(pillarModel);
 	pillar2->scale = { 2,20,1 };
-	pillar2->SetPosition({ 40,-32,180 });
+	pillar2->SetPosition({ 40,-32,280 });
 
 	pillar3->SetModel(pillarModel);
 	pillar3->scale = { 2,20,1 };
@@ -133,6 +137,8 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	Object3d::SetCamera(camera);
 
 	EnemyPopLoadData();
+
+	tutorialFlag2 = false;
 	
 }
 
@@ -140,6 +146,39 @@ void GameScene::Update()
 {
 	UpdateEnemyPop();
 
+	if (cameraObj->GetRaleIndex() <= 1)
+	{
+		if (enemyOneWay->GetEnemy()->GetEnemyDownCount() == 1)
+		{
+			tutorialFlag = false;
+		}
+	}
+	
+	//for (int i = 0; i < 100; i++)
+	//{
+	//	const float rnd_pos = 10.0f;
+	//	XMFLOAT3 pos{};
+	//	pos.x = (float)rand() / RAND_MAX * player->GetWorldPosition().x - player->GetWorldPosition().x / 2.0f;
+	//	pos.y = (float)rand() / RAND_MAX * player->GetWorldPosition().y - player->GetWorldPosition().y / 2.0f;
+	//	pos.z = (float)rand() / RAND_MAX * player->GetWorldPosition().z - player->GetWorldPosition().z / 2.0f;
+
+	//	const float rnd_vel = 0.1f;
+	//	XMFLOAT3 vel{};
+	//	vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+	//	vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+	//	vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+
+	//	XMFLOAT3 acc{};
+	//	const float rnd_acc = 0.001f;
+	//	acc.y = -(float)rand() / RAND_MAX * rnd_acc;
+
+	//	//Add(5, pos, vel, acc);
+	//	Particle->Add(16, pos, vel, acc, 1.0f, 0.0f);
+	//}
+
+	//Particle->Update();
+
+	cameraObj->SetTutorialFlag(tutorialFlag);
 	if (player->GetHp0() == true)
 	{
 		enemyPopCommands.str("");
@@ -161,10 +200,10 @@ void GameScene::Update()
 	mouseY = player->GetMouseY();
 
 	//デバッグ用
-	//sprintf_s(moji, "%d", cameraObj->GetRaleIndex());
-	//sprintf_s(moji2, "%d", waitRale);
-	sprintf_s(moji2, "%0.3f", bossChildRUF->GetEnemy()->angle);
-	sprintf_s(moji, "%0.3f", bossChildLUF->GetEnemy()->angle);
+	sprintf_s(moji, "%d", cameraObj->GetRaleIndex());
+	sprintf_s(moji2, "%d", enemyOneWay->GetEnemy()->GetEnemyDownCount());
+	//sprintf_s(moji2, "%0.3f", bossChildRUF->GetEnemy()->angle);
+	//sprintf_s(moji, "%0.3f", bossChildLUF->GetEnemy()->angle);
 
 //カメラ
 	cameraObj->UpdateCamera();
@@ -173,8 +212,6 @@ void GameScene::Update()
 	camera->SetTarget({ cameraObj->GetTarget() });
 	camera->SetUp({ cameraObj->GetUp() });
 	camera->UpdateCamera();
-
-
 
 //レティクルのため
 	player->SetHwnd(hwnd);
@@ -277,25 +314,19 @@ void GameScene::Update()
 	CheckBossANDChildCollision(bossChildRDF->GetEnemy());
 	CheckBossANDChildCollision(bossChildRDB->GetEnemy());
 
-	
-	
-	
-	
-	
-	
-	
-
-
+	//hp
 	bossHpBar = boss->GetEnemy()->GetHpBarX();
 	hpBar = player->GetHpBar();
 
-	
+	//おわり
 	if (cameraObj->GetEndFlag() == true)
 	{
 		bossFlag = true;
 	}
 	if (boss->GetEnemy()->IsDead() == true)
 	{
+		enemyPopCommands.str("");
+		enemyPopCommands.clear(std::stringstream::goodbit);
 		bossDieTimer--;
 		if (bossDieTimer <= 0)
 		{
@@ -309,11 +340,16 @@ void GameScene::Update()
 
 void GameScene::Draw()
 {
+	
+	
+	// 3Dオブクジェクトの描画
+	//Particle->Draw(dxcommon->GetCmdlist());
 	Object3d::PreDraw(dxcommon->GetCmdlist());
-	wallBoss->Draw();
+	//wallBoss->Draw();
 	wallBossBack->Draw();
-	wall->Draw();
-	wall2->Draw();
+	 //wall->Draw();
+	
+	//wall2->Draw();
 	pillar->Draw();
 	pillar2->Draw();
 	pillar3->Draw();
@@ -328,7 +364,16 @@ void GameScene::Draw()
 	//enemyCircle2->Draw();
 	enemyOneWay->Draw();
 	//enemyOneWay2->Draw();
+	
 
+
+	
+
+	/// <summary>
+	/// ここに3Dオブジェクトの描画処理を追加できる
+	/// </summary>
+
+	
 	if(cameraObj->GetEndFlag() == true)
 	{ 
 		boss->Draw();
@@ -343,8 +388,9 @@ void GameScene::Draw()
 	}
 	
 
-
+	
 	Object3d::PostDraw();
+
 }
 
 void GameScene::CheckAllCollision(Enemy* enemy)
@@ -392,13 +438,13 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 		}
 		if (length <= size)
 		{
-			if (cameraObj->GetRaleIndex() <= 6)
+			if (cameraObj->GetRaleIndex() <= 4)
 			{
 				enemy->OnCollision();
 
 				bullet->OnCollision();
 			}
-			if (cameraObj->GetRaleIndex() >= 7)
+			if (cameraObj->GetRaleIndex() >= 5)
 			{
 				enemy->OnBossCollision();
 
@@ -561,8 +607,17 @@ void GameScene::UpdateEnemyPop()
 			}
 			
 
+			getline(line_stream, word, ',');
+			//0が攻撃　1が攻撃しない
+			int attack = std::atof(word.c_str());
+			bool attackFlag = true;
+			if (attack == 1)
+			{
+				attackFlag = false;
+			}
+
 			enemyOneWay = new EnemyOneWay();
-			enemyOneWay->Init(enemyModel, { x,y,z }, LorR);
+			enemyOneWay->Init(enemyModel, { x,y,z }, LorR,attackFlag);
 		}
 		else if (word.find("CIRCLE") == 0)
 		{
@@ -585,7 +640,7 @@ void GameScene::UpdateEnemyPop()
 			}
 
 			enemyCircle = new EnemyCircle();
-			enemyCircle->Init(enemyModel, { x, y, z }, LorR);
+			enemyCircle->Init(enemyRotateModel, { x, y, z }, LorR);
 		}
 		else if (word.find("OUTWAY") == 0)
 		{

@@ -135,6 +135,11 @@ private:
 	float cameraZ = 0.0f;
 	XMFLOAT3 cameraVec;
 
+	bool attackFlag = true;
+
+	//敵が死んだ数 (チュートリアルに使う)
+	int enemyDown = 0;
+
 
 	//Pが最初についているのはPhase用
 	void PCircleR();
@@ -182,7 +187,7 @@ public:
 	//発射間隔
 	static const int shotInterval = 30;
 
-	void Init(Model* enemyModel,XMFLOAT3 position, Model *bulletModelXMFLOAT3 , XMFLOAT3 scale = { 2,2,2 });
+	void Init(Model* enemyModel,XMFLOAT3 position, Model *bulletModelXMFLOAT3 , XMFLOAT3 scale = { 2,2,2 },bool attackFlag = true);
 
 	void Update();
 
@@ -226,6 +231,8 @@ public:
 	XMFLOAT3 GetWorldPosition();
 
 	XMFLOAT3 GetPosition() { return enemy->position; }
+
+	INT GetEnemyDownCount() { return enemyDown; }
 
 	void OnCollision();
 
