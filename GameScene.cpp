@@ -30,7 +30,9 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	wallModel = Model::LoadFromOBJ("wallBig");
 	wallBossModel = Model::LoadFromOBJ("wallBoss");
 	wallFlatModel = Model::LoadFromOBJ("wallFlat");
-	pillarModel = Model::LoadFromOBJ("boxGreen");
+	pillarModel = Model::LoadFromOBJ("bill");
+	enemyBulletModel = Model::LoadFromOBJ("box_aka");
+	roadModel = Model::LoadFromOBJ("road");
 
 	// 3Dオブジェクト生成
 	//Particle = ParticleManager::Create(dxcommon->GetDev(), cameraObj);
@@ -69,7 +71,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	enemyOneWay2->Init(enemyModel, { 30.0f,-300.0f,-200.0f }, true);//30.0f,-100.0f,650.0f
 
 	boss = new Boss();
-	boss->Init(bossModel, enemyModel, { 0,0,-100.0f });
+	boss->Init(bossModel, enemyBulletModel, { 0,0,-100.0f });
 
 
 
@@ -97,41 +99,45 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	cameraObj = new CameraObj();
 	cameraObj->Init({0,0,-50},{0,0,0});
 
-	wall->SetModel(wallModel);
-	wall->scale = { 10,7,70 };
-	wall->SetPosition({ 0,-64,50 });
+	//wall->SetModel(wallModel);
+	//wall->scale = { 10,7,70 };
+	//wall->SetPosition({ 0,-64,50 });
 
-	wall2->SetModel(wallModel);
-	wall2->scale = { 10,7,70 };
-	wall2->SetPosition({ 0,110,50 });//0,110,50
+	//wall2->SetModel(wallModel);
+	//wall2->scale = { 10,7,70 };
+	//wall2->SetPosition({ 0,110,50 });//0,110,50
 
-	wallBoss->SetModel(wallModel);
-	wallBoss->scale = { 15,7,7 };
-	wallBoss->SetPosition({ 0,-64,1000 });
+	//wallBoss->SetModel(wallModel);
+	//wallBoss->scale = { 15,7,7 };
+	//wallBoss->SetPosition({ 0,-64,1000 });
 
 	wallBossBack->SetModel(wallFlatModel);
 	wallBossBack->scale = { 50,7,170 };
 	wallBossBack->SetPosition({ 0,-65,50 });
+
+	road->SetModel(roadModel);
+	road->scale = { 10,7,250 };
+	road->SetPosition({ 0,-55,650 });
 	
 			
 	pillar->SetModel(pillarModel);
-	pillar->scale = { 2,13,1 };
+	pillar->scale = { 4,13,1 };
 	pillar->SetPosition({ -30,-32,280 });
 
 	pillar2->SetModel(pillarModel);
-	pillar2->scale = { 2,20,1 };
+	pillar2->scale = { 4,20,1 };
 	pillar2->SetPosition({ 40,-32,280 });
 
 	pillar3->SetModel(pillarModel);
-	pillar3->scale = { 2,20,1 };
+	pillar3->scale = { 4,20,1 };
 	pillar3->SetPosition({ -50,-32,480 });
 
 	pillar4->SetModel(pillarModel);
-	pillar4->scale = { 2,18,1 };
+	pillar4->scale = { 4,18,1 };
 	pillar4->SetPosition({ 40,-32,480 });
 
 	pillar5->SetModel(pillarModel);
-	pillar5->scale = { 2,18,1 };
+	pillar5->scale = { 4,18,1 };
 	pillar5->SetPosition({ -50,-32,680 });
 	
 	Object3d::SetCamera(camera);
@@ -153,7 +159,8 @@ void GameScene::Update()
 			tutorialFlag = false;
 		}
 	}
-	
+
+	cameraObj->SetTutorialFlag(tutorialFlag);
 	//for (int i = 0; i < 100; i++)
 	//{
 	//	const float rnd_pos = 10.0f;
@@ -177,8 +184,6 @@ void GameScene::Update()
 	//}
 
 	//Particle->Update();
-
-	cameraObj->SetTutorialFlag(tutorialFlag);
 	if (player->GetHp0() == true)
 	{
 		enemyPopCommands.str("");
@@ -186,15 +191,18 @@ void GameScene::Update()
 		hp0 = true;
 	}
 	//設置物
-	wall->Update();
+	/*wall->Update();
 	wall2->Update();
-	wallBoss->Update();
+	wallBoss->Update();*/
 	wallBossBack->Update();
+	road->Update();
+
 	pillar->Update();
 	pillar2->Update();
 	pillar3->Update();
 	pillar4->Update();
 	pillar5->Update();
+
 	//2dレティクルスプライトの座標
 	mouseX = player->GetMouseX();
 	mouseY = player->GetMouseY();
@@ -206,6 +214,7 @@ void GameScene::Update()
 	//sprintf_s(moji, "%0.3f", bossChildLUF->GetEnemy()->angle);
 
 //カメラ
+	
 	cameraObj->UpdateCamera();
 
 	camera->SetEye({ cameraObj->GetEye() });
@@ -348,7 +357,7 @@ void GameScene::Draw()
 	//wallBoss->Draw();
 	wallBossBack->Draw();
 	 //wall->Draw();
-	
+	road->Draw();
 	//wall2->Draw();
 	pillar->Draw();
 	pillar2->Draw();
@@ -677,7 +686,7 @@ void GameScene::UpdateEnemyPop()
 			float z = (float)std::atof(word.c_str());
 
 			boss = new Boss();
-			boss->Init(bossModel, enemyModel, { x, y, z });
+			boss->Init(bossModel, enemyBulletModel, { x, y, z });
 		}
 		else if (word.find("CHILDLUF") == 0)
 		{

@@ -142,7 +142,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	Sprite *gameOverSprite = Sprite::Create(spriteCommon, 7);
 
-	const int debugTextTexNumber3 = 8;
+	spriteCommon->LoadTexture(8, L"Resource/tyutorial.png");
+
+	Sprite* tyutoRial = Sprite::Create(spriteCommon, 8);
+	
+	spriteCommon->LoadTexture(9, L"Resource/tyutorialMove.png");
+
+	Sprite* tyutoRialMove = Sprite::Create(spriteCommon, 9);
+
+	const int debugTextTexNumber3 = 20;
 
 	spriteCommon->LoadTexture(debugTextTexNumber3, L"Resource/ASC_White.png");
 
@@ -151,7 +159,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	DebugText* debugtext_minute2 = nullptr;
 	debugtext_minute2 = new DebugText();
 
-	const int debugTextTexNumber4 = 9;
+	const int debugTextTexNumber4 = 21;
 
 	spriteCommon->LoadTexture(debugTextTexNumber4, L"Resource/ASC_White.png");
 	debugtext_minute2->debugTextInit(spriteCommon, debugTextTexNumber4);
@@ -238,6 +246,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	playerHpSprite->SetTexsize({ 288,96 });
 	playerHpSprite->TransVertexBuffer();
 
+	tyutoRial->SetPosition({ 620.0f,120.0f,0.0f });
+	tyutoRial->SetSize({ 750,108 });
+	tyutoRial->TransVertexBuffer();
+
+	tyutoRialMove->SetPosition({ 620.0f,600.0f,0.0f });
+	tyutoRialMove->SetSize({ 750,190 });
+	tyutoRialMove->TransVertexBuffer();
+
 	float bossHpX = 733.0f;
 	float hp = 288;
 
@@ -285,9 +301,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		gameOverSprite->Update();
 		bossHpBarSprite->Update();
 		bossHpWakuSprite->Update();
+
+		tyutoRial->Update();
+		tyutoRialMove->Update();
+
+		//照準
+		sprite->Update();
+		sprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
 		if (gameflag == 0)
 		{
-			if (input->isKeyTrigger(DIK_SPACE))
+			gameScene->SetHwnd(win->GetHwnd());
+			gameScene->SetViewPort(dxcommon->GetViewPort());
+
+			gameScene->Update();
+			if (input->isMouseKey())
 			{
 				gameflag = 1;
 			}
@@ -309,9 +336,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			skydome->Update();
 
 			playerHpSprite->Update();
-			//照準
-			sprite->Update();
-			sprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
 			//デバッグテキスト
 			debugtext_minute->Print(gameScene->moji, secound_x, secound_y, 1.0f);
 			debugtext_minute2->Print(gameScene->moji2, secound_x, secound_y + 100, 1.0f);
@@ -383,13 +407,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		spriteCommon->PreDraw();
 		if (gameflag == 0)
 		{
+
 			titleSprite->Draw();
+			sprite->Draw();
 		}
 		else if (gameflag == 1)
 		{
 			sprite->Draw();
-			sprite2->Draw();
-			playerHpSprite->Draw();
+			//sprite2->Draw();
+			
+			if (gameScene->tutorialFlag == true)
+			{
+				tyutoRial->Draw();
+				tyutoRialMove->Draw();
+			}
+			else
+			{
+				playerHpSprite->Draw();
+			}
 			if (gameScene->bossFlag == true)
 			{
 				bossHpBarSprite->Draw();

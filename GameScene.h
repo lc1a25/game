@@ -127,10 +127,11 @@ private: // ƒƒ“ƒo•Ï”
 	Object3d* wall = wall->Create();
 	Object3d* wallBoss = wallBoss->Create();
 	Object3d* wallBossBack = wallBossBack->Create();
-	Object3d *wall2 = wall2->Create();
+	Object3d* wall2 = wall2->Create();
+	Object3d* road = road->Create();
+
 	Object3d* pillar = pillar->Create();
 	Object3d* pillar2 = pillar2->Create();
-
 	Object3d* pillar3 = pillar3->Create();
 	Object3d* pillar4 = pillar4->Create();
 	Object3d *pillar5 = pillar5->Create();
@@ -165,6 +166,8 @@ private: // ƒƒ“ƒo•Ï”
 	Model* wallBossModel = nullptr;
 	Model* wallFlatModel = nullptr;
 	Model* pillarModel = nullptr;
+	Model* enemyBulletModel = nullptr;
+	Model* roadModel = nullptr;
 
 	//ParticleManager* Particle = nullptr;
 	//“–‚½‚è”»’è—p•Ï”
