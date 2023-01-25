@@ -37,7 +37,7 @@ void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
 	targetVecTemp = { 0.0f,0.0f,0.0f };
 	targetVec = { 0.0f,0.0f,0.0f };
 
-	//eye = { start };
+	eye = { start2 };
 
 	////前方ベクトル
 	//XMVECTOR forward({ 0, 0, 1 });
@@ -64,16 +64,17 @@ void CameraObj::UpdateCamera()
 
 	timeRate = elapsedTime / maxTime;
 
-	if (pointsLast == false )//道中　雑魚戦
+	if (pointsStart == false)
 	{
-		//前方ベクトル
-		XMVECTOR forward({ 0, 0, 1 });
-		//回転(前方ベクトル)
-		forward = Matrix4::transform(forward, cameraObj->matWorld);
-		targetEnd = eye + forward;
-		
-		if (pointsStart == false)
+		if (pointsLast == false)//道中　雑魚戦
 		{
+			//前方ベクトル
+			XMVECTOR forward({ 0, 0, 1 });
+			//回転(前方ベクトル)
+			forward = Matrix4::transform(forward, cameraObj->matWorld);
+			targetEnd = eye + forward;
+
+
 			if (timeRate >= 1.0f)
 			{
 				if (startIndex < points.size() - 3)
@@ -96,40 +97,40 @@ void CameraObj::UpdateCamera()
 					targetIndex = points.size() - 1;
 				}
 
+
 			}
+			eye = splinePosition(points, startIndex, timeRate);
+			//target = splinePosition(points, targetIndex, timeRate);
+
+			//カメラの移動量
+			eyeVec.x = eye.m128_f32[0] - eyeVecTemp.x;
+			eyeVec.y = eye.m128_f32[1] - eyeVecTemp.y;
+			eyeVec.z = eye.m128_f32[2] - eyeVecTemp.z;
+
+			eyeVecTemp.x = eye.m128_f32[0];
+			eyeVecTemp.y = eye.m128_f32[1];
+			eyeVecTemp.z = eye.m128_f32[2];
+
+			//カメラの移動量
+			targetVec.x = target.m128_f32[0] - eye.m128_f32[0];
+			targetVec.y = target.m128_f32[1] - eye.m128_f32[1];
+			targetVec.z = target.m128_f32[2] - eye.m128_f32[2];
+
+			targetVecTemp.x = target.m128_f32[0];
+			targetVecTemp.y = target.m128_f32[1];
+			targetVecTemp.z = target.m128_f32[2];
+
+
+
+			target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
+			target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
+			target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
 		}
-		eye = splinePosition(points, startIndex, timeRate);
-		//target = splinePosition(points, targetIndex, timeRate);
-		
-		//カメラの移動量
-		eyeVec.x = eye.m128_f32[0] - eyeVecTemp.x;
-		eyeVec.y = eye.m128_f32[1] - eyeVecTemp.y;
-		eyeVec.z = eye.m128_f32[2] - eyeVecTemp.z;
-
-		eyeVecTemp.x = eye.m128_f32[0];
-		eyeVecTemp.y = eye.m128_f32[1];
-		eyeVecTemp.z = eye.m128_f32[2];
-
-		//カメラの移動量
-		targetVec.x = target.m128_f32[0] - eye.m128_f32[0];
-		targetVec.y = target.m128_f32[1] - eye.m128_f32[1];
-		targetVec.z = target.m128_f32[2] - eye.m128_f32[2];
-
-		targetVecTemp.x = target.m128_f32[0];
-		targetVecTemp.y = target.m128_f32[1];
-		targetVecTemp.z = target.m128_f32[2];
-
-
-
-		target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
-		target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
-		target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
-	}
-	else if(pointsLast == true)//最後まで行ったら視点を固定　ボス戦
-	{
-		//cameraObj->position.z+= 0.1f;
-	//cameraObj->rotation.z++;
-	//eye = { cameraObj->matWorld.r[3].m128_f32[0],cameraObj->matWorld.r[3].m128_f32[1],cameraObj->matWorld.r[3].m128_f32[2] };
+		else if (pointsLast == true)//最後まで行ったら視点を固定　ボス戦
+		{
+			//cameraObj->position.z+= 0.1f;
+		//cameraObj->rotation.z++;
+		//eye = { cameraObj->matWorld.r[3].m128_f32[0],cameraObj->matWorld.r[3].m128_f32[1],cameraObj->matWorld.r[3].m128_f32[2] };
 
 			eye = { end };
 			eyeVec = { 0,0,0 };
@@ -141,17 +142,19 @@ void CameraObj::UpdateCamera()
 			target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
 			target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
 			targetEnd = eye + forward;
+		}
 	}
-
-	////前方ベクトル
-	//XMVECTOR forward({ 0, 0, 1 });
-	////回転(前方ベクトル)
-	//forward = Matrix4::transform(forward, cameraObj->matWorld);
-	//target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
-	//target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
-	//target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
-	////targetEnd = eye + forward;
-
+	else
+	{
+		//前方ベクトル
+		XMVECTOR forward({ 0, 0, 1 });
+		//回転(前方ベクトル)
+		forward = Matrix4::transform(forward, cameraObj->matWorld);
+		target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
+		target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
+		target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
+		targetEnd = eye + forward;
+	}
 	//上方ベクトル
 	XMVECTOR upV({ 0,1,0 });
 	//回転(上方ベクトル)

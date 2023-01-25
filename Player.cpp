@@ -6,7 +6,7 @@ void Player::Init(Model* model,Model* bulletModel)
 	bulletModel_ = bulletModel;
 	reticleModel_ = model;
 	player->SetModel(model_);
-	player->SetPosition({ 0,0,0 });
+	
 	player->scale = { 1,1,1 };
 
 	reticle->matWorld.r[3].m128_f32[0] = player->matWorld.r[3].m128_f32[0];
@@ -21,12 +21,24 @@ void Player::Init(Model* model,Model* bulletModel)
 	player->matWorld.r[3].m128_f32[0] = cameraPos.x;
 	player->matWorld.r[3].m128_f32[1] = cameraPos.y;
 	player->matWorld.r[3].m128_f32[2] = cameraPos.z + 30;
+
+	player->SetPosition({ player->matWorld.r[3].m128_f32[0],player->matWorld.r[3].m128_f32[1],player->matWorld.r[3].m128_f32[2] });
+
 }
 
 
 void Player::Update()
 {
-
+	//デバッグ用　ｈｐ下げ
+	if (input->isKeyTrigger(DIK_E))
+	{
+		playerHp--;
+		hpBar -= 96;
+		if (playerHp <= 0)
+		{
+			hp0 = true;
+		}
+	}
 //2dレティクル
 	POINT mousePosition;
 	GetCursorPos(&mousePosition);

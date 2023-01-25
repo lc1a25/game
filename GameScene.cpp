@@ -30,7 +30,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	bossMiniModel = Model::LoadFromOBJ("bossMini");
 	wallModel = Model::LoadFromOBJ("wallBig");
 	wallBossModel = Model::LoadFromOBJ("wallBoss");
-	wallFlatModel = Model::LoadFromOBJ("wallFlat");
+	wallFlatModel = Model::LoadFromOBJ("wallFlatGray");
 	pillarModel = Model::LoadFromOBJ("bill");
 	enemyBulletModel = Model::LoadFromOBJ("box_aka");
 	roadModel = Model::LoadFromOBJ("road");
@@ -115,7 +115,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	wallBossBack->SetPosition({ 0,-65,50 });
 
 	road->SetModel(roadModel);
-	road->scale = { 10,7,250 };
+	road->scale = { 10,7,300 };
 	road->SetPosition({ 0,-55,650 });
 	
 			
@@ -143,7 +143,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 	EnemyPopLoadData();
 
-	tutorialFlag2 = false;
+	tutorialFlag = true;
 
 	// 3Dオブジェクト生成
 	Particle = ParticleManager::Create(dxcommon->GetDev(), camera);
@@ -152,14 +152,17 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 void GameScene::Update()
 {
-	//
+	//csvのenemy発生
 	UpdateEnemyPop();
 
 	if (cameraObj->GetRaleIndex() <= 1)
 	{
 		if (enemyOneWay->GetEnemy()->GetEnemyDownCount() == 1)
 		{
-			tutorialFlag = false;
+			
+				tutorialFlag = false;
+				sceneChange = true;
+			
 		}
 	}
 
@@ -238,6 +241,7 @@ void GameScene::Update()
 	enemyOneWay->Update();
 	enemyOneWay2->Update();
 
+	//ボス
 	boss->SetPlayerWorldPos(player->GetWorldPosition());
 	boss->GetEnemy()->SetBossHpBar(bossHpBar,bossHpBarMax);
 	boss->Update();
@@ -315,11 +319,14 @@ void GameScene::Update()
 	//ボスが倒されたら
 	if (boss->GetEnemy()->IsDead() == true)
 	{
-		enemyPopCommands.str("");
-		enemyPopCommands.clear(std::stringstream::goodbit);
+	
+
+		//bossのやられた演出まち用
 		bossDieTimer--;
+
 		if (bossDieTimer <= 0)
 		{
+			//シーンチェンジ
 			pointsLast = true;
 			
 			bossDieTimer = 120;
@@ -329,9 +336,7 @@ void GameScene::Update()
 	//プレイヤーのhpが０になったら
 	if (player->GetHp0() == true)
 	{
-		enemyPopCommands.str("");
-		enemyPopCommands.clear(std::stringstream::goodbit);
-		//EnemyPopLoadData();
+		
 		
 		//シーンチェンジ
 		hp0 = true;
@@ -344,7 +349,7 @@ void GameScene::Draw()
 	Object3d::PreDraw(dxcommon->GetCmdlist());
 	//wallBoss->Draw();
 	wallBossBack->Draw();
-	 //wall->Draw();
+	//wall->Draw();
 	road->Draw();
 	//wall2->Draw();
 	pillar->Draw();
@@ -415,6 +420,10 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 
 	pos1 = enemy->GetWorldPosition();
 	//自弾と敵当たり判定
+	if (input->isKeyTrigger(DIK_Q))
+	{
+		enemy->OnBossCollision();
+	}
 	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
 	{
 		pos2 = bullet->GetWorldPosition();
@@ -461,9 +470,11 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 					//Add(5, pos, vel, acc);
 					Particle->Add(64, pos, vel, acc, 15.0f, 0.0f,{1,1,1},{1,0.5,0});
 				}
+				
 			}
 			if (cameraObj->GetRaleIndex() >= 5)
 			{
+				
 				enemy->OnBossCollision();
 
 				bullet->OnCollision();

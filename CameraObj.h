@@ -143,7 +143,7 @@ private:
 	long long elapsedCount = 0;
 
 	XMVECTOR start{ 0.0f, 0.0f, -150.0f };
-	XMVECTOR start2{ 0.0f, 0.0f, -50.0f };
+	XMVECTOR start2{ 0.0f, 0.0f, 0.0f };
 	XMVECTOR p2{ 0.0f, 0.0f, 100.0f };
 	XMVECTOR p3{ 0.0f, 0.0f, +200.0f };
 	XMVECTOR p4{ 0.0f, 0.0f, +400.0f };

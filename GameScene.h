@@ -106,6 +106,8 @@ public: // ƒƒ“ƒoŠÖ”
 
 	bool tutorialFlag2 = true;
 
+	bool sceneChange = false;
+
 	std::list<std::unique_ptr<EnemyBullet>> enemyBullets_;
 
 	std::stringstream enemyPopCommands;
@@ -134,7 +136,8 @@ private: // ƒƒ“ƒo•Ï”
 	Object3d* pillar2 = pillar2->Create();
 	Object3d* pillar3 = pillar3->Create();
 	Object3d* pillar4 = pillar4->Create();
-	Object3d *pillar5 = pillar5->Create();
+	Object3d* pillar5 = pillar5->Create();
+
 
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;

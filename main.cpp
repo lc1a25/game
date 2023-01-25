@@ -51,6 +51,18 @@
 using namespace Microsoft::WRL;
 
 using namespace DirectX;
+
+GameScene* Reset(GameScene* gameScene, DirectXCommon* dxcommon, Input* input, Audio* audio)
+{
+	if (gameScene != nullptr)
+	{
+		delete gameScene;
+	}
+	gameScene = new GameScene();
+	gameScene->Init(dxcommon, input, audio);
+
+	return gameScene;
+}
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
@@ -104,9 +116,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	PostEffect* postEffect = nullptr;
 
-	gameScene = new GameScene();
-	gameScene->Init(dxcommon, input, audio);
-
+	gameScene = Reset(gameScene,dxcommon, input, audio);
+	//gameScene = new GameScene();
+	//gameScene->Init(dxcommon, input, audio);
+	//reset関数をつくる
+	//さきにはいってたらdelete
+	
 	// DirectX初期化処理　ここまで
 
 	//描画初期化処理　ここから
@@ -149,6 +164,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	spriteCommon->LoadTexture(9, L"Resource/tyutorialMove.png");
 
 	Sprite* tyutoRialMove = Sprite::Create(spriteCommon, 9);
+
+	spriteCommon->LoadTexture(10, L"Resource/backBlack.png");
+
+	Sprite* backBlack = Sprite::Create(spriteCommon, 10);
 
 	const int debugTextTexNumber3 = 20;
 
@@ -254,6 +273,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	tyutoRialMove->SetSize({ 750,190 });
 	tyutoRialMove->TransVertexBuffer();
 
+
+	float backBlackX = -640.0f;
+	backBlack->SetPosition({ backBlackX,360.0f,0.0f });
+	backBlack->SetSize({ 1280,720 });
+	
+
 	float bossHpX = 733.0f;
 	float hp = 288;
 
@@ -305,6 +330,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		tyutoRial->Update();
 		tyutoRialMove->Update();
 
+		backBlack->SetPosition({ backBlackX,360.0f,0.0f });
+		backBlack->Update();
+		backBlack->TransVertexBuffer();
 		//照準
 		sprite->Update();
 		sprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
@@ -339,6 +367,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			//デバッグテキスト
 			debugtext_minute->Print(gameScene->moji, secound_x, secound_y, 1.0f);
 			debugtext_minute2->Print(gameScene->moji2, secound_x, secound_y + 100, 1.0f);
+			if (gameScene->sceneChange == true)
+			{
+				backBlackX+= 100;
+			}
 			if (gameScene->hp0 == true)
 			{
 				gameflag = 3;
@@ -347,23 +379,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			{
 				gameflag = 2;
 			}
+
 		}
+		//ゲームクリア
 		else if (gameflag == 2)
 		{
 			if (input->isKeyTrigger(DIK_SPACE))
 			{
 				gameflag = 0;
-				gameScene->Init(dxcommon, input, audio);
+				gameScene = Reset(gameScene, dxcommon, input, audio);
 				bossHpX = 733.0f;
 				hp = 288;
 			}
 		}
+		//ゲームオーバー
 		else if (gameflag == 3)
 		{
 			if (input->isKeyTrigger(DIK_SPACE))
 			{
-				gameScene->Init(dxcommon, input, audio);
 				gameflag = 0;
+				gameScene = Reset(gameScene, dxcommon, input, audio);
+				
 				
 				bossHpX = 733.0f;
 				hp = 288;
@@ -413,7 +449,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{
 			sprite->Draw();
 			//sprite2->Draw();
-			
+			backBlack->Draw();
 			if (gameScene->tutorialFlag == true)
 			{
 				tyutoRial->Draw();
@@ -477,3 +513,4 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	
 	return 0;
 }
+
