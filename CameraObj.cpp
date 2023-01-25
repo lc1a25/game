@@ -159,10 +159,11 @@ void CameraObj::UpdateCamera()
 	up.y = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[1];
 	up.z = Matrix4::transform(upV, cameraObj->matWorld).m128_f32[2];
 
-	//カメラオブジェクトの位置
-	cameraObj->matWorld.r[3].m128_f32[0] = eye.m128_f32[0];
-	cameraObj->matWorld.r[3].m128_f32[1] = eye.m128_f32[1];
-	cameraObj->matWorld.r[3].m128_f32[2] = eye.m128_f32[2];
+	cameraObj->SetPosition({
+		//カメラオブジェクトの位置
+		cameraObj->matWorld.r[3].m128_f32[0] = eye.m128_f32[0],
+		cameraObj->matWorld.r[3].m128_f32[1] = eye.m128_f32[1],
+		cameraObj->matWorld.r[3].m128_f32[2] = eye.m128_f32[2] });
 
 	worldTransform = cameraObj->matWorld;
 
@@ -186,6 +187,7 @@ void CameraObj::UpdateCamera()
 	);
 
 	matViewProjection = matView * matProjection;
+	//UpdateViewMatrix();
 	cameraObj->Update();
 }
 

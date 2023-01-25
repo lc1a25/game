@@ -202,7 +202,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Object3d* skydome = skydome->Create();
 
 	skydome->SetModel(skydome_model);
-	skydome->scale = { 11,11,12 };
+	skydome->scale = { 11,11,15 };
 	skydome->SetPosition({ 0,0,0 });
 
 #pragma endregion
@@ -390,7 +390,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//postEffect->Draw(dxcommon->GetCmdlist());
 		
 		////obj描画
-		gameScene->Draw();
+		
 		Object3d::PreDraw(dxcommon->GetCmdlist());
 
 		//box->Draw();
@@ -398,10 +398,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//box3->Draw();
 		//box4->Draw();
 		skydome->Draw();
-	
-		
 		Object3d::PostDraw();
-
+		gameScene->Draw();
 		////スプライト共通コマンド
 		// スプライト
 		spriteCommon->PreDraw();

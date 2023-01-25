@@ -37,6 +37,21 @@ public:
 	const XMFLOAT3& GetTarget() { return target; }
 	const XMFLOAT3& GetUp() { return up; }
 
+	/// <summary>
+/// ビュー射影行列の取得
+/// </summary>
+/// <returns>ビュー射影行列</returns>
+	inline const XMMATRIX& GetViewProjectionMatrix() {
+		return matViewProjection;
+	}
+
+	/// <summary>
+	/// ビルボード行列の取得
+	/// </summary>
+	/// <returns>ビルボード行列</returns>
+	inline const XMMATRIX& GetBillboardMatrix() {
+		return matBillboard;
+	}
 	//setter
 	void SetEye(XMFLOAT3 eye) 
 	{ 
@@ -51,6 +66,8 @@ public:
 		this->up = up;
 		UpdateCamera();
 	}
+
+	void UpdateViewMatrix();
 	// 視点座標
 	XMFLOAT3 eye = { 0,0,-50 };
 private:
@@ -69,5 +86,10 @@ private:
 	XMMATRIX matRot = DirectX::XMMatrixIdentity();
 
 	XMMATRIX matViewProjection;
+
+	// ビルボード行列
+	XMMATRIX matBillboard = DirectX::XMMatrixIdentity();
+	// Y軸回りビルボード行列
+	XMMATRIX matBillboardY = DirectX::XMMatrixIdentity();
 
 };

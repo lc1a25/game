@@ -14,7 +14,7 @@
 #include "CameraObj.h"
 #include "Boss.h"
 #include "BossChild.h"
-//#include "ParticleManager.h"
+#include "ParticleManager.h"
 #include <sstream>
 
 class GameScene
@@ -159,7 +159,8 @@ private: // ƒƒ“ƒo•Ï”
 	Model* playerModel = nullptr;
 	Model* bulletModel = nullptr;
 	Model* enemyModel = nullptr;
-	Model* enemyRotateModel = nullptr;
+	Model* enemyRotateModel = 
+		nullptr;
 	Model* bossModel = nullptr;
 	Model* bossMiniModel = nullptr;
 	Model* wallModel = nullptr;
@@ -169,7 +170,7 @@ private: // ƒƒ“ƒo•Ï”
 	Model* enemyBulletModel = nullptr;
 	Model* roadModel = nullptr;
 
-	//ParticleManager* Particle = nullptr;
+	ParticleManager* Particle = nullptr;
 	//“–‚½‚è”»’è—p•Ï”
 	float length = 0.0f;
 	float size = 22.0f;

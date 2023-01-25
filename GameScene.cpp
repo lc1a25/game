@@ -20,6 +20,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	this->input = input;
 	this->audio = audio;
 
+	//モデル読み込み
 	/*playerModel = Model::LoadFromOBJ("boxplayer-0");*/
 	playerModel = Model::LoadFromOBJ("zikistar");
 	bulletModel = Model::LoadFromOBJ("ene-0");
@@ -34,8 +35,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	enemyBulletModel = Model::LoadFromOBJ("box_aka");
 	roadModel = Model::LoadFromOBJ("road");
 
-	// 3Dオブジェクト生成
-	//Particle = ParticleManager::Create(dxcommon->GetDev(), cameraObj);
 
 	bossHpBar = 733;
 	bossHpBarMax = 733;
@@ -47,8 +46,10 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 	hpBar = 288;
 	hpBarMax = 288;
+	//プレイヤーが倒された用
 	hp0 = false;
 
+	//オブジェクトの初期化
 	player = new Player();
 	player->Init(playerModel, bulletModel);
 
@@ -72,8 +73,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 	boss = new Boss();
 	boss->Init(bossModel, enemyBulletModel, { 0,0,-100.0f });
-
-
 
 	bossChildLUF = new BossChild();
 	bossChildLUF->Init(bossModel,{ 0, 0, -100.0f}, 1);
@@ -145,11 +144,15 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	EnemyPopLoadData();
 
 	tutorialFlag2 = false;
+
+	// 3Dオブジェクト生成
+	Particle = ParticleManager::Create(dxcommon->GetDev(), camera);
 	
 }
 
 void GameScene::Update()
 {
+	//
 	UpdateEnemyPop();
 
 	if (cameraObj->GetRaleIndex() <= 1)
@@ -161,35 +164,11 @@ void GameScene::Update()
 	}
 
 	cameraObj->SetTutorialFlag(tutorialFlag);
-	//for (int i = 0; i < 100; i++)
-	//{
-	//	const float rnd_pos = 10.0f;
-	//	XMFLOAT3 pos{};
-	//	pos.x = (float)rand() / RAND_MAX * player->GetWorldPosition().x - player->GetWorldPosition().x / 2.0f;
-	//	pos.y = (float)rand() / RAND_MAX * player->GetWorldPosition().y - player->GetWorldPosition().y / 2.0f;
-	//	pos.z = (float)rand() / RAND_MAX * player->GetWorldPosition().z - player->GetWorldPosition().z / 2.0f;
 
-	//	const float rnd_vel = 0.1f;
-	//	XMFLOAT3 vel{};
-	//	vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-	//	vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-	//	vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+	
 
-	//	XMFLOAT3 acc{};
-	//	const float rnd_acc = 0.001f;
-	//	acc.y = -(float)rand() / RAND_MAX * rnd_acc;
-
-	//	//Add(5, pos, vel, acc);
-	//	Particle->Add(16, pos, vel, acc, 1.0f, 0.0f);
-	//}
-
-	//Particle->Update();
-	if (player->GetHp0() == true)
-	{
-		enemyPopCommands.str("");
-		enemyPopCommands.clear(std::stringstream::goodbit);
-		hp0 = true;
-	}
+	Particle->Update();
+	
 	//設置物
 	/*wall->Update();
 	wall2->Update();
@@ -209,7 +188,7 @@ void GameScene::Update()
 
 	//デバッグ用
 	sprintf_s(moji, "%d", cameraObj->GetRaleIndex());
-	sprintf_s(moji2, "%d", enemyOneWay->GetEnemy()->GetEnemyDownCount());
+	//sprintf_s(moji2, "%f", pos.z);
 	//sprintf_s(moji2, "%0.3f", bossChildRUF->GetEnemy()->angle);
 	//sprintf_s(moji, "%0.3f", bossChildLUF->GetEnemy()->angle);
 
@@ -239,6 +218,7 @@ void GameScene::Update()
 	enemy->SetCameraZ(cameraObj->GetEyeVec().z);
 	enemyOneWay->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
 	enemyCircle->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
+
 // 敵
 	enemy->SetPlayerPosition(player->GetWorldPosition());
 	player->SetEnemyPosition(enemy->GetWorldPosition());
@@ -332,6 +312,7 @@ void GameScene::Update()
 	{
 		bossFlag = true;
 	}
+	//ボスが倒されたら
 	if (boss->GetEnemy()->IsDead() == true)
 	{
 		enemyPopCommands.str("");
@@ -344,15 +325,22 @@ void GameScene::Update()
 			bossDieTimer = 120;
 		}
 	}
-	
+
+	//プレイヤーのhpが０になったら
+	if (player->GetHp0() == true)
+	{
+		enemyPopCommands.str("");
+		enemyPopCommands.clear(std::stringstream::goodbit);
+		//EnemyPopLoadData();
+		
+		//シーンチェンジ
+		hp0 = true;
+	}
 }
 
 void GameScene::Draw()
 {
-	
-	
-	// 3Dオブクジェクトの描画
-	//Particle->Draw(dxcommon->GetCmdlist());
+	/// ここに3Dオブジェクトの描画処理
 	Object3d::PreDraw(dxcommon->GetCmdlist());
 	//wallBoss->Draw();
 	wallBossBack->Draw();
@@ -373,14 +361,7 @@ void GameScene::Draw()
 	//enemyCircle2->Draw();
 	enemyOneWay->Draw();
 	//enemyOneWay2->Draw();
-	
 
-
-	
-
-	/// <summary>
-	/// ここに3Dオブジェクトの描画処理を追加できる
-	/// </summary>
 
 	
 	if(cameraObj->GetEndFlag() == true)
@@ -396,10 +377,12 @@ void GameScene::Draw()
 		bossChildRDB->Draw();
 	}
 	
-
+	
+	
+	Particle->Draw(dxcommon->GetCmdlist());
 	
 	Object3d::PostDraw();
-
+// 3Dオブクジェクトの描画おわり
 }
 
 void GameScene::CheckAllCollision(Enemy* enemy)
@@ -452,6 +435,32 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 				enemy->OnCollision();
 
 				bullet->OnCollision();
+				//パーティクル
+				for (int i = 0; i < 100; i++)
+				{
+
+					const float rnd_pos = 10.0f;
+					XMFLOAT3 pos{};
+
+				
+					pos.x = enemy->GetWorldPosition().x;
+					pos.y = enemy->GetWorldPosition().y;
+					pos.z = enemy->GetWorldPosition().z;
+					
+
+					const float rnd_vel = 0.1f;
+					XMFLOAT3 vel{};
+					vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+					vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+					vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+
+					XMFLOAT3 acc{};
+					const float rnd_acc = 0.011f;
+					acc.y = -(float)rand() / RAND_MAX * rnd_acc;
+
+					//Add(5, pos, vel, acc);
+					Particle->Add(64, pos, vel, acc, 15.0f, 0.0f,{1,1,1},{1,0.5,0});
+				}
 			}
 			if (cameraObj->GetRaleIndex() >= 5)
 			{
@@ -549,7 +558,6 @@ void GameScene::EnemyPopLoadData()
 
 	//ファイルの内容をコピー
 	enemyPopCommands << file.rdbuf();
-
 	//ファイルを閉じる
 	file.close();
 

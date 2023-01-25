@@ -7,7 +7,7 @@
 #include <d3dx12.h>
 #include <forward_list>
 
-#include "CameraObj.h"
+#include "Camera.h"
 #include "PipelineSet.h"
 
 /// <summary>
@@ -30,6 +30,7 @@ public: // サブクラス
 	{
 		XMFLOAT3 pos; // xyz座標
 		float scale; // スケール
+		XMFLOAT4 color;
 	};
 
 	// 定数バッファ用データ構造体
@@ -37,6 +38,7 @@ public: // サブクラス
 	{
 		XMMATRIX mat;	// ビュープロジェクション行列
 		XMMATRIX matBillboard;	// ビルボード行列
+		//XMFLOAT3 color;
 	};
 
 	// パーティクル1粒
@@ -84,7 +86,7 @@ public: // 静的メンバ関数
 	/// インスタンス生成
 	/// </summary>
 	/// <returns>インスタンス</returns>
-	static ParticleManager* Create(ID3D12Device* device, CameraObj* camera);
+	static ParticleManager* Create(ID3D12Device* device, Camera* camera);
 
 public: // メンバ関数	
 	/// <summary>
@@ -111,7 +113,7 @@ public: // メンバ関数
 	/// <param name="accel">加速度</param>
 	/// <param name="start_scale">開始時スケール</param>
 	/// <param name="end_scale">終了時スケール</param>
-	void Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale);
+	void Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale, XMFLOAT3 start_color, XMFLOAT3 end_color);
 
 	/// <summary>
 	/// デスクリプタヒープの初期化
@@ -163,13 +165,13 @@ private: // メンバ変数
 	// パーティクル配列
 	std::forward_list<Particle> particles;
 	// カメラ
-	CameraObj* camera = nullptr;
+	Camera* camera = nullptr;
 private:
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="device">デバイス</param>
 	/// <param name="camera">カメラ</param>
-	ParticleManager(ComPtr<ID3D12Device> device, CameraObj* camera);
+	ParticleManager(ComPtr<ID3D12Device> device, Camera* camera);
 };
 

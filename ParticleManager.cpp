@@ -36,7 +36,7 @@ const DirectX::XMFLOAT3 operator/(const DirectX::XMFLOAT3& lhs, const float rhs)
 	return result;
 }
 
-ParticleManager* ParticleManager::Create(ID3D12Device* device, CameraObj* camera)
+ParticleManager* ParticleManager::Create(ID3D12Device* device, Camera* camera)
 {
 	// 3Dオブジェクトのインスタンスを生成
 	ParticleManager* partMan = new ParticleManager(device, camera);
@@ -106,7 +106,7 @@ void ParticleManager::Update()
 		it->position = it->position + it->velocity;
 
 		// カラーの線形補間
-		it->color = it->s_color + (it->e_color - it->s_color) / f;
+		it->color = it->s_color + ((it->e_color - it->s_color) / f);
 
 		// スケールの線形補間
 		it->scale = it->s_scale + (it->e_scale - it->s_scale) / f;
@@ -128,6 +128,8 @@ void ParticleManager::Update()
 			vertMap->pos = it->position;
 			// スケール
 			vertMap->scale = it->scale;
+			XMFLOAT4 color1 = { it->color.x,it->color.y,it->color.z,1 };
+			vertMap->color = color1;
 			// 次の頂点へ
 			vertMap++;
 			if (++vertCount >= vertexCount) {
@@ -140,6 +142,7 @@ void ParticleManager::Update()
 	// 定数バッファへデータ転送
 	ConstBufferData* constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
+	//constMap->color = color;
 	constMap->mat = camera->GetViewProjectionMatrix();
 	constMap->matBillboard = camera->GetBillboardMatrix();
 	constBuff->Unmap(0, nullptr);
@@ -182,7 +185,8 @@ void ParticleManager::Draw(ID3D12GraphicsCommandList* cmdList)
 	cmdList->DrawInstanced(drawNum, 1, 0, 0);
 }
 
-void ParticleManager::Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale)
+void ParticleManager::Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, 
+	float start_scale, float end_scale, XMFLOAT3 start_color, XMFLOAT3 end_color)
 {
 	// リストに要素を追加
 	particles.emplace_front();
@@ -193,6 +197,8 @@ void ParticleManager::Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOA
 	p.accel = accel;
 	p.s_scale = start_scale;
 	p.e_scale = end_scale;
+	p.s_color = start_color;
+	p.e_color = end_color;
 	p.num_frame = life;
 }
 
@@ -488,7 +494,7 @@ void ParticleManager::CreateModel()
 	vbView.StrideInBytes = sizeof(VertexPos);
 }
 
-ParticleManager::ParticleManager(ComPtr<ID3D12Device> device, CameraObj* camera)
+ParticleManager::ParticleManager(ComPtr<ID3D12Device> device, Camera* camera)
 {
 	this->device = device;
 	this->camera = camera;
