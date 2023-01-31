@@ -114,7 +114,6 @@
     <ClCompile Include="Matrix4.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelFbx.cpp" />
-    <ClCompile Include="MTGame.cpp" />
     <ClCompile Include="Object3d.cpp" />
     <ClCompile Include="Object3dFbx.cpp" />
     <ClCompile Include="ParticleManager.cpp" />
@@ -151,7 +150,6 @@
     <ClInclude Include="Matrix4.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelFbx.h" />
-    <ClInclude Include="MTGame.h" />
     <ClInclude Include="Object3d.h" />
     <ClInclude Include="Object3dFbx.h" />
     <ClInclude Include="ParticleManager.h" />

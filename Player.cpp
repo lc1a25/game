@@ -2,6 +2,7 @@
 
 void Player::Init(Model* model,Model* bulletModel)
 {
+	//モデルセット
 	model_ = model;
 	bulletModel_ = bulletModel;
 	reticleModel_ = model;
@@ -244,10 +245,6 @@ void Player::OnCollision()
 	}
 }
 
-XMFLOAT3 Player::GetSpriteReticle()
-{
-	return XMFLOAT3({positionReticle.m128_f32[0] ,positionReticle.m128_f32[1],0});
-}
 
 void Player::Attack()
 {
@@ -260,9 +257,6 @@ void Player::Attack()
 			XMVECTOR velocity = { 0,0,1 };
 			velocity = transform(velocity, player->matWorld);
 			//レティクルに向かって飛ぶ
-		  /*velocity.m128_f32[0] = reticle->matWorld.r[3].m128_f32[0] - player->matWorld.r[3].m128_f32[0];
-			velocity.m128_f32[1] = reticle->matWorld.r[3].m128_f32[1] - player->matWorld.r[3].m128_f32[1];
-			velocity.m128_f32[2] = reticle->matWorld.r[3].m128_f32[2] - player->matWorld.r[3].m128_f32[2];*/
 			velocity.m128_f32[0] = reticle->position.x - player->position.x;
 			velocity.m128_f32[1] = reticle->position.y - player->position.y;
 			velocity.m128_f32[2] = reticle->position.z - player->position.z;

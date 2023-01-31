@@ -20,8 +20,9 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	this->input = input;
 	this->audio = audio;
 
+
 	//モデル読み込み
-	/*playerModel = Model::LoadFromOBJ("boxplayer-0");*/
+	skydome_model = Model::LoadFromOBJ("skydome");
 	playerModel = Model::LoadFromOBJ("zikistar");
 	bulletModel = Model::LoadFromOBJ("ene-0");
 	enemyModel = Model::LoadFromOBJ("oneWay");
@@ -50,6 +51,11 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	hp0 = false;
 
 	//オブジェクトの初期化
+
+	skydome->SetModel(skydome_model);
+	skydome->scale = { 11,11,15 };
+	skydome->SetPosition({ 0,0,0 });
+
 	player = new Player();
 	player->Init(playerModel, bulletModel);
 
@@ -176,6 +182,9 @@ void GameScene::Update()
 	/*wall->Update();
 	wall2->Update();
 	wallBoss->Update();*/
+	//スカイドーム
+	skydome->Update();
+
 	wallBossBack->Update();
 	road->Update();
 
@@ -336,8 +345,6 @@ void GameScene::Update()
 	//プレイヤーのhpが０になったら
 	if (player->GetHp0() == true)
 	{
-		
-		
 		//シーンチェンジ
 		hp0 = true;
 	}
@@ -347,6 +354,10 @@ void GameScene::Draw()
 {
 	/// ここに3Dオブジェクトの描画処理
 	Object3d::PreDraw(dxcommon->GetCmdlist());
+
+	//スカイドーム
+	skydome->Draw();
+
 	//wallBoss->Draw();
 	wallBossBack->Draw();
 	//wall->Draw();
@@ -434,7 +445,7 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 		if (cameraObj->GetRaleIndex() >= 7)
 		{
 			length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
-				((pos2.y - pos1.y - 8) * (pos2.y - pos1.y - 8)) +
+				((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
 				((pos2.z - pos1.z) * (pos2.z - pos1.z));
 		}
 		if (length <= size)
@@ -444,33 +455,8 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 				enemy->OnCollision();
 
 				bullet->OnCollision();
-				//パーティクル
-				for (int i = 0; i < 100; i++)
-				{
-
-					const float rnd_pos = 10.0f;
-					XMFLOAT3 pos{};
-
-				
-					pos.x = enemy->GetWorldPosition().x;
-					pos.y = enemy->GetWorldPosition().y;
-					pos.z = enemy->GetWorldPosition().z;
-					
-
-					const float rnd_vel = 0.1f;
-					XMFLOAT3 vel{};
-					vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-					vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-					vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-
-					XMFLOAT3 acc{};
-					const float rnd_acc = 0.011f;
-					acc.y = -(float)rand() / RAND_MAX * rnd_acc;
-
-					//Add(5, pos, vel, acc);
-					Particle->Add(64, pos, vel, acc, 15.0f, 0.0f,{1,1,1},{1,0.5,0});
-				}
-				
+				//パーティクル生成
+				CreateParticle(enemy);
 			}
 			if (cameraObj->GetRaleIndex() >= 5)
 			{
@@ -556,10 +542,7 @@ void GameScene::CheckPillarCollision()
 
 }
 
-void GameScene::AddEnemyBullet(std::unique_ptr<EnemyBullet> enemyBullet)
-{
-	enemyBullets_.push_back(std::move(enemyBullet));
-}
+
 
 void GameScene::EnemyPopLoadData()
 {
@@ -590,11 +573,11 @@ void GameScene::UpdateEnemyPop()
 
 	//待機処理
 	//待機したい時まで　return　してif文より下の処理をさせない
-	if (waitRaleIndexCommand == true)
+	if (waitRailIndexCommand == true)
 	{
-		if (cameraObj->GetRaleIndex() >= waitRale)
+		if (cameraObj->GetRaleIndex() >= waitRail)
 		{
-			waitRaleIndexCommand = false;
+			waitRailIndexCommand = false;
 		}
 		return;
 	}
@@ -615,17 +598,16 @@ void GameScene::UpdateEnemyPop()
 			continue;
 		}
 
-		if (word.find("ONEWAY") == 0)
+		if (word.find("BILL") == 0)
 		{
-			getline(line_stream, word, ',');
-			float x = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float y = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float z = (float)std::atof(word.c_str());
-
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
+			
+			pillar->SetPosition( pos );
+		}
+		else if (word.find("ONEWAY") == 0)
+		{
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
+		
 			getline(line_stream, word, ',');
 			int LR = std::atof(word.c_str());
 			bool LorR = false;
@@ -633,7 +615,6 @@ void GameScene::UpdateEnemyPop()
 			{
 				LorR = true;
 			}
-			
 
 			getline(line_stream, word, ',');
 			//0が攻撃　1が攻撃しない
@@ -645,18 +626,11 @@ void GameScene::UpdateEnemyPop()
 			}
 
 			enemyOneWay = new EnemyOneWay();
-			enemyOneWay->Init(enemyModel, { x,y,z }, LorR,attackFlag);
+			enemyOneWay->Init(enemyModel,pos , LorR,attackFlag);
 		}
 		else if (word.find("CIRCLE") == 0)
 		{
-			getline(line_stream, word, ',');
-			float x = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float y = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float z = (float)std::atof(word.c_str());
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
 
 			getline(line_stream, word, ',');
 			int LR = std::atof(word.c_str());
@@ -668,18 +642,11 @@ void GameScene::UpdateEnemyPop()
 			}
 
 			enemyCircle = new EnemyCircle();
-			enemyCircle->Init(enemyRotateModel, { x, y, z }, LorR);
+			enemyCircle->Init(enemyRotateModel, pos, LorR);
 		}
 		else if (word.find("OUTWAY") == 0)
 		{
-			getline(line_stream, word, ',');
-			float x = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float y = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float z = (float)std::atof(word.c_str());
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
 
 			getline(line_stream, word, ',');
 			int LR = std::atof(word.c_str());
@@ -691,166 +658,103 @@ void GameScene::UpdateEnemyPop()
 			}
 
 			enemy = new Enemy();
-			enemy->Init(enemyModel, { x, y, z }, enemyModel);
+			enemy->Init(enemyModel, pos , enemyModel);
 		}
 		else if (word.find("BOSS") == 0)
 		{
-			getline(line_stream, word, ',');
-			float x = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float y = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float z = (float)std::atof(word.c_str());
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
 
 			boss = new Boss();
-			boss->Init(bossModel, enemyBulletModel, { x, y, z });
+			boss->Init(bossModel, enemyBulletModel, { pos });
 		}
 		else if (word.find("CHILDLUF") == 0)
 		{
-			getline(line_stream, word, ',');
-			float x = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float y = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float z = (float)std::atof(word.c_str());
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
 
 			getline(line_stream, word, ',');
 			int32_t number = (int32_t)std::atof(word.c_str());
 
 			bossChildLUF = new BossChild();
-			bossChildLUF->Init(bossModel,  { x, y, z },number);
+			bossChildLUF->Init(bossModel,   pos ,number);
 		}
 		else if (word.find("CHILDLUB") == 0)
 		{
-			getline(line_stream, word, ',');
-			float x = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float y = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float z = (float)std::atof(word.c_str());
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
 
 			getline(line_stream, word, ',');
 			int32_t number = (int32_t)std::atof(word.c_str());
 
 			bossChildLUB = new BossChild();
-			bossChildLUB->Init(bossModel, { x, y, z }, number);
+			bossChildLUB->Init(bossModel, pos, number);
 		}
 		else if (word.find("CHILDRUF") == 0)
 		{
-			getline(line_stream, word, ',');
-			float x = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float y = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float z = (float)std::atof(word.c_str());
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
 
 			getline(line_stream, word, ',');
 			int32_t number = (int32_t)std::atof(word.c_str());
 
 			bossChildRUF = new BossChild();
-			bossChildRUF->Init(bossModel, { x, y, z }, number);
+			bossChildRUF->Init(bossModel, pos, number);
 		}
 		else if (word.find("CHILDRUB") == 0)
 		{
-			getline(line_stream, word, ',');
-			float x = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float y = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float z = (float)std::atof(word.c_str());
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
 
 			getline(line_stream, word, ',');
 			int32_t number = (int32_t)std::atof(word.c_str());
 
 			bossChildRUB = new BossChild();
-			bossChildRUB->Init(bossModel, { x, y, z }, number);
+			bossChildRUB->Init(bossModel, pos, number);
 		}
 		else if (word.find("CHILDLDF") == 0)
 		{
-			getline(line_stream, word, ',');
-			float x = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float y = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float z = (float)std::atof(word.c_str());
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
 
 			getline(line_stream, word, ',');
 			int32_t number = (int32_t)std::atof(word.c_str());
 
 			bossChildLDF = new BossChild();
-			bossChildLDF->Init(bossModel, { x, y, z }, number);
+			bossChildLDF->Init(bossModel, pos, number);
 		}
 		else if (word.find("CHILDLDB") == 0)
 		{
-			getline(line_stream, word, ',');
-			float x = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float y = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float z = (float)std::atof(word.c_str());
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
 
 			getline(line_stream, word, ',');
 			int32_t number = (int32_t)std::atof(word.c_str());
 
 			bossChildLDB = new BossChild();
-			bossChildLDB->Init(bossModel, { x, y, z }, number);
+			bossChildLDB->Init(bossModel, pos, number);
 		}
 		else if (word.find("CHILDRDF") == 0)
 		{
-			getline(line_stream, word, ',');
-			float x = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float y = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float z = (float)std::atof(word.c_str());
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
 
 			getline(line_stream, word, ',');
 			int32_t number = (int32_t)std::atof(word.c_str());
 
 			bossChildRDF = new BossChild();
-			bossChildRDF->Init(bossModel, { x, y, z }, number);
+			bossChildRDF->Init(bossModel, pos, number);
 		}
 		else if (word.find("CHILDRDB") == 0)
 		{
-			getline(line_stream, word, ',');
-			float x = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float y = (float)std::atof(word.c_str());
-
-			getline(line_stream, word, ',');
-			float z = (float)std::atof(word.c_str());
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
 
 			getline(line_stream, word, ',');
 			int32_t number = (int32_t)std::atof(word.c_str());
 
 			bossChildRDB = new BossChild();
-			bossChildRDB->Init(bossModel, { x, y, z }, number);
+			bossChildRDB->Init(bossModel, pos, number);
 		}
-		else if (word.find("RALE") == 0)
+		else if (word.find("RAIL") == 0)
 		{
 			getline(line_stream, word, ',');
 
-			int32_t waitRaleIndex = atoi(word.c_str());
+			int32_t waitRailIndex = atoi(word.c_str());
 
-			waitRaleIndexCommand = true;
-			waitRale = waitRaleIndex;
+			waitRailIndexCommand = true;
+			waitRail = waitRailIndex;
 			break;//ループから抜けて待機処理に行く
 		}
 		else if (word.find("WAIT") == 0)
@@ -866,4 +770,54 @@ void GameScene::UpdateEnemyPop()
 		}
 
 	}
+}
+
+XMFLOAT3 GameScene::CommandPositionSet(std::istream  &line_stream, std::string &word)
+{
+	XMFLOAT3 position;
+	getline(line_stream, word, ',');
+	position.x = (float)std::atof(word.c_str());
+
+	getline(line_stream, word, ',');
+	position.y = (float)std::atof(word.c_str());
+
+	getline(line_stream, word, ',');
+	position.z = (float)std::atof(word.c_str());
+
+	return position;
+}
+
+void GameScene::CreateParticle(Enemy* enemy)
+{
+	//パーティクル
+	for (int i = 0; i < 100; i++)
+	{
+
+		const float rnd_pos = 10.0f;
+		XMFLOAT3 pos{};
+
+
+		pos.x = enemy->GetWorldPosition().x;
+		pos.y = enemy->GetWorldPosition().y;
+		pos.z = enemy->GetWorldPosition().z;
+
+		/*pos.x = (float)rand() / RAND_MAX * enemy->GetWorldPosition().x - enemy->GetWorldPosition().x / 2.0f;
+		pos.y = (float)rand() / RAND_MAX * enemy->GetWorldPosition().y - enemy->GetWorldPosition().y / 2.0f;
+		pos.z = (float)rand() / RAND_MAX * enemy->GetWorldPosition().z - enemy->GetWorldPosition().z / 2.0f;*/
+
+
+		const float rnd_vel = 0.1f;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+
+		XMFLOAT3 acc{};
+		const float rnd_acc = 0.011f;
+		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
+
+		//Add(5, pos, vel, acc);
+		Particle->Add(64, pos, vel, acc, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+	}
+
 }

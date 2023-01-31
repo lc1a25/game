@@ -67,17 +67,24 @@ public: // メンバ関数
 	//ビューポート行列の取得
 	void SetViewPort(XMMATRIX winViewPort) { viewPort = winViewPort; }
 
-	void AddEnemyBullet(std::unique_ptr<EnemyBullet> enemyBullet);
-
+	//csv読み込み
 	void EnemyPopLoadData();
 
 	void UpdateEnemyPop();
+	
+	XMFLOAT3 CommandPositionSet(std::istream &line_stream, std::string &word);
+
+	//パーティクル
+	void CreateParticle(Enemy* enemy);
 
 	FLOAT GetbossHpBar() { return bossHpBar; }
 	FLOAT GetHpBar() { return hpBar; }
 
+	//マウス座標
 	float mouseX;
 	float mouseY;
+
+	//デバッグテキスト用
 	char moji[64];
 	char moji2[64];
 
@@ -88,18 +95,19 @@ public: // メンバ関数
 	bool waitCommand = false;
 	int waitTimer = 0;
 	//コマンド用
-	bool waitRaleIndexCommand = false;
-	int waitRale = 0;
+	bool waitRailIndexCommand = false;
+	int waitRail = 0;
 
 	//ボス系
 	float bossHpBar = 733;
 	float bossHpBarMax = 733;
 	int bossDieTimer = 120;
 
-
+	//プレイヤーhp
 	float hpBar = 288;
 	float hpBarMax = 288;
 	bool hp0 = false;
+
 	int  coll = 0;
 
 	bool tutorialFlag = true;
@@ -108,38 +116,46 @@ public: // メンバ関数
 
 	bool sceneChange = false;
 
-	std::list<std::unique_ptr<EnemyBullet>> enemyBullets_;
-
+	//csv　コマンド読み込み
 	std::stringstream enemyPopCommands;
 
 private: // メンバ変数
 
 	HWND hwnd;
+	//ビューポート
 	XMMATRIX viewPort;
+
 	DirectXCommon* dxcommon = nullptr;
 	Input* input = nullptr;
 	Audio* audio = nullptr;
-	//DebugText* debugText;
 
 	//カメラ
 	Camera* camera = nullptr;
 
 	CameraObj* cameraObj = nullptr;//カメラオブジェクト
 
+	//スカイドーム
+	Object3d* skydome = skydome->Create();
+
+	//壁系
 	Object3d* wall = wall->Create();
 	Object3d* wallBoss = wallBoss->Create();
 	Object3d* wallBossBack = wallBossBack->Create();
 	Object3d* wall2 = wall2->Create();
+	//道
 	Object3d* road = road->Create();
 
+	//ビル
 	Object3d* pillar = pillar->Create();
 	Object3d* pillar2 = pillar2->Create();
 	Object3d* pillar3 = pillar3->Create();
 	Object3d* pillar4 = pillar4->Create();
 	Object3d* pillar5 = pillar5->Create();
 
-
+	//プレイヤー
 	Player* player = nullptr;
+
+	//敵
 	Enemy* enemy = nullptr;
 	Enemy* enemyL = nullptr;
 	EnemyCircle* enemyCircle = nullptr;
@@ -159,11 +175,12 @@ private: // メンバ変数
 	XMVECTOR reticlePos;//レティクル用変数
 
 	//モデル
+	Model* skydome_model = nullptr;
+
 	Model* playerModel = nullptr;
 	Model* bulletModel = nullptr;
 	Model* enemyModel = nullptr;
-	Model* enemyRotateModel = 
-		nullptr;
+	Model* enemyRotateModel = nullptr;
 	Model* bossModel = nullptr;
 	Model* bossMiniModel = nullptr;
 	Model* wallModel = nullptr;
@@ -173,7 +190,9 @@ private: // メンバ変数
 	Model* enemyBulletModel = nullptr;
 	Model* roadModel = nullptr;
 
+	//パーティクル
 	ParticleManager* Particle = nullptr;
+
 	//当たり判定用変数
 	float length = 0.0f;
 	float size = 22.0f;

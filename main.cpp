@@ -7,19 +7,17 @@
 #include <math.h>
 #include <d3dcompiler.h>
 #include <DirectXTex.h>
-#include "Input.h"
-#include <wrl.h> // 7-1
-#include <d3dx12.h>//7-3
+#include <wrl.h>
 #include<xaudio2.h>
 #pragma comment(lib,"xaudio2.lib")
+
 #include<fstream>
 
 #include "Object3d.h"
 
 #include "Win.h"
+#include "Input.h"
 #include "DirectXCommon.h"
-#include "CollisionBase.h"
-#include "Collision.h"
 
 #include "Sprite.h"
 #include "SpriteCommon.h"
@@ -28,17 +26,6 @@
 #include "DebugText.h"
 
 #include "Audio.h"
-
-#include "fbxsdk.h"
-#include "LoadFbx.h"
-
-#include "Object3dFbx.h"
-#include "Camera.h"
-
-#include "PostEffect.h"
-
-#include "Player.h"
-#include "Enemy.h"
 
 #include "Matrix4.h"
 #include "GameScene.h"
@@ -80,29 +67,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	win = new Win();
 	win->WinCreate();
 
-
 	dxcommon = new DirectXCommon();
 	dxcommon->Init(win);
 
-	SpriteCommon* spriteCommon = new SpriteCommon;
-	spriteCommon->Init(dxcommon->GetDev(), dxcommon->GetCmdlist(), win->window_width, win->window_height);
-
-	DebugText* debugtext_minute = nullptr;
-	debugtext_minute = new DebugText();
-
 	Object3d::StaticInitialize(dxcommon->GetDev(), win->window_width, win->window_height);
-
-	
-
-	Object3dFbx::SetDevice(dxcommon->GetDev());
-
-	Camera* camera;
-	camera = new Camera();
-	camera->Init();
-
-	Object3dFbx::SetCamera(camera);
-
-	Object3dFbx::CreateGraphicsPipeline();
 
 	audio = new Audio();
 	audio->Init();
@@ -110,138 +78,91 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	input = new Input();
 	input->Initialize(win);
 
-	FbxManager* fbxManager = FbxManager::Create();
-
-	LoadFbx::GetInstance()->Init(dxcommon->GetDev());
-
-	PostEffect* postEffect = nullptr;
-
+	//ゲームシーン初期化
 	gameScene = Reset(gameScene,dxcommon, input, audio);
-	//gameScene = new GameScene();
-	//gameScene->Init(dxcommon, input, audio);
-	//reset関数をつくる
-	//さきにはいってたらdelete
 	
 	// DirectX初期化処理　ここまで
 
 	//描画初期化処理　ここから
+	//スプライト初期化
+	SpriteCommon* spriteCommon = new SpriteCommon;
+	spriteCommon->Init(dxcommon->GetDev(), dxcommon->GetCmdlist(), win->window_width, win->window_height);
+
+	//レティクル
 	spriteCommon->LoadTexture(0, L"Resource/target.png");
+	Sprite *reticleSprite = Sprite::Create(spriteCommon,0);
 
-	Sprite *sprite = Sprite::Create(spriteCommon,0);
-
+	//説明のテキスト
 	spriteCommon->LoadTexture(1, L"Resource/setu.png");
-
-	Sprite* sprite2 = Sprite::Create(spriteCommon, 1);
+	Sprite* explanSprite = Sprite::Create(spriteCommon, 1);
 	
+	//タイトル
 	spriteCommon->LoadTexture(2, L"Resource/title.png");
-
 	Sprite* titleSprite = Sprite::Create(spriteCommon, 2);
 
+	//エンド
 	spriteCommon->LoadTexture(3, L"Resource/end.png");
-
 	Sprite* endSprite = Sprite::Create(spriteCommon, 3);
 
+	//ボスのhpバーの枠
 	spriteCommon->LoadTexture(4, L"Resource/hpWaku.png");
-
 	Sprite* bossHpWakuSprite = Sprite::Create(spriteCommon, 4);
 
+	//ボスのhpバー
 	spriteCommon->LoadTexture(5, L"Resource/hpBar.png");
-
 	Sprite* bossHpBarSprite = Sprite::Create(spriteCommon, 5,{0,0});
 
+	//プレイヤーのhp
 	spriteCommon->LoadTexture(6, L"Resource/heart.png");
-
 	Sprite *playerHpSprite = Sprite::Create(spriteCommon, 6);
 
+	//ゲームオーバー
 	spriteCommon->LoadTexture(7, L"Resource/gameover.png");
-
 	Sprite *gameOverSprite = Sprite::Create(spriteCommon, 7);
 
+	//チュートリアル攻撃方法
 	spriteCommon->LoadTexture(8, L"Resource/tyutorial.png");
-
 	Sprite* tyutoRial = Sprite::Create(spriteCommon, 8);
 	
+	//チュートリアル移動方法
 	spriteCommon->LoadTexture(9, L"Resource/tyutorialMove.png");
-
 	Sprite* tyutoRialMove = Sprite::Create(spriteCommon, 9);
 
+	//シーン遷移用
 	spriteCommon->LoadTexture(10, L"Resource/backBlack.png");
-
 	Sprite* backBlack = Sprite::Create(spriteCommon, 10);
 
+	//デバッグテキスト
+	DebugText* debugtext_minute = nullptr;
+	debugtext_minute = new DebugText();
+
 	const int debugTextTexNumber3 = 20;
-
 	spriteCommon->LoadTexture(debugTextTexNumber3, L"Resource/ASC_White.png");
-
 	debugtext_minute->debugTextInit(spriteCommon, debugTextTexNumber3);
 
 	DebugText* debugtext_minute2 = nullptr;
 	debugtext_minute2 = new DebugText();
 
 	const int debugTextTexNumber4 = 21;
-
 	spriteCommon->LoadTexture(debugTextTexNumber4, L"Resource/ASC_White.png");
 	debugtext_minute2->debugTextInit(spriteCommon, debugTextTexNumber4);
 
-	//ポストエフェクト
-	//spriteCommon->LoadTexture(100, L"Resource/mimikkyu.jpg");
-
-	//postEffect = new PostEffect();
-	//postEffect->Init(spriteCommon,100, { 0.5f,0.5f }, false, false);
-
-#pragma region model
-	
-	//ModelFbx* modelFbx = nullptr;
-	//Object3dFbx* object1 = nullptr;
-
-
-	/*Model * model1 = Model::LoadFromOBJ("bullet");
-	Object3d* box = box->Create();
-	box->SetModel(model1);
-	box->scale = { 1,1,1, };
-	box->SetPosition({ -100.0f, 0.0f, +200.0f });
-
-	Object3d* box2 = box2->Create();
-	box2->SetModel(model1);
-	box2->scale = { 1,1,1, };
-	box2->SetPosition({ 50.0f, 100.0f, +400.0f });
-
-	Object3d* box3 = box3->Create();
-	box3->SetModel(model1);
-	box3->scale = { 1,1,1, };
-	box3->SetPosition({ 50.0f, -100.0f, +600.0f });
-
-	Object3d* box4 = box4->Create();
-	box4->SetModel(model1);
-	box4->scale = { 1,1,1, };
-	box4->SetPosition({ 10.0f, -30.0f, +800.0f });*/
-	
-	Model* skydome_model = Model::LoadFromOBJ("skydome");
-
-	Object3d* skydome = skydome->Create();
-
-	skydome->SetModel(skydome_model);
-	skydome->scale = { 11,11,15 };
-	skydome->SetPosition({ 0,0,0 });
-
-#pragma endregion
 	//描画初期化処理　ここまで
 
 
 
-#pragma region シェーダーの色,初期化
-	char moji[64];
+#pragma region 初期化
 	
 	float secound_x = 0;
 	float secound_y = 0;
 
-	sprite->SetPosition({ 0.0f,0.0f,0.0f });
-	sprite->SetSize({ 100,100 });
-	sprite->TransVertexBuffer();
+	reticleSprite->SetPosition({ 0.0f,0.0f,0.0f });
+	reticleSprite->SetSize({ 100,100 });
+	reticleSprite->TransVertexBuffer();
 
-	sprite2->SetPosition({ 640.0f,360.0f,0.0f });
-	sprite2->SetSize({ 1280,720 });
-	sprite2->TransVertexBuffer();
+	explanSprite->SetPosition({ 640.0f,360.0f,0.0f });
+	explanSprite->SetSize({ 1280,720 });
+	explanSprite->TransVertexBuffer();
 
 	titleSprite->SetPosition({ 640.0f,360.0f,0.0f });
 	titleSprite->SetSize({ 1280,720 });
@@ -283,11 +204,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	float hp = 288;
 
 	bossHpBarSprite->SetPosition({ 273.0f,34.0f,0.0f });
-	//bossHpBarSprite->SetTexLeftTop({ 0,0 });
-	//bossHpBarSprite->TransVertexBuffer();
-	
-
-	XMFLOAT3 eye = camera->GetEye();
 
 	int gameflag = 0;
 	
@@ -320,7 +236,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		playerHpSprite->SetTexsize({ hp,96 });
 		playerHpSprite->TransVertexBuffer();
 
-		sprite2->Update();
+		explanSprite->Update();
 		titleSprite->Update();
 		endSprite->Update();
 		gameOverSprite->Update();
@@ -334,8 +250,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		backBlack->Update();
 		backBlack->TransVertexBuffer();
 		//照準
-		sprite->Update();
-		sprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
+		reticleSprite->Update();
+		reticleSprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
 		if (gameflag == 0)
 		{
 			gameScene->SetHwnd(win->GetHwnd());
@@ -353,15 +269,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			gameScene->SetViewPort(dxcommon->GetViewPort());
 
 			gameScene->Update();
-
-			//spline 曲線　通り道
-		/*	box->Update();
-			box2->Update();
-			box3->Update();
-			box4->Update();*/
-			
-			//スカイドーム
-			skydome->Update();
 
 			playerHpSprite->Update();
 			//デバッグテキスト
@@ -407,34 +314,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 		
 		
-		camera->UpdateCamera();
-		
-		
 //描画
-		//ポストエフェクト
-
-		//postEffect->PreDrawScene(dxcommon->GetCmdlist());
-		
-		//object1->Draw(dxcommon->GetCmdlist());
-		//postEffect->PostDrawScene(dxcommon->GetCmdlist());
 		
 		dxcommon->BeginDraw();
 
 		// ４．描画コマンドここから
-
-		//object1->Draw(dxcommon->GetCmdlist());
-		//postEffect->Draw(dxcommon->GetCmdlist());
 		
-		////obj描画
-		
-		Object3d::PreDraw(dxcommon->GetCmdlist());
 
-		//box->Draw();
-		//box2->Draw();
-		//box3->Draw();
-		//box4->Draw();
-		skydome->Draw();
-		Object3d::PostDraw();
 		gameScene->Draw();
 		////スプライト共通コマンド
 		// スプライト
@@ -443,12 +329,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{
 
 			titleSprite->Draw();
-			sprite->Draw();
+			reticleSprite->Draw();
 		}
 		else if (gameflag == 1)
 		{
-			sprite->Draw();
-			//sprite2->Draw();
+			reticleSprite->Draw();
+			//explanSprite->Draw();
 			backBlack->Draw();
 			if (gameScene->tutorialFlag == true)
 			{
@@ -466,14 +352,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			
 
-			debugtext_minute->DrawAll();
-			debugtext_minute2->DrawAll();
+			/*debugtext_minute->DrawAll();
+			debugtext_minute2->DrawAll();*/
 			
 		}
 		else if (gameflag == 2)
 		{
 			endSprite->Draw();
-
 		}
 		else if (gameflag == 3)
 		{
@@ -492,22 +377,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	win->WinFinalize();
 
 //解放
-	/*delete modelFbx;
-	delete object1;*/
 
 	//Audio解放
 	audio->Finalize();
 	delete audio;
 
 	//デバッグテキスト解放
-	delete postEffect;
-
 	debugtext_minute->Finalize();
 	delete debugtext_minute;
+	delete debugtext_minute2;
 
-	delete sprite;
+	//スプライト解放
+	delete reticleSprite;
+	delete explanSprite;
+	delete titleSprite;
+	delete backBlack;
+	delete tyutoRial;
+	delete tyutoRialMove;
+	delete gameOverSprite;
+	delete bossHpBarSprite;
+	delete playerHpSprite;
+	delete endSprite;
 	delete spriteCommon;
-	LoadFbx::GetInstance()->Finalize();
+
+
 	delete dxcommon;
 	delete input;
 	

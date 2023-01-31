@@ -12,30 +12,38 @@
 class Player
 {
 private:
-
+	//モデル
 	Model* model_ = nullptr;
 	Model* bulletModel_ = nullptr;
 	Model* reticleModel_ = nullptr;
 
-	Enemy* enemy = nullptr;
-
+	//プレイヤー　レティクル　オブジェクトの初期化
 	Object3d* player = player->Create();
 	Object3d* reticle = reticle->Create();
 
-
+	//弾
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
+	//入力　初期化
 	Input* input = nullptr;
 
+	//弾の速さ
 	const float playerVelocity = 1.2f;
 
+	//カメラの行列
 	XMMATRIX cameraObj;
+	//敵の座標
 	XMFLOAT3 enemyWorldPos;
+	//レティクルの座標
 	XMVECTOR reticleWorldPos;
+	//ビューポート
 	XMMATRIX viewPortMatrix;
+	
 	XMMATRIX cameraMatViewProjection;
-	XMVECTOR positionReticle = { 0.0f,0.0f,0.0f };
+	
+	//カメラの座標
 	XMFLOAT3 cameraPos = { 0.0f,0.0f,0.0f };
 
+	//カメラの移動量
 	XMFLOAT3 cameraEyeVec = { 0.0f,0.0f,0.0f };
 	XMVECTOR cameraTargetVec = { 0.0f,0.0f,0.0f };
 
@@ -46,8 +54,10 @@ private:
 	HWND hwnd;
 	XMMATRIX viewPort;
 
+	//マウス座標
 	float mouseX;
 	float mouseY;
+
 
 	bool isDeadEnemy = false;
 	//弾のクールタイム
@@ -56,22 +66,39 @@ private:
 
 	bool rockOn = false;
 
+	//プレイヤーの動ける範囲
 	XMFLOAT2 playerMoveRange = { 25,15 };
-
+	
+	//プレイヤーhp
 	int playerHp = 3;
 	float hpBar = 0;
 	bool hp0 = false;
 public:
-
+	//プレイヤーの弾
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
 	
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	/// <param name="model">プレイヤーのモデル</param>
+	/// <param name="bulletModel">弾のモデル</param>
 	void Init(Model* model, Model* bulletModel);
 
+	/// <summary>
+	/// 攻撃
+	/// </summary>
 	void Attack();
 
+	/// <summary>
+	/// 更新
+	/// </summary>
 	void Update();
 
+	/// <summary>
+	/// 描画
+	/// </summary>
 	void Draw();
+
 
 	XMVECTOR transform(const XMVECTOR& v, const DirectX::XMMATRIX& m);
 	XMVECTOR transform2(const XMVECTOR& v, const DirectX::XMMATRIX& m);
@@ -107,11 +134,11 @@ public:
 	XMFLOAT3 GetReticleWorldPosition();
 	XMFLOAT3 GetReticleNear();
 	XMFLOAT3 GetReticleFar();
-	XMFLOAT3 GetSpriteReticle();
 	
 	//マウス座標
 	FLOAT GetMouseX(){return  mouseX;}
 	FLOAT GetMouseY() { return  mouseY; }
 
+	//当たり判定
 	void OnCollision();
 };
