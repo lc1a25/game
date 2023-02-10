@@ -278,7 +278,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			{
 				backBlackX+= 100;
 			}
-			if (gameScene->hp0 == true)
+			if (gameScene->playerDieFlag == true)
 			{
 				gameflag = 3;
 			}

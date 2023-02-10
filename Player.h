@@ -72,7 +72,7 @@ private:
 	//プレイヤーhp
 	int playerHp = 3;
 	float hpBar = 0;
-	bool hp0 = false;
+	bool playerDieFlag = false;
 public:
 	//プレイヤーの弾
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
@@ -128,7 +128,7 @@ public:
 
 	FLOAT GetHpBar() { return hpBar; }
 
-	BOOL GetHp0() { return hp0; }
+	BOOL GetHp0() { return playerDieFlag; }
 
 	XMFLOAT3 GetWorldPosition();
 	XMFLOAT3 GetReticleWorldPosition();

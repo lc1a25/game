@@ -48,7 +48,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	hpBar = 288;
 	hpBarMax = 288;
 	//プレイヤーが倒された用
-	hp0 = false;
+	playerDieFlag = false;
 
 	//オブジェクトの初期化
 
@@ -104,21 +104,9 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	cameraObj = new CameraObj();
 	cameraObj->Init({0,0,-50},{0,0,0});
 
-	//wall->SetModel(wallModel);
-	//wall->scale = { 10,7,70 };
-	//wall->SetPosition({ 0,-64,50 });
-
-	//wall2->SetModel(wallModel);
-	//wall2->scale = { 10,7,70 };
-	//wall2->SetPosition({ 0,110,50 });//0,110,50
-
-	//wallBoss->SetModel(wallModel);
-	//wallBoss->scale = { 15,7,7 };
-	//wallBoss->SetPosition({ 0,-64,1000 });
-
-	wallBossBack->SetModel(wallFlatModel);
-	wallBossBack->scale = { 50,7,170 };
-	wallBossBack->SetPosition({ 0,-65,50 });
+	wallFloor->SetModel(wallFlatModel);
+	wallFloor->scale = { 50,7,170 };
+	wallFloor->SetPosition({ 0,-65,50 });
 
 	road->SetModel(roadModel);
 	road->scale = { 10,7,300 };
@@ -144,7 +132,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	pillar5->SetModel(pillarModel);
 	pillar5->scale = { 4,18,1 };
 	pillar5->SetPosition({ -50,-32,680 });
-	
+
 	Object3d::SetCamera(camera);
 
 	EnemyPopLoadData();
@@ -158,6 +146,11 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 void GameScene::Update()
 {
+
+	if (input->isKeyTrigger(DIK_P))
+	{
+		player->OnCollision();
+	}
 	//csvのenemy発生
 	UpdateEnemyPop();
 
@@ -165,27 +158,19 @@ void GameScene::Update()
 	{
 		if (enemyOneWay->GetEnemy()->GetEnemyDownCount() == 1)
 		{
-			
-				tutorialFlag = false;
-				sceneChange = true;
-			
+			tutorialFlag = false;
+			sceneChange = true;	
 		}
 	}
 
 	cameraObj->SetTutorialFlag(tutorialFlag);
 
-	
-
 	Particle->Update();
-	
-	//設置物
-	/*wall->Update();
-	wall2->Update();
-	wallBoss->Update();*/
+
 	//スカイドーム
 	skydome->Update();
 
-	wallBossBack->Update();
+	wallFloor->Update();
 	road->Update();
 
 	pillar->Update();
@@ -200,9 +185,7 @@ void GameScene::Update()
 
 	//デバッグ用
 	sprintf_s(moji, "%d", cameraObj->GetRaleIndex());
-	//sprintf_s(moji2, "%f", pos.z);
-	//sprintf_s(moji2, "%0.3f", bossChildRUF->GetEnemy()->angle);
-	//sprintf_s(moji, "%0.3f", bossChildLUF->GetEnemy()->angle);
+	
 
 //カメラ
 	
@@ -342,11 +325,26 @@ void GameScene::Update()
 		}
 	}
 
+	cameraObj->SetPlayerDieFlag(player->GetHp0());
+	cameraObj->SetTarget(player->GetWorldPosition());
 	//プレイヤーのhpが０になったら
 	if (player->GetHp0() == true)
 	{
-		//シーンチェンジ
-		hp0 = true;
+		
+		//パーティクル生成
+		PlayerCreateParticle(player->GetWorldPosition());
+		
+		//bossのやられた演出まち用
+		bossDieTimer--;
+
+		if (bossDieTimer <= 0)
+		{
+			//シーンチェンジ
+			playerDieFlag = true;
+
+			bossDieTimer = 120;
+		}
+		
 	}
 }
 
@@ -358,11 +356,8 @@ void GameScene::Draw()
 	//スカイドーム
 	skydome->Draw();
 
-	//wallBoss->Draw();
-	wallBossBack->Draw();
-	//wall->Draw();
+	wallFloor->Draw();
 	road->Draw();
-	//wall2->Draw();
 	pillar->Draw();
 	pillar2->Draw();
 	pillar3->Draw();
@@ -423,6 +418,7 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 			if (boss->GetEnemy()->IsDead() == false)
 			{
 				player->OnCollision();
+				
 			}
 
 			bullet->OnCollision();
@@ -456,20 +452,20 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 
 				bullet->OnCollision();
 				//パーティクル生成
-				CreateParticle(enemy);
+				EnemyCreateParticle(enemy->GetWorldPosition());
 			}
 			if (cameraObj->GetRaleIndex() >= 5)
 			{
 				
 				enemy->OnBossCollision();
 
+				if (enemy->IsDead() == true)
+				{
+					BossCreateParticle(enemy->GetWorldPosition());
+				}
 				bullet->OnCollision();
 			}
 			
-		}
-		else
-		{
-			enemy->bossDamage = false;
 		}
 	}
 
@@ -603,6 +599,24 @@ void GameScene::UpdateEnemyPop()
 			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
 			
 			pillar->SetPosition( pos );
+		}
+		else if (word.find("BILL2") == 0)
+		{
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
+
+			pillar2->SetPosition(pos);
+		}
+		else if (word.find("BILL3") == 0)
+		{
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
+
+			pillar3->SetPosition(pos);
+		}
+		else if (word.find("BILL4") == 0)
+		{
+			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
+
+			pillar4->SetPosition(pos);
 		}
 		else if (word.find("ONEWAY") == 0)
 		{
@@ -787,7 +801,42 @@ XMFLOAT3 GameScene::CommandPositionSet(std::istream  &line_stream, std::string &
 	return position;
 }
 
-void GameScene::CreateParticle(Enemy* enemy)
+void GameScene::PlayerCreateParticle(XMFLOAT3 position)
+{
+	//パーティクル
+	for (int i = 0; i < 5; i++)
+	{
+
+		const float rnd_pos = 10.0f;
+		XMFLOAT3 pos{};
+
+
+		pos.x = position.x;
+		pos.y = position.y;
+		pos.z = position.z;
+
+		/*pos.x = (float)rand() / RAND_MAX * enemy->GetWorldPosition().x - enemy->GetWorldPosition().x / 2.0f;
+		pos.y = (float)rand() / RAND_MAX * enemy->GetWorldPosition().y - enemy->GetWorldPosition().y / 2.0f;
+		pos.z = (float)rand() / RAND_MAX * enemy->GetWorldPosition().z - enemy->GetWorldPosition().z / 2.0f;*/
+
+
+		const float rnd_vel = 0.8f;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+
+		XMFLOAT3 acc{};
+		const float rnd_acc = 0.051f;
+		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
+
+		//Add(5, pos, vel, acc);
+		Particle->Add(32, pos, vel, acc, 3.0f, 0.0f, { 1,1,1 }, { 1,0,0 });
+	}
+
+}
+
+void GameScene::EnemyCreateParticle(XMFLOAT3 position)
 {
 	//パーティクル
 	for (int i = 0; i < 100; i++)
@@ -797,9 +846,9 @@ void GameScene::CreateParticle(Enemy* enemy)
 		XMFLOAT3 pos{};
 
 
-		pos.x = enemy->GetWorldPosition().x;
-		pos.y = enemy->GetWorldPosition().y;
-		pos.z = enemy->GetWorldPosition().z;
+		pos.x = position.x;
+		pos.y = position.y;
+		pos.z = position.z;
 
 		/*pos.x = (float)rand() / RAND_MAX * enemy->GetWorldPosition().x - enemy->GetWorldPosition().x / 2.0f;
 		pos.y = (float)rand() / RAND_MAX * enemy->GetWorldPosition().y - enemy->GetWorldPosition().y / 2.0f;
@@ -821,3 +870,38 @@ void GameScene::CreateParticle(Enemy* enemy)
 	}
 
 }
+
+void GameScene::BossCreateParticle(XMFLOAT3 position)
+{
+	//パーティクル
+	for (int i = 0; i < 30; i++)
+	{
+
+		const float rnd_pos = 10.0f;
+		XMFLOAT3 pos{};
+
+
+		pos.x = position.x;
+		pos.y = position.y;
+		pos.z = position.z;
+
+		/*pos.x = (float)rand() / RAND_MAX * enemy->GetWorldPosition().x - enemy->GetWorldPosition().x / 2.0f;
+		pos.y = (float)rand() / RAND_MAX * enemy->GetWorldPosition().y - enemy->GetWorldPosition().y / 2.0f;
+		pos.z = (float)rand() / RAND_MAX * enemy->GetWorldPosition().z - enemy->GetWorldPosition().z / 2.0f;*/
+
+
+		const float rnd_vel = 0.8f;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+
+		XMFLOAT3 acc{};
+		const float rnd_acc = 0.011f;
+		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
+
+		//Add(5, pos, vel, acc);
+		Particle->Add(32, pos, vel, acc, 5.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+	}
+}
+

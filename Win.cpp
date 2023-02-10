@@ -17,7 +17,7 @@ void Win::WinCreate()
 	
 	windowClass.cbSize = sizeof(WNDCLASSEX);
 	windowClass.lpfnWndProc = (WNDPROC)WindowProc; // ウィンドウプロシージャを設定
-	windowClass.lpszClassName = L"GO GO HighWay"; // ウィンドウクラス名
+	windowClass.lpszClassName = L"FLIGHT"; // ウィンドウクラス名
 	windowClass.hInstance = GetModuleHandle(nullptr); // ウィンドウハンドル
 	windowClass.hCursor = LoadCursor(NULL, IDC_ARROW); // カーソル指定
 

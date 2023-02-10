@@ -1,6 +1,4 @@
 #pragma once
-//#include "Win.h"
-//#include <DirectXMath.h>
 #include "Matrix4.h"
 #include "Object3d.h"
 
@@ -27,8 +25,6 @@ public:
 
 	XMVECTOR splinePosition(const std::vector<XMVECTOR>& points, size_t startIndex, float t);
 
-	void UpdateViewMatrix();
-
 	//getter
 	const XMMATRIX& GetMatViewProjection() { return matViewProjection; }
 	const XMMATRIX& GetMatProjection() { return matProjection; }
@@ -50,55 +46,19 @@ public:
 
 	const BOOL& GetEndFlag() { return pointsLast; }
 
+	void SetPlayerDieFlag(bool playerDieFlag) { this->playerDieFlag = playerDieFlag; }
+
 	void SetTutorialFlag(bool tutorialFlag) { pointsStart = tutorialFlag; }
 
-	
-
-
-	//setter
-	/*void SetEye(XMFLOAT3 eye)
-	{
-		this->eye = eye;
-		UpdateCamera();
-	}
-	void SetTarget(XMFLOAT3 target)
-	{
-		this->target = target;
-		UpdateCamera();
-	}
-	void SetUp(XMFLOAT3 up)
-	{
-		this->up = up;
-		UpdateCamera();
-	}*/
-
-
+	void SetTarget(XMFLOAT3 target) { playerPos = target; }
 
 	XMMATRIX GetWorldTransform()
 	{
 		return worldTransform;
 	}
 
-	/// <summary>
-	/// ビュー射影行列の取得
-	/// </summary>
-	/// <returns>ビュー射影行列</returns>
-	inline const XMMATRIX& GetViewProjectionMatrix() {
-		return matViewProjection;
-	}
-
-	/// <summary>
-	/// ビルボード行列の取得
-	/// </summary>
-	/// <returns>ビルボード行列</returns>
-	inline const XMMATRIX& GetBillboardMatrix() {
-		return matBillboard;
-	}
 private:
-	// ビルボード行列
-	XMMATRIX matBillboard = DirectX::XMMatrixIdentity();
-	// Y軸回りビルボード行列
-	XMMATRIX matBillboardY = DirectX::XMMatrixIdentity();
+	XMFLOAT3 playerPos;
 	float distance = 20.0f;
 	// ビュー行列
 	XMMATRIX matView;
@@ -133,10 +93,7 @@ private:
 
 	DWORD time = 0;
 
-	// ビュー行列ダーティフラグ
-	bool viewDirty = false;
-	// 射影行列ダーティフラグ
-	bool projectionDirty = false;
+	bool playerDieFlag = false;
 
 	long long startCount = 0;
 	long long nowCount = 0;
@@ -150,14 +107,6 @@ private:
 	XMVECTOR p5{ 0.0f, 0.0f, +600.0f };
 	XMVECTOR p6{ 0.0f, 0.0f, +800.0f };
 	XMVECTOR p7{ 0.0f, 0.0f, +800.0f };
-
-
-	//p2{ 10.0f, 0.0f, 0.0f };
-	//p3{ -100.0f, 0.0f, +200.0f };
-	//p4{ 50.0f, 100.0f, +400.0f };
-	//p5{ 50.0f, -100.0f, +600.0f };
-	//p6{ 10.0f, -30.0f, +800.0f };
-	//p7{ 0.0f, 0.0f, +850.0f };
 
 	XMVECTOR end{ 0.0f, 0.0f, 800.0f };
 	XMVECTOR targetEnd{};
@@ -173,12 +122,7 @@ private:
 	bool pointsStart = true;
 
 	std::vector<XMVECTOR>points{ start,p2,p3,p4,p5,p6,p7,end,end };
-	//std::vector<XMVECTOR>points{ start,start,start,start,start,start,start,start,start,start };
-	//std::vector<XMVECTOR>points{ end,end,end,end,end,end,end,end,end,end };
 
 	int startIndex = 0;
 	int targetIndex = 2;
-
-	//XMVECTOR position{ 0, 0, 0 };
-	//XMVECTOR target{ 0, 0, 0 };
 };

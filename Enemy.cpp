@@ -15,12 +15,6 @@ void Enemy::PCircleR()
 
 	//äpìxÇÇΩÇµÇƒâ~èÛÇ…ìÆÇ©Ç∑
 	angle += angleVec;
-
-	//if (angle >= 460.0f)
-	//{
-	//	shotTimer;
-	//	//enemy->position.z -= 0.5;
-	//}
 	
 }
 
@@ -39,21 +33,13 @@ void Enemy::PCircleL()
 
 	//äpìxÇÇΩÇµÇƒâ~èÛÇ…ìÆÇ©Ç∑
 	angle -= angleVec;
-
-	//if (angle <= -270.0f)
-	//{
-	//	shotTimer = shotInterval;
-	//	//enemy->position.z -= 0.5;
-	//}
-	
-
-	
 }
 
 void Enemy::PShot()
 {
 	if (attackFlag == false)
 	{
+		shotEndFlag = true;
 		return;
 	}
 	//íeÇåÇÇ¬
@@ -70,6 +56,7 @@ void Enemy::PHoming()
 {
 	if (attackFlag == false)
 	{
+		shotEndFlag = true;
 		return;
 	}
 		//íeÇåÇÇ¬
@@ -323,17 +310,6 @@ void Enemy::Update()
 			isL = false;
 		}
 
-		if (time >= 600)
-		{
-			/*EasingTime();
-			enemy->position.x = ease_in({ enemy->position.x,enemy->position.y,enemy->position.z },
-				{ 0,0,enemy->position.z }, timeRate).m128_f32[0];
-			enemy->position.x = ease_in({ enemy->position.x,enemy->position.y,enemy->position.z },
-				{ 0,0,enemy->position.z }, timeRate).m128_f32[1];
-			enemy->position.x = ease_in({ enemy->position.x,enemy->position.y,enemy->position.z },
-				{ 0,0,enemy->position.z }, timeRate).m128_f32[2];*/
-			//phase = Phase::BossMiniVertical;
-		}
 		if (bossHp <= 25)
 		{
 			phase = Phase::BossSide;
@@ -342,13 +318,6 @@ void Enemy::Update()
 		break;
 
 	case Phase::OneWayL:
-		//EasingTime();
-
-		//OneWayPos = ease_in(OneWayPos, { -200,OneWayPos.m128_f32[1] ,OneWayPos.m128_f32[2]  },timeRate);
-		//
-		//enemy->position.x = OneWayPos.m128_f32[0];
-		//enemy->position.y = OneWayPos.m128_f32[1];
-		//enemy->position.z = OneWayPos.m128_f32[2];
 		
 		enemy->position.x -= OWRSpeed;
 
@@ -362,12 +331,11 @@ void Enemy::Update()
 		{
 			OWRSpeed *= -1;
 		}
-		//shotEndFlag = true;
+
 		PHoming();
-		if (attackFlag == false)
-		{
-			PLeaveF();
-		}
+		
+		PLeaveF();
+		
 
 		break;
 
@@ -385,12 +353,10 @@ void Enemy::Update()
 		{
 			OWRSpeed *= -1;
 		}
-		//shotEndFlag = true;
 		PHoming();
-		if (attackFlag == false)
-		{
-			PLeaveF();
-		}
+		
+		PLeaveF();
+		
 
 		break;
 
@@ -661,8 +627,6 @@ void Enemy::FrontShot()
 	//íeê∂ê¨
 	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
 	newBullet->Init(bulletModel_, enemy->position,{0,0,-2});
-	//newBullet->SetDiffVec(GetWorldPosition(), playerWorldPos);
-
 
 	//íeìoò^
 	bullets_.push_back(std::move(newBullet));//move ÇÕÉÜÉjÅ[ÉNÇ©ÇÁè˜ìnÇ∑ÇÈÇΩÇﬂ
@@ -734,12 +698,10 @@ void Enemy::OnCollision()
 void Enemy::OnBossCollision()
 {
 	bossHp--;
-	bossDamage = true;
 	hpBar -= hpBarMax / 50;
 	if (bossHp <= 0)
 	{
 		isDead = true;
-		enemy->position.z -= 350;
 	}
 }
 

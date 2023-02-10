@@ -63,7 +63,7 @@ private:
 	Object3d* enemy = enemy->Create();
 	std::list<std::unique_ptr<EnemyBullet>> bullets_;
 
-	GameScene* gameScene = nullptr;
+	//GameScene* gameScene = nullptr;
 	//Player* player_ = nullptr;
 	
 	//OneWayの敵のスピード
@@ -180,36 +180,73 @@ public:
 	Phase phase = Phase::OutApproach;
 	BossPhase phaseMini = BossPhase::None;
 
-	bool bossDamage = false;
+	//bool bossDamage = false;
 
 	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; }
 
 	//発射間隔
 	static const int shotInterval = 30;
 
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	/// <param name="enemyModel">モデル</param>
+	/// <param name="position">座標</param>
+	/// <param name="bulletModelXMFLOAT3">弾のモデル</param>
+	/// <param name="scale">サイズ</param>
+	/// <param name="attackFlag">攻撃するか</param>
 	void Init(Model* enemyModel,XMFLOAT3 position, Model *bulletModelXMFLOAT3 , XMFLOAT3 scale = { 2,2,2 },bool attackFlag = true);
 
+	/// <summary>
+	/// 更新
+	/// </summary>
 	void Update();
 
+	/// <summary>
+	/// 描画
+	/// </summary>
 	void Draw();
 
+	/// <summary>
+	/// ホーミング
+	/// </summary>
 	void Homing();
 
+	/// <summary>
+	/// ボスの周りのコアがボスに向かっていく
+	/// </summary>
 	void ChildHoming();
 
+	/// <summary>
+	/// 前に向かって弾を打つ
+	/// </summary>
 	void FrontShot();
 
+	/// <summary>
+	/// Phase の　初期化
+	/// </summary>
+	/// <param name="rightMoveTrue">敵が画面の右からでてくるか左から出てくるか</param>
 	void PhaseInit(bool rightMoveTrue);
 
 	//void SetPlayer(Player* player) { player_ = player; }
 
+	/// <summary>
+	/// プレイヤーの座標
+	/// </summary>
+	/// <param name="position">プレイヤーの座標</param>
 	void SetPlayerPosition(XMFLOAT3 position) { playerWorldPos = position; }
 
+	/// <summary>
+	/// 敵の座標
+	/// </summary>
+	/// <param name="position">敵の座標</param>
 	void SetPosition(XMFLOAT3 position) { enemy->position = position; }
 
+	/// <summary>
+	/// カメラのz座標  敵がカメラのzの方向の動きに合わせる
+	/// </summary>
+	/// <param name="z">カメラのz座標</param>
 	void SetCameraZ(float z) { cameraZ = z; }
-
-	void SetGameScene(GameScene* gameScene) { this->gameScene = gameScene; }
 
 	void SetChildNumber(int childNumber) { this->childNumber = childNumber; }
 

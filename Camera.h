@@ -23,10 +23,6 @@ public:
 
 	void CameraMoveVector(XMFLOAT3 move, bool addFrag);
 
-	void CameraMoveVectorAdd(XMFLOAT3 move);
-
-	void CameraMoveVectorSub(XMFLOAT3 move);
-
 	//getter
 	const XMMATRIX& GetMatViewProjection() { return matViewProjection; }
 
@@ -52,6 +48,7 @@ public:
 	inline const XMMATRIX& GetBillboardMatrix() {
 		return matBillboard;
 	}
+
 	//setter
 	void SetEye(XMFLOAT3 eye) 
 	{ 

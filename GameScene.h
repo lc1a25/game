@@ -75,7 +75,11 @@ public: // メンバ関数
 	XMFLOAT3 CommandPositionSet(std::istream &line_stream, std::string &word);
 
 	//パーティクル
-	void CreateParticle(Enemy* enemy);
+	void PlayerCreateParticle(XMFLOAT3 position);
+
+	void EnemyCreateParticle(XMFLOAT3 position);
+
+	void BossCreateParticle(XMFLOAT3 position);
 
 	FLOAT GetbossHpBar() { return bossHpBar; }
 	FLOAT GetHpBar() { return hpBar; }
@@ -106,7 +110,7 @@ public: // メンバ関数
 	//プレイヤーhp
 	float hpBar = 288;
 	float hpBarMax = 288;
-	bool hp0 = false;
+	bool playerDieFlag = false;
 
 	int  coll = 0;
 
@@ -138,10 +142,7 @@ private: // メンバ変数
 	Object3d* skydome = skydome->Create();
 
 	//壁系
-	Object3d* wall = wall->Create();
-	Object3d* wallBoss = wallBoss->Create();
-	Object3d* wallBossBack = wallBossBack->Create();
-	Object3d* wall2 = wall2->Create();
+	Object3d* wallFloor = wallFloor->Create();
 	//道
 	Object3d* road = road->Create();
 
@@ -152,6 +153,7 @@ private: // メンバ変数
 	Object3d* pillar4 = pillar4->Create();
 	Object3d* pillar5 = pillar5->Create();
 
+	//std::list<std::unique_ptr<Object3d*>> bills;
 	//プレイヤー
 	Player* player = nullptr;
 
@@ -197,6 +199,5 @@ private: // メンバ変数
 	float length = 0.0f;
 	float size = 22.0f;
 	float wallColliLength = 0.0f;
-	//std::unique_ptr<Enemy> enemy(new Enemy());
 
 };

@@ -38,7 +38,6 @@ public: // サブクラス
 	{
 		XMMATRIX mat;	// ビュープロジェクション行列
 		XMMATRIX matBillboard;	// ビルボード行列
-		//XMFLOAT3 color;
 	};
 
 	// パーティクル1粒

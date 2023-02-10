@@ -37,7 +37,7 @@ void Player::Update()
 		hpBar -= 96;
 		if (playerHp <= 0)
 		{
-			hp0 = true;
+			playerDieFlag = true;
 		}
 	}
 //2dレティクル
@@ -130,7 +130,7 @@ void Player::Update()
 		player->position.y += playerVelocity;
 		player->rotation.x -= playerVelocity / 4;
 	}
-	if (player->position.y >= cameraPos.y + playerMoveRange.y)
+	if (player->position.y >= cameraPos.y + playerMoveRange.y && playerDieFlag == false)
 	{
 		player->position.y -= playerVelocity;
 		player->rotation.x += playerVelocity / 4;
@@ -167,6 +167,12 @@ void Player::Update()
 		bullet->Update();
 	}
 
+	if (playerDieFlag == true)
+	{
+		player->position.y-=0.1;
+		player->rotation.x++;
+		player->rotation.z++;
+	}
 //更新
 	
 	player->Update();
@@ -241,7 +247,7 @@ void Player::OnCollision()
 	hpBar -= 96;
 	if (playerHp <= 0)
 	{
-		hp0 = true;
+		playerDieFlag = true;
 	}
 }
 

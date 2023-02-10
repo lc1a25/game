@@ -1,13 +1,6 @@
 #include "Camera.h"
 using namespace DirectX;
 
-//XMMATRIX Camera::matView{};
-//XMMATRIX Camera::matProjection{};
-//XMFLOAT3 Camera::eye = { 0, 0, -50.0f };
-//XMFLOAT3 Camera::target = { 0, 0, 0 };
-//XMFLOAT3 Camera::up = { 0, 1, 0 };
-//XMMATRIX Camera::matViewProjection{};
-
 void Camera::Init()
 {
 	// ÉrÉÖÅ[çsóÒÇÃê∂ê¨
@@ -16,11 +9,6 @@ void Camera::Init()
 		XMLoadFloat3(&target),
 		XMLoadFloat3(&up));
 
-	// ïΩçsìäâeÇ…ÇÊÇÈéÀâeçsóÒÇÃê∂ê¨
-	//constMap->mat = XMMatrixOrthographicOffCenterLH(
-	//	0, window_width,
-	//	window_height, 0,
-	//	0, 1);
 	// ìßéãìäâeÇ…ÇÊÇÈéÀâeçsóÒÇÃê∂ê¨
 	matProjection = XMMatrixPerspectiveFovLH(
 		XMConvertToRadians(60.0f),
@@ -59,7 +47,6 @@ void Camera::CameraRot(float anglex, float angley)
 	XMMATRIX matRotNew = XMMatrixIdentity();
 	matRotNew *= XMMatrixRotationX(-anglex);
 	matRotNew *= XMMatrixRotationY(-angley);
-
 
 	matRot = matRotNew * matRot;
 
@@ -101,39 +88,7 @@ void Camera::CameraMoveVector(XMFLOAT3 move, bool addFrag)
 	SetTarget(target_moved);
 }
 
-void Camera::CameraMoveVectorAdd(XMFLOAT3 move)
-{
-	XMFLOAT3 eye_moved = GetEye();
-	XMFLOAT3 target_moved = GetTarget();
 
-	eye_moved.x += move.x;
-	eye_moved.y += move.y;
-	eye_moved.z += move.z;
-
-	target_moved.x += move.x;
-	target_moved.y += move.y;
-	target_moved.z += move.z;
-
-	SetEye(eye_moved);
-	SetTarget(target_moved);
-}
-
-void Camera::CameraMoveVectorSub(XMFLOAT3 move)
-{
-	XMFLOAT3 eye_moved = GetEye();
-	XMFLOAT3 target_moved = GetTarget();
-
-	eye_moved.x -= move.x;
-	eye_moved.y -= move.y;
-	eye_moved.z -= move.z;
-
-	target_moved.x -= move.x;
-	target_moved.y -= move.y;
-	target_moved.z -= move.z;
-
-	SetEye(eye_moved);
-	SetTarget(target_moved);
-}
 
 void Camera::UpdateViewMatrix()
 {
