@@ -59,7 +59,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(ProjectDir);$(ProjectDir)2d;$(ProjectDir)3d;$(ProjectDir)base;$(ProjectDir)input;$(ProjectDir)audio;$(ProjectDir)scene;$(ProjectDir)3d\enemy;$(ProjectDir)math</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -76,7 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(ProjectDir);$(ProjectDir)2d;$(ProjectDir)3d;$(ProjectDir)base;$(ProjectDir)input;$(ProjectDir)audio;$(ProjectDir)scene;$(ProjectDir)3d\enemy;$(ProjectDir)math</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -89,68 +89,60 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Audio.cpp" />
-    <ClCompile Include="Boss.cpp" />
-    <ClCompile Include="BossChild.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="CameraObj.cpp" />
-    <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="CollisionBase.cpp" />
-    <ClCompile Include="DebugText.cpp" />
-    <ClCompile Include="DirectXCommon.cpp" />
-    <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="EnemyBullet.cpp" />
-    <ClCompile Include="EnemyCircle.cpp" />
-    <ClCompile Include="EnemyOneWay.cpp" />
-    <ClCompile Include="GameScene.cpp" />
-    <ClCompile Include="LoadFbx.cpp" />
-    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="2d\DebugText.cpp" />
+    <ClCompile Include="2d\Sprite.cpp" />
+    <ClCompile Include="2d\SpriteCommon.cpp" />
+    <ClCompile Include="3d\Boss.cpp" />
+    <ClCompile Include="3d\BossChild.cpp" />
+    <ClCompile Include="3d\Camera.cpp" />
+    <ClCompile Include="3d\CameraObj.cpp" />
+    <ClCompile Include="3d\Collision.cpp" />
+    <ClCompile Include="3d\CollisionBase.cpp" />
+    <ClCompile Include="3d\Enemy.cpp" />
+    <ClCompile Include="3d\EnemyBullet.cpp" />
+    <ClCompile Include="3d\EnemyCircle.cpp" />
+    <ClCompile Include="3d\EnemyOneWay.cpp" />
+    <ClCompile Include="3d\Model.cpp" />
+    <ClCompile Include="3d\Object3d.cpp" />
+    <ClCompile Include="3d\ParticleManager.cpp" />
+    <ClCompile Include="3d\Player.cpp" />
+    <ClCompile Include="3d\PlayerBullet.cpp" />
+    <ClCompile Include="audio\Audio.cpp" />
+    <ClCompile Include="base\DirectXCommon.cpp" />
+    <ClCompile Include="base\Win.cpp" />
+    <ClCompile Include="input\Input.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Matrix4.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="ModelFbx.cpp" />
-    <ClCompile Include="Object3d.cpp" />
-    <ClCompile Include="Object3dFbx.cpp" />
-    <ClCompile Include="ParticleManager.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PlayerBullet.cpp" />
-    <ClCompile Include="PostEffect.cpp" />
-    <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="SpriteCommon.cpp" />
-    <ClCompile Include="Vector3.cpp" />
-    <ClCompile Include="Win.cpp" />
+    <ClCompile Include="math\Matrix4.cpp" />
+    <ClCompile Include="math\Vector3.cpp" />
+    <ClCompile Include="scene\GameScene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Audio.h" />
-    <ClInclude Include="Boss.h" />
-    <ClInclude Include="BossChild.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="CameraObj.h" />
-    <ClInclude Include="Collision.h" />
-    <ClInclude Include="CollisionBase.h" />
-    <ClInclude Include="DebugText.h" />
-    <ClInclude Include="DirectXCommon.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="EnemyBullet.h" />
-    <ClInclude Include="EnemyOneWay.h" />
-    <ClInclude Include="GameScene.h" />
-    <ClInclude Include="LoadFbx.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="Matrix4.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="ModelFbx.h" />
-    <ClInclude Include="Object3d.h" />
-    <ClInclude Include="Object3dFbx.h" />
-    <ClInclude Include="ParticleManager.h" />
-    <ClInclude Include="PipelineSet.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="PlayerBullet.h" />
-    <ClInclude Include="PostEffect.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="SpriteCommon.h" />
-    <ClInclude Include="Vector3.h" />
-    <ClInclude Include="Win.h" />
-    <ClInclude Include="EnemyCircle.h" />
+    <ClInclude Include="2d\DebugText.h" />
+    <ClInclude Include="2d\Sprite.h" />
+    <ClInclude Include="2d\SpriteCommon.h" />
+    <ClInclude Include="3d\Boss.h" />
+    <ClInclude Include="3d\BossChild.h" />
+    <ClInclude Include="3d\Camera.h" />
+    <ClInclude Include="3d\CameraObj.h" />
+    <ClInclude Include="3d\Collision.h" />
+    <ClInclude Include="3d\CollisionBase.h" />
+    <ClInclude Include="3d\Enemy.h" />
+    <ClInclude Include="3d\EnemyBullet.h" />
+    <ClInclude Include="3d\EnemyCircle.h" />
+    <ClInclude Include="3d\EnemyOneWay.h" />
+    <ClInclude Include="3d\Model.h" />
+    <ClInclude Include="3d\Object3d.h" />
+    <ClInclude Include="3d\ParticleManager.h" />
+    <ClInclude Include="3d\Player.h" />
+    <ClInclude Include="3d\PlayerBullet.h" />
+    <ClInclude Include="audio\Audio.h" />
+    <ClInclude Include="base\DirectXCommon.h" />
+    <ClInclude Include="base\PipelineSet.h" />
+    <ClInclude Include="base\Win.h" />
+    <ClInclude Include="input\Input.h" />
+    <ClInclude Include="math\Matrix4.h" />
+    <ClInclude Include="math\Vector3.h" />
+    <ClInclude Include="scene\GameScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resource\Shader\BasicPS.hlsl">

@@ -1,9 +1,6 @@
 #include "Vector3.h"
 #include <cmath>
 
-
-
-
 Vector3::Vector3(float x, float y, float z)
 {
 }

@@ -1,7 +1,6 @@
 #include <Windows.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
-//#include <DirectXMath.h>
 #include <vector>
 #include <string>
 #include <math.h>
