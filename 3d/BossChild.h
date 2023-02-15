@@ -17,6 +17,8 @@ class BossChild
 
 
 	bool bossDrawFlag = true;
+
+	bool bossDead = false;
 public:
 	void Init(Model* enemyModel,XMFLOAT3 position, int childNumber); 
 
@@ -29,6 +31,8 @@ public:
 	void SetBossPos(XMFLOAT3 bossPos) { this->bossPos = bossPos; }
 
 	void SetBossVec(XMFLOAT3 bossVec) { this->bossVec = bossVec; }
+
+	void SetBossDead(bool bossDead) { this->bossDead = bossDead; }
 
 
 	Enemy* GetEnemy() { return bossChild; }

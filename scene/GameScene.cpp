@@ -97,7 +97,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	bossChildRDB = new BossChild();
 	bossChildRDB->Init(bossModel, { 0, 0, -100.0f }, 8);
 
-
 	camera = new Camera();
 	camera->Init();
 
@@ -111,8 +110,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	road->SetModel(roadModel);
 	road->scale = { 10,7,300 };
 	road->SetPosition({ 0,-55,650 });
-	
-			
+				
 	pillar->SetModel(pillarModel);
 	pillar->scale = { 4,13,1 };
 	pillar->SetPosition({ -30,-32,280 });
@@ -146,11 +144,26 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 void GameScene::Update()
 {
-
+	//デバッグ用playerhp-
 	if (input->isKeyTrigger(DIK_P))
 	{
 		player->OnCollision();
 	}
+
+	//カメラの後ろ行ったら消える
+	bills.remove_if([](std::unique_ptr<Bill>& bill)
+	{
+			return bill->billDead();
+	});
+	
+	//ビル生成
+	BillCreate();
+	for (std::unique_ptr<Bill>& bill : bills)
+	{
+		bill->SetCameraZ(cameraObj->GetEye().z);
+		bill->Update();
+	}
+
 	//csvのenemy発生
 	UpdateEnemyPop();
 
@@ -184,24 +197,21 @@ void GameScene::Update()
 	mouseY = player->GetMouseY();
 
 	//デバッグ用
-	sprintf_s(moji, "%d", cameraObj->GetRaleIndex());
-	
+	sprintf_s(moji, "%d", cameraObj->GetRaleIndex());	
 
-//カメラ
-	
+	//カメラ
 	cameraObj->UpdateCamera();
-
 	camera->SetEye({ cameraObj->GetEye() });
 	camera->SetTarget({ cameraObj->GetTarget() });
 	camera->SetUp({ cameraObj->GetUp() });
 	camera->UpdateCamera();
 
-//レティクルのため
+	//レティクルのため
 	player->SetHwnd(hwnd);
 	player->SetViewPort(viewPort);
 	player->SetCameraMatViewProjection(cameraObj->GetMatViewProjection());
 
-//自機
+	//自機
 	player->SetEnemyFlag(enemyL->IsDead());
 	player->SetCameraObj(cameraObj->GetWorldTransform());
 	player->SetCameraPos(cameraObj->GetEye());
@@ -214,7 +224,7 @@ void GameScene::Update()
 	enemyOneWay->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
 	enemyCircle->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
 
-// 敵
+	// 敵
 	enemy->SetPlayerPosition(player->GetWorldPosition());
 	player->SetEnemyPosition(enemy->GetWorldPosition());
 	enemy->Update();
@@ -239,36 +249,44 @@ void GameScene::Update()
 	boss->Update();
 
 
-	bossChildLUF->SetBossPos(boss->GetEnemy()->GetWorldPosition());
+	bossChildLUF->SetBossPos(boss->GetPos());
 	bossChildLUF->SetBossVec(boss->GetBossVec());
+	bossChildLUF->SetBossDead(boss->GetBossDead());
 	bossChildLUF->Update();
 
-	bossChildLUB->SetBossPos(boss->GetEnemy()->GetWorldPosition());
+	bossChildLUB->SetBossPos(boss->GetPos());
 	bossChildLUB->SetBossVec(boss->GetBossVec());
+	bossChildLUB->SetBossDead(boss->GetBossDead());
 	bossChildLUB->Update();
 
-	bossChildRUF->SetBossPos(boss->GetEnemy()->GetWorldPosition());
+	bossChildRUF->SetBossPos(boss->GetPos());
 	bossChildRUF->SetBossVec(boss->GetBossVec());
+	bossChildRUF->SetBossDead(boss->GetBossDead());
 	bossChildRUF->Update();
 
-	bossChildRUB->SetBossPos(boss->GetEnemy()->GetWorldPosition());
+	bossChildRUB->SetBossPos(boss->GetPos());
 	bossChildRUB->SetBossVec(boss->GetBossVec());
+	bossChildRUB->SetBossDead(boss->GetBossDead());
 	bossChildRUB->Update();
 
-	bossChildLDF->SetBossPos(boss->GetEnemy()->GetWorldPosition());
+	bossChildLDF->SetBossPos(boss->GetPos());
 	bossChildLDF->SetBossVec(boss->GetBossVec());
+	bossChildLDF->SetBossDead(boss->GetBossDead());
 	bossChildLDF->Update();
 
-	bossChildLDB->SetBossPos(boss->GetEnemy()->GetWorldPosition());
+	bossChildLDB->SetBossPos(boss->GetPos());
 	bossChildLDB->SetBossVec(boss->GetBossVec());
+	bossChildLDB->SetBossDead(boss->GetBossDead());
 	bossChildLDB->Update();
 
-	bossChildRDF->SetBossPos(boss->GetEnemy()->GetWorldPosition());
+	bossChildRDF->SetBossPos(boss->GetPos());
 	bossChildRDF->SetBossVec(boss->GetBossVec());
+	bossChildRDF->SetBossDead(boss->GetBossDead());
 	bossChildRDF->Update();
 
-	bossChildRDB->SetBossPos(boss->GetEnemy()->GetWorldPosition());
+	bossChildRDB->SetBossPos(boss->GetPos());
 	bossChildRDB->SetBossVec(boss->GetBossVec());
+	bossChildRDB->SetBossDead(boss->GetBossDead());
 	bossChildRDB->Update();
 
 	bossChildLUF->SetChildShotRange(cameraObj->GetEye());
@@ -311,22 +329,30 @@ void GameScene::Update()
 	//ボスが倒されたら
 	if (boss->GetEnemy()->IsDead() == true)
 	{
-	
 
-		//bossのやられた演出まち用
-		bossDieTimer--;
-
-		if (bossDieTimer <= 0)
+		if (boss->GetEnemy()->GetWorldPosition().y <= floorY)
 		{
-			//シーンチェンジ
-			pointsLast = true;
+			//bossのやられた演出まち用
+			bossDieTimer--;
+			if (bossDieTimer <= 0)
+			{
+				//シーンチェンジ
+				pointsLast = true;
 			
-			bossDieTimer = 120;
+				bossDieTimer = 120;
+			}
 		}
+		else
+		{
+			BossCreateParticle(boss->GetPos());
+		}
+		
 	}
 
+	//カメラの注視点セット
 	cameraObj->SetPlayerDieFlag(player->GetHp0());
 	cameraObj->SetTarget(player->GetWorldPosition());
+	cameraObj->SetBoss(boss->GetPos(), boss->GetBossDead());
 	//プレイヤーのhpが０になったら
 	if (player->GetHp0() == true)
 	{
@@ -352,7 +378,7 @@ void GameScene::Draw()
 {
 	/// ここに3Dオブジェクトの描画処理
 	Object3d::PreDraw(dxcommon->GetCmdlist());
-
+	
 	//スカイドーム
 	skydome->Draw();
 
@@ -364,6 +390,11 @@ void GameScene::Draw()
 	pillar4->Draw();
 	pillar5->Draw();
 	 
+	/*for (std::unique_ptr<Bill>& bill : bills)
+	{
+		bill->Draw();
+	}*/
+
 	player->Draw();
 	
 	enemy->Draw();
@@ -372,7 +403,6 @@ void GameScene::Draw()
 	//enemyCircle2->Draw();
 	enemyOneWay->Draw();
 	//enemyOneWay2->Draw();
-
 
 	
 	if(cameraObj->GetEndFlag() == true)
@@ -387,8 +417,6 @@ void GameScene::Draw()
 		bossChildRDF->Draw();
 		bossChildRDB->Draw();
 	}
-	
-	
 	
 	Particle->Draw(dxcommon->GetCmdlist());
 	
@@ -417,7 +445,7 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 		{
 			if (boss->GetEnemy()->IsDead() == false)
 			{
-				player->OnCollision();
+				//player->OnCollision();
 				
 			}
 
@@ -459,7 +487,7 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 				
 				enemy->OnBossCollision();
 
-				if (enemy->IsDead() == true)
+				if (boss->GetEnemy()->IsDead() == true)
 				{
 					BossCreateParticle(enemy->GetWorldPosition());
 				}
@@ -901,7 +929,107 @@ void GameScene::BossCreateParticle(XMFLOAT3 position)
 		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
 
 		//Add(5, pos, vel, acc);
-		Particle->Add(32, pos, vel, acc, 5.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		Particle->Add(32, pos, vel, acc, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
 	}
+}
+
+void GameScene::BillCreate()
+{
+	const float iMax = 600;
+	const float iAdd = 80;
+	for (float i = 0; i < iMax; i += iAdd)
+	{
+		//もでる　ランダムで１２３とかきめてだす
+		
+		//bill生成
+		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+		newBill->Init(pillarModel, { -50,-32,280 + i }, { 4,13,1 });
+		//bill登録
+		bills.push_back(std::move(newBill));//move はユニークから譲渡するため
+	}
+	for (float i = 0; i < iMax; i += iAdd)
+	{
+		//bill生成
+		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+		newBill->Init(pillarModel, { 50,-32,280 + i }, { 4,13,1 });
+
+		//bill登録
+		bills.push_back(std::move(newBill));//move はユニークから譲渡するため
+	}
+	//for (float i = 0; i < iMax; i += iAdd)
+	//{
+	//	//bill生成
+	//	std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+	//	newBill->Init(pillarModel, { 80,-32,280 + i }, { 4,13,1 });
+
+	//	//bill登録
+	//	bills.push_back(std::move(newBill));//move はユニークから譲渡するため
+	//}
+	//for (float i = 0; i < iMax; i += iAdd)
+	//{
+	//	//bill生成
+	//	std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+	//	newBill->Init(pillarModel, { -80,-32,280 + i }, { 4,13,1 });
+
+	//	//bill登録
+	//	bills.push_back(std::move(newBill));//move はユニークから譲渡するため
+	//}
+
+	//for (float i = 0; i < iMax; i += iAdd)
+	//{
+	//	//bill生成
+	//	std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+	//	newBill->Init(pillarModel, { 110,-32,280 + i }, { 4,13,1 });
+	//	
+	//	//bill登録
+	//	bills.push_back(std::move(newBill));//move はユニークから譲渡するため
+	//}
+	//for (float i = 0; i < iMax; i += iAdd)
+	//{
+	//	//bill生成
+	//	std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+	//	newBill->Init(pillarModel, { -110,-32,280 + i }, { 4,13,1 });
+	//	
+	//	//bill登録
+	//	bills.push_back(std::move(newBill));//move はユニークから譲渡するため
+	//}
+	//for (float i = 0; i < iMax; i += iAdd)
+	//{
+	//	//bill生成
+	//	std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+	//	newBill->Init(pillarModel, { 140,-32,280 + i }, { 4,13,1 });
+	//	
+	//	//bill登録
+	//	bills.push_back(std::move(newBill));//move はユニークから譲渡するため
+	//}
+	//for (float i = 0; i < iMax; i += iAdd)
+	//{
+	//	//bill生成
+	//	std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+	//	newBill->Init(pillarModel, { -140,-32,280 + i }, { 4,13,1 });
+	//	
+	//	//bill登録
+	//	bills.push_back(std::move(newBill));//move はユニークから譲渡するため
+	//}
+	//for (float i = 0; i < iMax; i += iAdd)
+	//{
+	//	//bill生成
+	//	std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+	//	newBill->Init(pillarModel, { 170,-32,280 + i }, { 4,13,1 });
+	//	
+	//	//bill登録
+	//	bills.push_back(std::move(newBill));//move はユニークから譲渡するため
+	//}
+	//for (float i = 0; i < iMax; i += iAdd)
+	//{
+	//	//bill生成
+	//	std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+	//	newBill->Init(pillarModel, { -170,-32,280 + i }, { 4,13,1 });
+
+	//	//bill登録
+	//	bills.push_back(std::move(newBill));//move はユニークから譲渡するため
+	//}
+
+
 }
 

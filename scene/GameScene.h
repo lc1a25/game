@@ -16,6 +16,7 @@
 #include "BossChild.h"
 #include "ParticleManager.h"
 #include <sstream>
+#include "Bill.h"
 
 class GameScene
 {
@@ -84,6 +85,7 @@ public: // メンバ関数
 	FLOAT GetbossHpBar() { return bossHpBar; }
 	FLOAT GetHpBar() { return hpBar; }
 
+	void BillCreate();
 	//マウス座標
 	float mouseX;
 	float mouseY;
@@ -153,7 +155,7 @@ private: // メンバ変数
 	Object3d* pillar4 = pillar4->Create();
 	Object3d* pillar5 = pillar5->Create();
 
-	//std::list<std::unique_ptr<Object3d*>> bills;
+	std::list<std::unique_ptr<Bill>> bills;
 	//プレイヤー
 	Player* player = nullptr;
 
@@ -199,5 +201,8 @@ private: // メンバ変数
 	float length = 0.0f;
 	float size = 22.0f;
 	float wallColliLength = 0.0f;
+
+	//床のy
+	float floorY = -55.0f;
 
 };

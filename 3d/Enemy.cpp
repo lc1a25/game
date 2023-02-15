@@ -131,7 +131,7 @@ void Enemy::PChild()
 	enemy->position.x += bossVec.x /= 1.1;
 	enemy->position.y += bossVec.y /= 1.1;
 	enemy->position.z += bossVec.z /= 1.1;
-	PShotMinor();
+
 }
 
 void Enemy::PWait()
@@ -179,6 +179,15 @@ void Enemy::PChildHoming()
 		shotEndFlag = true;
 		ChildHoming();
 		shotTimer = shotInterval;
+	}
+}
+
+void Enemy::PChangeBossDead()
+{
+	if (bossHp <= 0)
+	{
+		phase = Phase::BossDead;
+		phaseMini = BossPhase::BossDead;
 	}
 }
 
@@ -334,7 +343,10 @@ void Enemy::Update()
 
 		PHoming();
 		
-		PLeaveF();
+		if (attackFlag == true)
+		{
+			PLeaveF();
+		}
 		
 
 		break;
@@ -355,7 +367,10 @@ void Enemy::Update()
 		}
 		PHoming();
 		
-		PLeaveF();
+		if (attackFlag == true)
+		{
+			PLeaveF();
+		}
 		
 
 		break;
@@ -368,6 +383,7 @@ void Enemy::Update()
 		{
 			phase = Phase::BossSideUp;
 		}
+		PChangeBossDead();
 		
 		break;
 		case Phase::BossVerticalL:
@@ -377,7 +393,7 @@ void Enemy::Update()
 		{
 			phase = Phase::BossSide;
 		}
-
+		PChangeBossDead();
 		break;
 	case Phase::BossSide:
 		enemy->position.x+= 0.8;
@@ -386,6 +402,7 @@ void Enemy::Update()
 		{
 			phase = Phase::BossVertical;
 		}
+		PChangeBossDead();
 		break;
 	case Phase::BossSideUp:
 		enemy->position.x-= 0.8;
@@ -394,9 +411,16 @@ void Enemy::Update()
 		{
 			phase = Phase::BossVerticalL;
 		}
+
+		PChangeBossDead();
+		break;
+	case Phase::BossDead:
+		enemy->position.y -= 0.1;
+		enemy->rotation.x++;
+		enemy->rotation.z++;
 		break;
 	case Phase::None:
-
+		
 		break;
 	default:
 		break;
@@ -406,9 +430,17 @@ void Enemy::Update()
 	{
 
 	case BossPhase::None:
+		
+		break;
+	case BossPhase::BossDead:
+		//enemy->position.y -= 0.1;
+		PChild();
+		enemy->rotation.x++;
+		enemy->rotation.z++;
 		break;
 	case BossPhase::MiniStop:
 		PChild();
+		PShotMinor();
 		//PCircleZ();
 		/*if (childNumber == 1)
 		{
@@ -509,7 +541,6 @@ void Enemy::Update()
 			enemy->position.z = 930;
 			circleZFlag = true;
 		}
-
 		break;
 	case BossPhase::MiniVerticalRUF:
 		if (circleZFlag == true)

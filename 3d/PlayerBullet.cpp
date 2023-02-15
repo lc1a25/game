@@ -1,5 +1,5 @@
 #include "PlayerBullet.h"
-
+using namespace DirectX;
 void PlayerBullet::Init(Model* model,XMFLOAT3 playerPosition ,XMVECTOR velocity)
 {
 	model_ = model;

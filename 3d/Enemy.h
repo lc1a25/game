@@ -27,12 +27,14 @@ enum class Phase
 	BossSide,//bossのミニが横方向に動く
 	BossSideUp,
 	BossStop,
+	BossDead,
 	None,
 };
 
 enum class BossPhase
 {
 	None,
+	BossDead,
 	MiniStop,
 	MiniVerticalLUF,
 	MiniVerticalLUB,
@@ -174,6 +176,8 @@ private:
 
 	void PChildHoming();
 
+	void PChangeBossDead();
+
 	XMVECTOR ease_in(const XMVECTOR& start, const XMVECTOR& end, float t);
 public:
 	float angle = 90.0f;//最初の角度
@@ -182,6 +186,7 @@ public:
 
 	//bool bossDamage = false;
 
+	//当たり判定用　弾
 	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; }
 
 	//発射間隔
@@ -283,5 +288,9 @@ public:
 	bool IsTimer();
 
 	bool IsDead() const { return isDead; }
+
+	void SetBossHp(int bossHp) { this->bossHp = bossHp; }
+
+	INT GetBossHp() { return bossHp; }
 
 };

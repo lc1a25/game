@@ -57,5 +57,18 @@ public:
 	/// <returns>ボスの移動量</returns>
 	XMFLOAT3 GetBossVec() { return bossVec; }
 
+
 	Enemy* GetEnemy() { return boss; }
+
+	/// <summary>
+	/// ボスの場所
+	/// </summary>
+	/// <returns>ボスの場所</returns>
+	XMFLOAT3 GetPos() { return boss->GetWorldPosition(); }
+
+	/// <summary>
+	/// ボスの生死
+	/// </summary>
+	/// <returns>ボスの生死</returns>
+	BOOL GetBossDead() { return boss->IsDead(); }
 };

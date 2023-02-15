@@ -15,6 +15,10 @@ void BossChild::Init(Model* enemyModel, XMFLOAT3 position, int childNumber)
 
 void BossChild::Update()
 {
+	if (bossDead == true)
+	{
+		bossChild->phaseMini = BossPhase::BossDead;
+	}
 	bossChild->SetChildShotRange(shotRange);
 	bossChild->SetBossPos(bossPos);
 	bossChild->SetBossVec(bossVec);

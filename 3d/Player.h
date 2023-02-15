@@ -7,8 +7,6 @@
 #include <memory>//ユニークポインタ
 #include <list>
 
-
-
 class Player
 {
 private:
@@ -74,7 +72,8 @@ private:
 	float hpBar = 0;
 	bool playerDieFlag = false;
 public:
-	//プレイヤーの弾
+
+	//プレイヤーの弾　当たり判定でつかう
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
 	
 	/// <summary>

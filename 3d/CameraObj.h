@@ -3,7 +3,7 @@
 #include "Object3d.h"
 
 #pragma comment (lib, "winmm.lib")
-
+using namespace DirectX;
 class CameraObj
 {
 private:
@@ -13,17 +13,18 @@ private:
 	using XMFLOAT3 = DirectX::XMFLOAT3;
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMMATRIX = DirectX::XMMATRIX;
+	using XMVECTOR = DirectX::XMVECTOR;
 
 	Object3d* cameraObj = cameraObj->Create();
 
 public:
 
 
-	void Init(XMVECTOR worldPos,XMFLOAT3 rotation);
+	void Init(DirectX::XMVECTOR worldPos,XMFLOAT3 rotation);
 
 	void UpdateCamera();
 
-	XMVECTOR splinePosition(const std::vector<XMVECTOR>& points, size_t startIndex, float t);
+	XMVECTOR splinePosition(const std::vector<DirectX::XMVECTOR>& points, size_t startIndex, float t);
 
 	//getter
 	const XMMATRIX& GetMatViewProjection() { return matViewProjection; }
@@ -52,6 +53,12 @@ public:
 
 	void SetTarget(XMFLOAT3 target) { playerPos = target; }
 
+	void SetBoss(XMFLOAT3 target,bool bossDieFlag) 
+	{ 
+		bossPos = target;
+		this->bossDieFlag = bossDieFlag;
+	}
+		 
 	XMMATRIX GetWorldTransform()
 	{
 		return worldTransform;
@@ -59,6 +66,12 @@ public:
 
 private:
 	XMFLOAT3 playerPos;
+	XMFLOAT3 bossPos;
+
+	bool playerDieFlag = false;
+	bool bossDieFlag = false;
+
+
 	float distance = 20.0f;
 	// ÉrÉÖÅ[çsóÒ
 	XMMATRIX matView;
@@ -92,8 +105,6 @@ private:
 	XMFLOAT3 rotation = { 0,0,0 };
 
 	DWORD time = 0;
-
-	bool playerDieFlag = false;
 
 	long long startCount = 0;
 	long long nowCount = 0;

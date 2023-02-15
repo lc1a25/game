@@ -1,6 +1,6 @@
 #include "CameraObj.h"
 
-using namespace DirectX;
+
 
 
 void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
@@ -117,6 +117,7 @@ void CameraObj::UpdateCamera()
 				target.m128_f32[1] = playerPos.y+ forward.m128_f32[1];
 				target.m128_f32[2] = playerPos.z+ forward.m128_f32[2];
 			}
+
 		}
 		else if (pointsLast == true)//最後まで行ったら視点を固定　ボス戦
 		{
@@ -137,6 +138,12 @@ void CameraObj::UpdateCamera()
 				target.m128_f32[0] = playerPos.x + forward.m128_f32[0];
 				target.m128_f32[1] = playerPos.y + forward.m128_f32[1];
 				target.m128_f32[2] = playerPos.z + forward.m128_f32[2];
+			}
+			else if (bossDieFlag == true)
+			{
+				target.m128_f32[0] = bossPos.x + forward.m128_f32[0];
+				target.m128_f32[1] = bossPos.y + forward.m128_f32[1];
+				target.m128_f32[2] = bossPos.z + forward.m128_f32[2];
 			}
 		}
 	}

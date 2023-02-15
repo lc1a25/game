@@ -1,6 +1,7 @@
 #include "Vector3.h"
 #include <cmath>
 
+using namespace DirectX;
 Vector3::Vector3(float x, float y, float z)
 {
 }
