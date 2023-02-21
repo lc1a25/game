@@ -27,6 +27,7 @@
 #include "Audio.h"
 
 #include "Matrix4.h"
+#include "Light.h"
 #include "GameScene.h"
 
 #pragma comment(lib, "d3d12.lib")

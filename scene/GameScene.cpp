@@ -39,9 +39,9 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 	bossHpBar = 733;
 	bossHpBarMax = 733;
-	bossDieTimer = 120;
+	dieTimer = 120;
 
-	pointsLast = false; 
+	pointsLast = false;
 
 	bossFlag = false;
 
@@ -54,7 +54,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 	skydome->SetModel(skydome_model);
 	skydome->scale = { 11,11,15 };
-	skydome->SetPosition({ 0,0,0 });
+	skydome->SetPosition({ 0,-220,skydomeZ });
 
 	player = new Player();
 	player->Init(playerModel, bulletModel);
@@ -81,7 +81,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	boss->Init(bossModel, enemyBulletModel, { 0,0,-100.0f });
 
 	bossChildLUF = new BossChild();
-	bossChildLUF->Init(bossModel,{ 0, 0, -100.0f}, 1);
+	bossChildLUF->Init(bossModel, { 0, 0, -100.0f }, 1);
 	bossChildLUB = new BossChild();
 	bossChildLUB->Init(bossModel, { 0, 0, -100.0f }, 2);
 	bossChildRUF = new BossChild();
@@ -100,11 +100,12 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	camera = new Camera();
 	camera->Init();
 
+	
 	cameraObj = new CameraObj();
 	cameraObj->Init({0,0,-50},{0,0,0});
 
 	wallFloor->SetModel(wallFlatModel);
-	wallFloor->scale = { 50,7,170 };
+	wallFloor->scale = { 65,7,170 };
 	wallFloor->SetPosition({ 0,-65,50 });
 
 	road->SetModel(roadModel);
@@ -157,12 +158,12 @@ void GameScene::Update()
 	});
 	
 	//ビル生成
-	BillCreate();
-	for (std::unique_ptr<Bill>& bill : bills)
+	//BillCreate();
+	/*for (std::unique_ptr<Bill>& bill : bills)
 	{
 		bill->SetCameraZ(cameraObj->GetEye().z);
 		bill->Update();
-	}
+	}*/
 
 	//csvのenemy発生
 	UpdateEnemyPop();
@@ -181,6 +182,8 @@ void GameScene::Update()
 	Particle->Update();
 
 	//スカイドーム
+	skydomeZ += cameraObj->GetEyeVec().z;
+	skydome->SetPosition({ 0,-220,skydomeZ });
 	skydome->Update();
 
 	wallFloor->Update();
@@ -332,14 +335,16 @@ void GameScene::Update()
 
 		if (boss->GetEnemy()->GetWorldPosition().y <= floorY)
 		{
+			//フラグをついか　カメラにわたす　ぷれいやーをとばす
+			
 			//bossのやられた演出まち用
-			bossDieTimer--;
-			if (bossDieTimer <= 0)
+			dieTimer--;
+			if (dieTimer <= 0)
 			{
 				//シーンチェンジ
 				pointsLast = true;
 			
-				bossDieTimer = 120;
+				dieTimer = 120;
 			}
 		}
 		else
@@ -361,14 +366,14 @@ void GameScene::Update()
 		PlayerCreateParticle(player->GetWorldPosition());
 		
 		//bossのやられた演出まち用
-		bossDieTimer--;
+		dieTimer--;
 
-		if (bossDieTimer <= 0)
+		if (dieTimer <= 0)
 		{
 			//シーンチェンジ
 			playerDieFlag = true;
 
-			bossDieTimer = 120;
+			dieTimer = 120;
 		}
 		
 	}

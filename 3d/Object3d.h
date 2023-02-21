@@ -38,6 +38,9 @@ public: // サブクラス
 	{
 		//XMFLOAT4 color;	// 色 (RGBA)
 		XMMATRIX mat;	// ３Ｄ変換行列
+		XMMATRIX viewProj;//ビュープロジェクション
+		XMMATRIX world;//ワールド行列
+		XMFLOAT3 cameraPos;//カメラ座標
 	};
 
 	struct ConstBufferDataB1
@@ -153,8 +156,9 @@ private: // 静的メンバ変数
 	// 頂点インデックス配列
 	//static unsigned short indices[planeCount * 3];
 	static std::vector<unsigned short> indices;
-
+	//カメラ
 	static Camera* camera;
+
 private:// 静的メンバ関数
 	/// <summary>
 	/// デスクリプタヒープの初期化
@@ -201,11 +205,22 @@ public: // メンバ関数
 	/// <param name="position">座標</param>
 	void SetPosition(XMFLOAT3 position) { this->position = position; }
 
+	/// <summary>
+	/// モデルセット
+	/// </summary>
+	/// <param name="model">モデル</param>
 	void SetModel(Model* model) { this->model = model; }
 
+	/// <summary>
+	/// カメラセット
+	/// </summary>
+	/// <param name="camera">カメラ</param>
 	static void SetCamera(Camera* camera) { Object3d::camera = camera; }
 
 	void SetCameraMatWorld(XMMATRIX matWorld) { matCameraWorld = matWorld; }
+
+	void SetMatWorld(XMMATRIX worldTransform) { this->matWorld = worldTransform; }
+
 
 	const XMFLOAT3& GetEye() { return camera->GetEye(); }
 	const XMFLOAT3& GetTarget() { return camera->GetTarget(); }
@@ -213,7 +228,7 @@ public: // メンバ関数
 
 	const XMMATRIX& GetMatViewProjection() { return camera->GetMatViewProjection(); }
 
-	void SetMatWorld(XMMATRIX worldTransform) { this->matWorld = worldTransform; }
+	
 
 	// ローカル座標
 	XMFLOAT3 position = { 0,0,0 };

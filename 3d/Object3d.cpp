@@ -50,7 +50,6 @@ Object3d::Material Object3d::material;
 Camera* Object3d::camera = nullptr;
 
 
-
 bool Object3d::StaticInitialize(ID3D12Device* device, int window_width, int window_height)
 {
 	// nullptrチェック
@@ -243,6 +242,7 @@ bool Object3d::InitializeGraphicsPipeline()
 	rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	rootparams[1].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
 	rootparams[2].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
+	//rootparams[3].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
 
 	// スタティックサンプラー
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0);
@@ -328,13 +328,18 @@ void Object3d::Update( bool flag)
 		// 親オブジェクトのワールド行列を掛ける
 		matWorld *= matCameraWorld;
 	}
+	const XMFLOAT3& cameraPos = camera->GetEye();
+	const XMMATRIX& viewProj = camera->GetMatViewProjection();
 
 	// 定数バッファへデータ転送
 	ConstBufferDataB0* constMap = nullptr;
 	result = constBuffB0->Map(0, nullptr, (void**)&constMap);
 	//constMap->color = color;
 	
-	constMap->mat = matWorld * camera->GetMatViewProjection();	// 行列の合成
+	//constMap->mat = matWorld * camera->GetMatViewProjection();	// 行列の合成
+	constMap->cameraPos = cameraPos;
+	constMap->viewProj = viewProj;
+	constMap->world = matWorld;
 	constBuffB0->Unmap(0, nullptr);
 	
 }
@@ -354,6 +359,7 @@ void Object3d::Draw()
 	cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0->GetGPUVirtualAddress());
 
 	model->Draw(cmdList, 1);
+	//light->Draw(cmdList, 3);
 	
 
 }

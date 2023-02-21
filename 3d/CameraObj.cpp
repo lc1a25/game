@@ -1,8 +1,6 @@
 #include "CameraObj.h"
 
-
-
-
+using namespace DirectX;
 void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
 {
 	this->worldPos = worldPos;

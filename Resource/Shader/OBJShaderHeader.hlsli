@@ -1,6 +1,9 @@
 cbuffer cbuff0 : register(b0)
 {
 	matrix mat; // ３Ｄ変換行列
+	matrix viewProj;//ビュープロジェクション
+	matrix world;//world行列
+	float3 cameraPos;//カメラの座標
 };
 
 cbuffer cbuff1 : register(b1)

@@ -37,6 +37,7 @@ void Enemy::PCircleL()
 
 void Enemy::PShot()
 {
+	//“G‚ªUŒ‚‚·‚é‚©‚µ‚È‚¢‚©
 	if (attackFlag == false)
 	{
 		shotEndFlag = true;
@@ -54,6 +55,7 @@ void Enemy::PShot()
 
 void Enemy::PHoming()
 {
+	//“G‚ªUŒ‚‚·‚é‚©‚µ‚È‚¢‚©
 	if (attackFlag == false)
 	{
 		shotEndFlag = true;
@@ -128,9 +130,9 @@ void Enemy::PCircleZ()
 
 void Enemy::PChild()
 {
-	enemy->position.x += bossVec.x /= 1.1;
-	enemy->position.y += bossVec.y /= 1.1;
-	enemy->position.z += bossVec.z /= 1.1;
+	enemy->position.x += bossVec.x ;
+	enemy->position.y += bossVec.y ;
+	enemy->position.z += bossVec.z ;
 
 }
 
@@ -191,9 +193,6 @@ void Enemy::PChangeBossDead()
 	}
 }
 
-
-
-
 XMVECTOR Enemy::ease_in(const XMVECTOR& start, const XMVECTOR& end, float t)
 {
 	t = t * t;
@@ -233,6 +232,7 @@ void Enemy::Update()
 		{
 			return bullet->IsDead();
 		});
+
 	switch (phase)
 	{
 	case Phase::Approach:
@@ -395,6 +395,7 @@ void Enemy::Update()
 		}
 		PChangeBossDead();
 		break;
+
 	case Phase::BossSide:
 		enemy->position.x+= 0.8;
 		PHoming();
@@ -439,8 +440,9 @@ void Enemy::Update()
 		enemy->rotation.z++;
 		break;
 	case BossPhase::MiniStop:
-		PChild();
-		PShotMinor();
+		PChild();//ƒ{ƒX‚É’Ç]
+		PShotMinor();//’e‚ð‘O‚É”­ŽË
+		enemy->rotation.y++;
 		//PCircleZ();
 		/*if (childNumber == 1)
 		{
@@ -518,7 +520,7 @@ void Enemy::Update()
 		}
 		//flag	wo tatete PcircleZ wo tukau
 
-	/*	enemy->position.y = MiniPosLUF.m128_f32[1];
+		/*enemy->position.y = MiniPosLUF.m128_f32[1];
 		enemy->position.z = MiniPosLUF.m128_f32[2];*/
 
 		break;

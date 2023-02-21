@@ -3,7 +3,7 @@
 #include "Object3d.h"
 
 #pragma comment (lib, "winmm.lib")
-using namespace DirectX;
+
 class CameraObj
 {
 private:
@@ -131,6 +131,7 @@ private:
 	XMFLOAT3 targetVec = { 0.0f,0.0f,0.0f };
 	bool pointsLast = false;
 	bool pointsStart = true;
+	
 
 	std::vector<XMVECTOR>points{ start,p2,p3,p4,p5,p6,p7,end,end };
 

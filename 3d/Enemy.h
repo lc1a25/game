@@ -129,8 +129,9 @@ private:
 
 	const float waitTimerInterval = 120;
 
+	//”­ŽËŠ´Šo
 	int shotMinorTimer = 60;
-	const int shotMinorInterval = 60;
+	const int shotMinorInterval = 40;
 
 	bool circleZFlag = false;
 

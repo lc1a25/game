@@ -107,13 +107,13 @@ public: // メンバ関数
 	//ボス系
 	float bossHpBar = 733;
 	float bossHpBarMax = 733;
-	int bossDieTimer = 120;
 
 	//プレイヤーhp
 	float hpBar = 288;
 	float hpBarMax = 288;
 	bool playerDieFlag = false;
 
+	int dieTimer = 120;
 	int  coll = 0;
 
 	bool tutorialFlag = true;
@@ -139,6 +139,7 @@ private: // メンバ変数
 	Camera* camera = nullptr;
 
 	CameraObj* cameraObj = nullptr;//カメラオブジェクト
+
 
 	//スカイドーム
 	Object3d* skydome = skydome->Create();
@@ -204,5 +205,8 @@ private: // メンバ変数
 
 	//床のy
 	float floorY = -55.0f;
+
+	//skydome z
+	float skydomeZ = 0;
 
 };
