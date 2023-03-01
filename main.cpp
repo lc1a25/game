@@ -249,6 +249,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		backBlack->SetPosition({ backBlackX,360.0f,0.0f });
 		backBlack->Update();
 		backBlack->TransVertexBuffer();
+
 		//Æ€
 		reticleSprite->Update();
 		reticleSprite->SetPosition({ gameScene->mouseX,gameScene->mouseY,0 });
@@ -335,10 +336,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{
 			reticleSprite->Draw();
 			//explanSprite->Draw();
-			backBlack->Draw();
+			//backBlack->Draw();
 			if (gameScene->tutorialFlag == true)
 			{
-				tyutoRial->Draw();
+				//tyutoRial->Draw();
 				tyutoRialMove->Draw();
 			}
 			else
@@ -352,8 +353,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			
 
-			/*debugtext_minute->DrawAll();
-			debugtext_minute2->DrawAll();*/
+			debugtext_minute->DrawAll();
+			debugtext_minute2->DrawAll();
 			
 		}
 		else if (gameflag == 2)

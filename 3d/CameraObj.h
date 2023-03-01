@@ -47,11 +47,20 @@ public:
 
 	const BOOL& GetEndFlag() { return pointsLast; }
 
+	const BOOL& GetStartMovieFlag() { return startMovie; }
+
+	XMMATRIX GetWorldTransform()
+	{
+		return worldTransform;
+	}
+
 	void SetPlayerDieFlag(bool playerDieFlag) { this->playerDieFlag = playerDieFlag; }
 
 	void SetTutorialFlag(bool tutorialFlag) { pointsStart = tutorialFlag; }
 
 	void SetTarget(XMFLOAT3 target) { playerPos = target; }
+
+	void SetTargetS(XMFLOAT3 target) { startPlayerObj = target; }
 
 	void SetBoss(XMFLOAT3 target,bool bossDieFlag) 
 	{ 
@@ -59,13 +68,11 @@ public:
 		this->bossDieFlag = bossDieFlag;
 	}
 		 
-	XMMATRIX GetWorldTransform()
-	{
-		return worldTransform;
-	}
+	
 
 private:
 	XMFLOAT3 playerPos;
+	XMFLOAT3 startPlayerObj;
 	XMFLOAT3 bossPos;
 
 	bool playerDieFlag = false;
@@ -78,7 +85,7 @@ private:
 	// éÀâeçsóÒ
 	XMMATRIX matProjection;
 	// éãì_ç¿ïW
-	XMVECTOR eye = { 0,0,-150 };
+	XMVECTOR eye = { 0,0,-50 };
 
 	XMFLOAT3 eyeBill = { 0,0,0 };
 
@@ -110,8 +117,8 @@ private:
 	long long nowCount = 0;
 	long long elapsedCount = 0;
 
-	XMVECTOR start{ 0.0f, 0.0f, -150.0f };
-	XMVECTOR start2{ 0.0f, 0.0f, 0.0f };
+	XMVECTOR start{ 0.0f, 0.0f, 0.0f };
+	//XMVECTOR start2{ 0.0f, 0.0f, 0.0f };
 	XMVECTOR p2{ 0.0f, 0.0f, 100.0f };
 	XMVECTOR p3{ 0.0f, 0.0f, +200.0f };
 	XMVECTOR p4{ 0.0f, 0.0f, +400.0f };
@@ -120,6 +127,12 @@ private:
 	XMVECTOR p7{ 0.0f, 0.0f, +800.0f };
 
 	XMVECTOR end{ 0.0f, 0.0f, 800.0f };
+
+	XMVECTOR startT{ 500.0f, 0.0f, 0.0f };
+	//XMVECTOR start2{ 0.0f, 0.0f, 0.0f };
+	XMVECTOR p2T{ 450.0f, 0.0f, -50.0f };
+	XMVECTOR p3T{ 500.0f, 0.0f, -100.0f };
+
 	XMVECTOR targetEnd{};
 	float maxTime = 10.0f;
 	float timeRate = 0.0f;
@@ -131,10 +144,16 @@ private:
 	XMFLOAT3 targetVec = { 0.0f,0.0f,0.0f };
 	bool pointsLast = false;
 	bool pointsStart = true;
+	bool startMovie = true;
 	
 
-	std::vector<XMVECTOR>points{ start,p2,p3,p4,p5,p6,p7,end,end };
+	std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,p6,p7,end,end };
+
+	std::vector<XMVECTOR>tyutoPoints{ startT,startT,p2T,p3T,p3T };
 
 	int startIndex = 0;
 	int targetIndex = 2;
+
+	int startTIndex = 0;
+
 };

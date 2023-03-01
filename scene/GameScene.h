@@ -77,15 +77,17 @@ public: // メンバ関数
 
 	//パーティクル
 	void PlayerCreateParticle(XMFLOAT3 position);
-
 	void EnemyCreateParticle(XMFLOAT3 position);
-
 	void BossCreateParticle(XMFLOAT3 position);
+	void MojiCreateParticle(XMFLOAT3 position);
 
+	//hpバー
 	FLOAT GetbossHpBar() { return bossHpBar; }
 	FLOAT GetHpBar() { return hpBar; }
 
+	//ビル生成
 	void BillCreate();
+
 	//マウス座標
 	float mouseX;
 	float mouseY;
@@ -100,6 +102,7 @@ public: // メンバ関数
 	//コマンド用
 	bool waitCommand = false;
 	int waitTimer = 0;
+
 	//コマンド用
 	bool waitRailIndexCommand = false;
 	int waitRail = 0;
@@ -140,7 +143,6 @@ private: // メンバ変数
 
 	CameraObj* cameraObj = nullptr;//カメラオブジェクト
 
-
 	//スカイドーム
 	Object3d* skydome = skydome->Create();
 
@@ -157,8 +159,14 @@ private: // メンバ変数
 	Object3d* pillar5 = pillar5->Create();
 
 	std::list<std::unique_ptr<Bill>> bills;
+
+	Object3d* shotObj = shotObj->Create();
+	Object3d* shotHibiObj = shotHibiObj->Create();
+
 	//プレイヤー
 	Player* player = nullptr;
+	
+	Object3d* startPlayer = startPlayer->Create();
 
 	//敵
 	Enemy* enemy = nullptr;
@@ -194,13 +202,15 @@ private: // メンバ変数
 	Model* pillarModel = nullptr;
 	Model* enemyBulletModel = nullptr;
 	Model* roadModel = nullptr;
+	Model* shotObjModel = nullptr;
+	Model* shotHibiObjModel = nullptr;
 
 	//パーティクル
 	ParticleManager* Particle = nullptr;
 
 	//当たり判定用変数
 	float length = 0.0f;
-	float size = 22.0f;
+	float size = 25.0f;
 	float wallColliLength = 0.0f;
 
 	//床のy
@@ -209,4 +219,7 @@ private: // メンバ変数
 	//skydome z
 	float skydomeZ = 0;
 
+	//チュートリアル文字のｈｐ
+	int mojiHp = 20;
 };
+

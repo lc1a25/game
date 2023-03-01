@@ -59,6 +59,10 @@ enum class BossPhase
 class Enemy
 {
 private:
+	
+	int phaseNumber = static_cast<int>(phase);
+	int phaseBossNumber = static_cast<int>(phase);
+	static void (Enemy::*spFuncTable[])();
 	Model* enemyModel_ = nullptr;
 	Model* bulletModel_ = nullptr;
 	
@@ -185,6 +189,8 @@ public:
 	Phase phase = Phase::OutApproach;
 	BossPhase phaseMini = BossPhase::None;
 
+
+
 	//bool bossDamage = false;
 
 	//当たり判定用　弾
@@ -212,6 +218,28 @@ public:
 	/// 描画
 	/// </summary>
 	void Draw();
+
+	void Approach();//接近
+	void ApproachL();
+	void OutApproach();
+	void LeaveL();	//離脱
+	void LeaveR();
+	void LeaveF();
+	void Stop(); //止まる
+	void CircleR();//円運動右からくる
+	void CircleL();//左からくる
+	void CircleInfinity();//∞上にまわる
+	void OneWayR();//右から左に行く
+	void OneWayL();
+	void BossVertical();//bossのミニが縦方向に動く
+	void BossVerticalL();
+	void BossSide();//bossのミニが横方向に動く
+	void BossSideUp();
+	void BossStop();	
+	void BossDead();
+	void None();
+
+	
 
 	/// <summary>
 	/// ホーミング
@@ -276,6 +304,8 @@ public:
 	XMFLOAT3 GetPosition() { return enemy->position; }
 
 	INT GetEnemyDownCount() { return enemyDown; }
+
+	INT GetphaseNumber() { return phaseNumber; }
 
 	void OnCollision();
 

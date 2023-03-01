@@ -9,6 +9,7 @@ class PlayerBullet
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMMATRIX = DirectX::XMMATRIX;
 	using XMVECTOR = DirectX::XMVECTOR;
+
 private:
 	Model* model_ = nullptr;
 	Object3d* bullet = bullet->Create();

@@ -1,5 +1,26 @@
 #include "Enemy.h"
 
+void(Enemy::*Enemy::spFuncTable[])() = {
+	&Enemy::Approach,//Ú‹ß
+	&Enemy::ApproachL,
+	&Enemy::OutApproach,
+	&Enemy::LeaveL,	//—£’E
+	&Enemy::LeaveR,
+	&Enemy::LeaveF,
+	&Enemy::Stop, //~‚Ü‚é
+	&Enemy::CircleR,//‰~‰^“®‰E‚©‚ç‚­‚é
+	&Enemy::CircleL,//¶‚©‚ç‚­‚é
+	&Enemy::CircleInfinity,//‡ã‚É‚Ü‚í‚é
+	&Enemy::OneWayR,//‰E‚©‚ç¶‚És‚­
+	&Enemy::OneWayL,
+	&Enemy::BossVertical,//boss‚Ìƒ~ƒj‚ªc•ûŒü‚É“®‚­
+	&Enemy::BossVerticalL,
+	&Enemy::BossSide,//boss‚Ìƒ~ƒj‚ª‰¡•ûŒü‚É“®‚­
+	&Enemy::BossSideUp,
+	&Enemy::BossStop,
+	&Enemy::BossDead,
+	&Enemy::None
+};
 void Enemy::PCircleR()
 {
 	//‰~‚ÌŠp“x
@@ -15,7 +36,6 @@ void Enemy::PCircleR()
 
 	//Šp“x‚ğ‚½‚µ‚Ä‰~ó‚É“®‚©‚·
 	angle += angleVec;
-	
 }
 
 void Enemy::PCircleL()
@@ -43,6 +63,7 @@ void Enemy::PShot()
 		shotEndFlag = true;
 		return;
 	}
+
 	//’e‚ğŒ‚‚Â
 	shotTimer--;
 	if (shotTimer <= 0)
@@ -232,200 +253,9 @@ void Enemy::Update()
 		{
 			return bullet->IsDead();
 		});
-
-	switch (phase)
-	{
-	case Phase::Approach:
-		leaveTime = leaveTimeInit;
-		enemy->position.x -= ApproachSpeed;
-
-		if (enemy->position.x >= 0)
-		{
-			phase = Phase::CircleR;
-		}
-		
-		break;
-	case Phase::ApproachL:
-		leaveTime = leaveTimeInit;
-		enemy->position.x += ApproachSpeed;
-
-		if (enemy->position.x >= 0 )
-		{
-			phase = Phase::CircleL;
-		}
-
-		break;
-	case Phase::OutApproach:
-		enemy->position.z += outApproachSpeed;
-
-		if (enemy->position.z >= playerWorldPos.z + 100)
-		{
-			phase = Phase::ApproachL;
-		}
-		break;
-	case Phase::LeaveL:
-		enemy->position.x -= outApproachSpeed;
-		break;
-
-	case Phase::LeaveR:
-		enemy->position.x += outApproachSpeed;
-
-		break;
-	case Phase::LeaveF:
-		enemy->position.z -= outApproachSpeed;
-
-		break;
-	case Phase::Stop:
-
-		PHoming();
-
-		if (enemy->position.z <= playerWorldPos.z)
-		{
-			phase = Phase::LeaveL;
-		}
-
-		break;
-	case Phase::CircleR://‰E‚©‚ç—ˆ‚½ver 90‚Ç
-
-		PCircleR();
-		PShot();
-		enemy->position.z += cameraZ;
-		PLeaveR();
-		
-		
-		break;
-	case Phase::CircleL://¶‚©‚ç—ˆ‚½ver 270‚Ç
-
-		PCircleL();
-		PShot();
-		enemy->position.z += cameraZ;
-		PLeaveR();
-		
-		break;
-
-	case Phase::CircleInfinity:
-		time++;
-		PCircleR();
-		PShot();
-		
-		if (angle >= 450)
-		{
-			angleVec = -2;
-			isL = true;
-		}
-		if (angle <= 90 && isL == true)
-		{
-			angleVec = 2;
-			isL = false;
-		}
-
-		if (bossHp <= 25)
-		{
-			phase = Phase::BossSide;
-		}
-		
-		break;
-
-	case Phase::OneWayL:
-		
-		enemy->position.x -= OWRSpeed;
-
-		enemy->position.z += cameraZ;
-
-		if (enemy->position.x <= -100)
-		{
-			OWRSpeed *= -1;
-		}
-		if (enemy->position.x >= 100)
-		{
-			OWRSpeed *= -1;
-		}
-
-		PHoming();
-		
-		if (attackFlag == true)
-		{
-			PLeaveF();
-		}
-		
-
-		break;
-
-	case Phase::OneWayR:
-
-		enemy->position.x += OWRSpeed;
-
-		enemy->position.z += cameraZ;
-
-		if (enemy->position.x <= -100)
-		{
-			OWRSpeed *= -1;
-		}
-		if (enemy->position.x >= 100)
-		{
-			OWRSpeed *= -1;
-		}
-		PHoming();
-		
-		if (attackFlag == true)
-		{
-			PLeaveF();
-		}
-		
-
-		break;
-
-
-	case Phase::BossVertical:
-		enemy->position.y+= 0.8;
-		PHoming();
-		if (enemy->position.y >= 30.4)
-		{
-			phase = Phase::BossSideUp;
-		}
-		PChangeBossDead();
-		
-		break;
-		case Phase::BossVerticalL:
-		enemy->position.y-= 0.8;
-		PHoming();
-		if (enemy->position.y <= -30.4)
-		{
-			phase = Phase::BossSide;
-		}
-		PChangeBossDead();
-		break;
-
-	case Phase::BossSide:
-		enemy->position.x+= 0.8;
-		PHoming();
-		if (enemy->position.x >= 60)
-		{
-			phase = Phase::BossVertical;
-		}
-		PChangeBossDead();
-		break;
-	case Phase::BossSideUp:
-		enemy->position.x-= 0.8;
-		PHoming();
-		if (enemy->position.x <= -60)
-		{
-			phase = Phase::BossVerticalL;
-		}
-
-		PChangeBossDead();
-		break;
-	case Phase::BossDead:
-		enemy->position.y -= 0.1;
-		enemy->rotation.x++;
-		enemy->rotation.z++;
-		break;
-	case Phase::None:
-		
-		break;
-	default:
-		break;
-	}
+	phaseNumber = static_cast<int>(phase);
+	(this->*spFuncTable[phaseNumber])(); 
+	
 
 	switch (phaseMini)
 	{
@@ -627,6 +457,208 @@ void Enemy::Draw()
 	{
 		bullet->Draw();
 	}
+}
+
+void Enemy::Approach()
+{
+	leaveTime = leaveTimeInit;
+	enemy->position.x -= ApproachSpeed;
+
+	if (enemy->position.x >= 0)
+	{
+		phase = Phase::CircleR;
+	}
+}
+
+void Enemy::ApproachL()
+{
+	leaveTime = leaveTimeInit;
+	enemy->position.x += ApproachSpeed;
+
+	if (enemy->position.x >= 0)
+	{
+		phase = Phase::CircleL;
+	}
+}
+
+void Enemy::OutApproach()
+{
+	enemy->position.z += outApproachSpeed;
+
+	if (enemy->position.z >= playerWorldPos.z + 100)
+	{
+		phase = Phase::ApproachL;
+	}
+}
+
+void Enemy::LeaveL()
+{
+	enemy->position.x -= outApproachSpeed;
+}
+
+void Enemy::LeaveR()
+{
+	enemy->position.x += outApproachSpeed;
+}
+
+void Enemy::LeaveF()
+{
+	enemy->position.z -= outApproachSpeed;
+}
+
+void Enemy::Stop()
+{
+	PHoming();
+
+	if (enemy->position.z <= playerWorldPos.z)
+	{
+		phase = Phase::LeaveL;
+	}
+}
+
+void Enemy::CircleR()
+{
+	PCircleR();
+	PShot();
+	enemy->position.z += cameraZ;
+	PLeaveR();
+}
+
+void Enemy::CircleL()
+{
+	PCircleL();
+	PShot();
+	enemy->position.z += cameraZ;
+	PLeaveR();
+}
+
+void Enemy::CircleInfinity()
+{
+	time++;
+	PCircleR();
+	PShot();
+
+	if (angle >= 450)
+	{
+		angleVec = -2;
+		isL = true;
+	}
+	if (angle <= 90 && isL == true)
+	{
+		angleVec = 2;
+		isL = false;
+	}
+
+	if (bossHp <= 25)
+	{
+		phase = Phase::BossSide;
+	}
+}
+
+void Enemy::OneWayR()
+{
+	enemy->position.x += OWRSpeed;
+
+	enemy->position.z += cameraZ;
+
+	if (enemy->position.x <= -100)
+	{
+		OWRSpeed *= -1;
+	}
+	if (enemy->position.x >= 100)
+	{
+		OWRSpeed *= -1;
+	}
+
+	PHoming();
+
+	if (attackFlag == true)
+	{
+		PLeaveF();
+	}
+}
+
+void Enemy::OneWayL()
+{
+	enemy->position.x -= OWRSpeed;
+
+	enemy->position.z += cameraZ;
+
+	if (enemy->position.x <= -100)
+	{
+		OWRSpeed *= -1;
+	}
+	if (enemy->position.x >= 100)
+	{
+		OWRSpeed *= -1;
+	}
+
+	PHoming();
+
+	if (attackFlag == true)
+	{
+		PLeaveF();
+	}
+}
+
+void Enemy::BossVertical()
+{
+	enemy->position.y += 0.8;
+	PHoming();
+	if (enemy->position.y >= 30.4)
+	{
+		phase = Phase::BossSideUp;
+	}
+	PChangeBossDead();
+}
+
+void Enemy::BossVerticalL()
+{
+	enemy->position.y -= 0.8;
+	PHoming();
+	if (enemy->position.y <= -30.4)
+	{
+		phase = Phase::BossSide;
+	}
+	PChangeBossDead();
+}
+
+void Enemy::BossSide()
+{
+	enemy->position.x += 0.8;
+	PHoming();
+	if (enemy->position.x >= 60)
+	{
+		phase = Phase::BossVertical;
+	}
+	PChangeBossDead();
+}
+
+void Enemy::BossSideUp()
+{
+	enemy->position.x -= 0.8;
+	PHoming();
+	if (enemy->position.x <= -60)
+	{
+		phase = Phase::BossVerticalL;
+	}
+
+	PChangeBossDead();
+}
+
+void Enemy::BossStop()
+{
+}
+
+void Enemy::BossDead()
+{
+	enemy->position.y -= 0.1;
+	enemy->rotation.x++;
+	enemy->rotation.z++;
+}
+
+void Enemy::None()
+{
 }
 
 void Enemy::Homing()

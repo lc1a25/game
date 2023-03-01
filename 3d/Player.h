@@ -71,6 +71,10 @@ private:
 	int playerHp = 3;
 	float hpBar = 0;
 	bool playerDieFlag = false;
+
+	bool gameStartFlag = false;
+	bool playerSet = true;
+	
 public:
 
 	//プレイヤーの弾　当たり判定でつかう
@@ -124,6 +128,8 @@ public:
 	}
 
 	void SetPlayerHpBar(float hpBar) { this->hpBar = hpBar; }
+
+	void SetStartFlag(bool gameStartFlag) { this->gameStartFlag = gameStartFlag; }
 
 	FLOAT GetHpBar() { return hpBar; }
 

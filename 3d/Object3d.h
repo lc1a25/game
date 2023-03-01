@@ -160,18 +160,6 @@ private: // 静的メンバ変数
 	static Camera* camera;
 
 private:// 静的メンバ関数
-	/// <summary>
-	/// デスクリプタヒープの初期化
-	/// </summary>
-	/// <returns></returns>
-	static bool InitializeDescriptorHeap();
-
-	/// <summary>
-	/// カメラ初期化
-	/// </summary>
-	/// <param name="window_width">画面横幅</param>
-	/// <param name="window_height">画面縦幅</param>
-	static void InitializeCamera(int window_width, int window_height);
 
 	/// <summary>
 	/// グラフィックパイプライン生成
@@ -197,7 +185,9 @@ public: // メンバ関数
 	/// 座標の取得
 	/// </summary>
 	/// <returns>座標</returns>
-	const XMFLOAT3& GetPosition() { return position; }
+	const XMFLOAT3& GetPosition() { return { matWorld.r[3].m128_f32[0], 
+											matWorld.r[3].m128_f32[1] ,
+											matWorld.r[3].m128_f32[2] }; }
 
 	/// <summary>
 	/// 座標の設定

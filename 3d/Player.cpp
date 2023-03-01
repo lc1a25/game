@@ -12,16 +12,21 @@ void Player::Init(Model* model,Model* bulletModel)
 
 	reticle->matWorld.r[3].m128_f32[0] = player->matWorld.r[3].m128_f32[0];
 	reticle->matWorld.r[3].m128_f32[1] = player->matWorld.r[3].m128_f32[1];
-	reticle->matWorld.r[3].m128_f32[2] = player->matWorld.r[3].m128_f32[2] + 30;
+	reticle->matWorld.r[3].m128_f32[2] = player->matWorld.r[3].m128_f32[2] + 60;
 
 	reticle->SetModel(model_);
 	reticle->SetPosition({ reticle->matWorld.r[3].m128_f32[0], reticle->matWorld.r[3].m128_f32[1], reticle->matWorld.r[3].m128_f32[2]});
 	reticle->scale = { 1,1,1 }; 
 
+	
 	//playerの座標をワールド座標に カメラの前に
-	player->matWorld.r[3].m128_f32[0] = cameraPos.x;
-	player->matWorld.r[3].m128_f32[1] = cameraPos.y;
-	player->matWorld.r[3].m128_f32[2] = cameraPos.z + 30;
+	//player->matWorld.r[3].m128_f32[0] = cameraPos.x;
+	//player->matWorld.r[3].m128_f32[1] = cameraPos.y;
+	//player->matWorld.r[3].m128_f32[2] = cameraPos.z;
+
+	player->matWorld.r[3].m128_f32[0] = -500;
+	player->matWorld.r[3].m128_f32[1] = 0;
+	player->matWorld.r[3].m128_f32[2] = -50;
 
 	player->SetPosition({ player->matWorld.r[3].m128_f32[0],player->matWorld.r[3].m128_f32[1],player->matWorld.r[3].m128_f32[2] });
 
@@ -30,16 +35,22 @@ void Player::Init(Model* model,Model* bulletModel)
 
 void Player::Update()
 {
-	//デバッグ用　ｈｐ下げ
-	if (input->isKeyTrigger(DIK_E))
+	
+	if (gameStartFlag == false)
 	{
-		playerHp--;
-		hpBar -= 96;
-		if (playerHp <= 0)
+		if (playerSet == true)
 		{
-			playerDieFlag = true;
+			player->matWorld.r[3].m128_f32[0] = cameraPos.x;
+			player->matWorld.r[3].m128_f32[1] = cameraPos.y;
+			player->matWorld.r[3].m128_f32[2] = cameraPos.z + 30;
 		}
+		player->matWorld.r[3].m128_f32[0] += cameraEyeVec.x;
+		player->matWorld.r[3].m128_f32[1] += cameraEyeVec.y;
+		player->matWorld.r[3].m128_f32[2] += cameraEyeVec.z;
+		playerSet == false;
 	}
+	
+	//player->SetPosition({ player->matWorld.r[3].m128_f32[0],player->matWorld.r[3].m128_f32[1],player->matWorld.r[3].m128_f32[2] });
 //2dレティクル
 	POINT mousePosition;
 	GetCursorPos(&mousePosition);
@@ -93,14 +104,9 @@ void Player::Update()
 	reticle->position.z = reticle->matWorld.r[3].m128_f32[2];
 
 	//player->matWorld.r[3].m128_f32[2] = cameraPos.z +	30;
-	player->matWorld.r[3].m128_f32[0] += cameraEyeVec.x;
-	player->matWorld.r[3].m128_f32[1] += cameraEyeVec.y;
-	player->matWorld.r[3].m128_f32[2] += cameraEyeVec.z;
 
 
-	player->position.x = player->matWorld.r[3].m128_f32[0];
-	player->position.y = player->matWorld.r[3].m128_f32[1];
-	player->position.z = player->matWorld.r[3].m128_f32[2];
+	
 
 	cameraTargetVec = XMVector3Normalize(cameraTargetVec);
 	//player->position.x = cameraPos.x + cameraTargetVec.m128_f32[0] * 10;
@@ -125,12 +131,12 @@ void Player::Update()
 		player->rotation.y -= playerVelocity / 2;
 	}
 
-	if (player->position.y <= cameraPos.y - playerMoveRange.y)
+	if (player->position.y <= cameraPos.y - playerMoveRange.y && playerDieFlag == false)
 	{
 		player->position.y += playerVelocity;
-		player->rotation.x -= playerVelocity / 4;
+		player->rotation.x -= playerVelocity / 4;	
 	}
-	if (player->position.y >= cameraPos.y + playerMoveRange.y && playerDieFlag == false)
+	if (player->position.y >= cameraPos.y + playerMoveRange.y )
 	{
 		player->position.y -= playerVelocity;
 		player->rotation.x += playerVelocity / 4;
@@ -247,6 +253,7 @@ void Player::OnCollision()
 	hpBar -= 96;
 	if (playerHp <= 0)
 	{
+		hpBar = 0;
 		playerDieFlag = true;
 	}
 }
