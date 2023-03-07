@@ -163,6 +163,13 @@ private: // メンバ変数
 	Object3d* shotObj = shotObj->Create();
 	Object3d* shotHibiObj = shotHibiObj->Create();
 
+	Object3d* kanbanObj = kanbanObj->Create();
+	Object3d* kanbanPlaneObj = kanbanPlaneObj->Create();
+	Object3d* kanbanShotObj = kanbanShotObj->Create();
+	Object3d* kanbanShot2Obj = kanbanShot2Obj->Create();
+	Object3d* kanbanShot3Obj = kanbanShot3Obj->Create();
+	Object3d* kanbanShot4Obj = kanbanShot4Obj->Create();
+
 	//プレイヤー
 	Player* player = nullptr;
 	
@@ -204,6 +211,12 @@ private: // メンバ変数
 	Model* roadModel = nullptr;
 	Model* shotObjModel = nullptr;
 	Model* shotHibiObjModel = nullptr;
+	Model* kanbanModel = nullptr;
+	Model* kanbanPlaneModel = nullptr;
+	Model* kanbanShotModel = nullptr;
+	Model* kanbanShot2Model = nullptr;
+	Model* kanbanShot3Model = nullptr;
+	Model* kanbanShot4Model = nullptr;
 
 	//パーティクル
 	ParticleManager* Particle = nullptr;
@@ -218,6 +231,10 @@ private: // メンバ変数
 
 	//skydome z
 	float skydomeZ = 0;
+
+	int kanbanTime = 0;
+	XMFLOAT3 kanbanShotPos = { 90,-30,115 };
+	XMFLOAT3 kanbanShotPosDown = { 90,-90,115 };
 
 	//チュートリアル文字のｈｐ
 	int mojiHp = 20;

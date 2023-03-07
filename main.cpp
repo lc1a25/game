@@ -340,7 +340,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			if (gameScene->tutorialFlag == true)
 			{
 				//tyutoRial->Draw();
-				tyutoRialMove->Draw();
+				//tyutoRialMove->Draw();
 			}
 			else
 			{

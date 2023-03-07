@@ -49,6 +49,10 @@ public:
 
 	const BOOL& GetStartMovieFlag() { return startMovie; }
 
+	const BOOL& GetStartGameFlag() { return startGame; }
+
+	const XMVECTOR& GetStartPos() { return start; }
+
 	XMMATRIX GetWorldTransform()
 	{
 		return worldTransform;
@@ -67,8 +71,12 @@ public:
 		bossPos = target;
 		this->bossDieFlag = bossDieFlag;
 	}
-		 
-	
+		
+	/// <summary>
+	/// ムービースキップ用
+	/// </summary>
+	/// <param name="startMovie">falseならスキップ</param>
+	void SetStartMovieSkip(bool startMovie) { this->startMovie = startMovie; }
 
 private:
 	XMFLOAT3 playerPos;
@@ -145,6 +153,7 @@ private:
 	bool pointsLast = false;
 	bool pointsStart = true;
 	bool startMovie = true;
+	bool startGame = false;
 	
 
 	std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,p6,p7,end,end };

@@ -36,6 +36,12 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	roadModel = Model::LoadFromOBJ("road");
 	shotObjModel = Model::LoadFromOBJ("shotObj");
 	shotHibiObjModel = Model::LoadFromOBJ("shotHibiObj");
+	kanbanModel = Model::LoadFromOBJ("kanban");
+	kanbanPlaneModel = Model::LoadFromOBJ("kanbanPlane");
+	kanbanShotModel = Model::LoadFromOBJ("kanbanShot");
+	kanbanShot2Model = Model::LoadFromOBJ("kanbanShot2");
+	kanbanShot3Model = Model::LoadFromOBJ("kanbanShot3");
+	kanbanShot4Model = Model::LoadFromOBJ("kanbanShot4");
 
 
 	bossHpBar = 733;
@@ -64,6 +70,26 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	shotHibiObj->SetModel(shotHibiObjModel);
 	shotHibiObj->scale = { 3,3,3 };
 	shotHibiObj->SetPosition({ 0,0,90 });
+
+	kanbanObj->SetModel(kanbanModel);
+	kanbanObj->scale = { 1.5,1.5,1.5 };
+	kanbanObj->SetPosition({ -90,-50,120 });
+	
+	kanbanPlaneObj->SetModel(kanbanPlaneModel);
+	kanbanPlaneObj->scale = { 1.5,1.5,1.5 };
+	kanbanPlaneObj->SetPosition({ 90,-50,120 });
+	kanbanShotObj->SetModel(kanbanShotModel);
+	kanbanShotObj->scale = { 1.5,1.5,1.5 };
+	kanbanShotObj->SetPosition({ kanbanShotPos });
+	kanbanShot2Obj->SetModel(kanbanShot2Model);
+	kanbanShot2Obj->scale = { 1.5,1.5,1.5 };
+	kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
+	kanbanShot3Obj->SetModel(kanbanShot3Model);
+	kanbanShot3Obj->scale = { 1.5,1.5,1.5 };
+	kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
+	kanbanShot4Obj->SetModel(kanbanShot4Model);
+	kanbanShot4Obj->scale = { 1.5,1.5,1.5 };
+	kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
 	
 	player = new Player();
 	player->Init(playerModel, bulletModel);
@@ -167,6 +193,18 @@ void GameScene::Update()
 		player->OnCollision();
 	}
 
+	if (input->isKeyTrigger(DIK_K))
+	{
+		cameraObj->SetStartMovieSkip(false);
+		startPlayer->SetPosition({ 0,-200,600 });
+	}
+
+	//スタートムービー後の自機(仮)の場所
+	if (startPlayer->GetPosition().z >= 600)
+	{
+		startPlayer->SetPosition({0,-200,600});
+	}
+
 	//ビルがカメラの後ろ行ったら消える
 	bills.remove_if([](std::unique_ptr<Bill>& bill)
 	{
@@ -209,6 +247,49 @@ void GameScene::Update()
 	shotObj->Update();
 	shotHibiObj->Update();
 
+	kanbanObj->Update();
+	kanbanPlaneObj->Update();
+
+	if (cameraObj->GetStartGameFlag() == true)
+	{
+		kanbanTime++;
+	}
+	
+	if (kanbanTime >= 31)
+	{
+		kanbanShotObj->SetPosition({ kanbanShotPosDown });
+		kanbanShot2Obj->SetPosition({ kanbanShotPos });
+		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
+	}
+	if (kanbanTime >= 61)
+	{
+		kanbanShotObj->SetPosition({ kanbanShotPosDown });
+		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot3Obj->SetPosition({ kanbanShotPos });
+		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
+	}
+	if (kanbanTime >= 91)
+	{
+		kanbanShotObj->SetPosition({ kanbanShotPosDown });
+		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot4Obj->SetPosition({ kanbanShotPos });
+	}
+	if (kanbanTime >= 121)
+	{
+		kanbanShotObj->SetPosition({ kanbanShotPos });
+		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
+		kanbanTime = 0;
+	}
+	
+	kanbanShotObj->Update();
+	kanbanShot2Obj->Update();
+	kanbanShot3Obj->Update();
+	kanbanShot4Obj->Update();
+
 	//スタートムービー
 	if (cameraObj->GetStartMovieFlag() == false)
 	{
@@ -229,7 +310,7 @@ void GameScene::Update()
 	mouseY = player->GetMouseY();
 
 	//デバッグ用
-	sprintf_s(moji, "%f", startPlayer->position.z);
+	sprintf_s(moji, "%d", kanbanTime);
 
 	//カメラ
 	cameraObj->UpdateCamera();
@@ -238,13 +319,13 @@ void GameScene::Update()
 	camera->SetUp({ cameraObj->GetUp() });
 	camera->UpdateCamera();
 
-	//レティクルのため
+	//レティクル
 	player->SetHwnd(hwnd);
 	player->SetViewPort(viewPort);
 	player->SetCameraMatViewProjection(cameraObj->GetMatViewProjection());
 
 	//自機
-	player->SetStartFlag(cameraObj->GetStartMovieFlag());
+	player->SetStartFlag(cameraObj->GetStartGameFlag());
 	player->SetEnemyFlag(enemyL->IsDead());
 	player->SetCameraObj(cameraObj->GetWorldTransform());
 	player->SetCameraPos(cameraObj->GetEye());
@@ -438,6 +519,14 @@ void GameScene::Draw()
 	{
 		bill->Draw();
 	}
+
+	kanbanObj->Draw();
+
+	kanbanPlaneObj->Draw();
+	kanbanShotObj->Draw();
+	kanbanShot2Obj->Draw();
+	kanbanShot3Obj->Draw();
+	kanbanShot4Obj->Draw();
 
 	startPlayer->Draw();
 
@@ -635,7 +724,8 @@ void GameScene::CheckPillarCollision()
 			mojiHp--;
 			//パーティクル生成
 			MojiCreateParticle({ shotObj->GetPosition().x ,  shotObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z });
-		}	
+		}
+		
 	}
 }
 

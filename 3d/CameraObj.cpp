@@ -22,6 +22,7 @@ void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
 
 	pointsLast = false;
 	pointsStart = true;
+	startGame = false;
 
 	eyeVecTemp = { 0.0f,0.0f,0.0f };
 	eyeVec = { 0.0f,0.0f,0.0f };
@@ -82,6 +83,8 @@ void CameraObj::UpdateCamera()
 	else if (startMovie == false && startPlayerObj.z >= 500)
 	{
 		eye = { start };
+		
+		startGame = true;
 		//前方ベクトル
 		XMVECTOR forward({ 0, 0, 1 });
 		//回転(前方ベクトル)
@@ -108,6 +111,7 @@ void CameraObj::UpdateCamera()
 	{
 		if (pointsLast == false)//道中　雑魚戦
 		{
+			startGame = true;
 			//前方ベクトル
 			XMVECTOR forward({ 0, 0, 1 });
 			//回転(前方ベクトル)

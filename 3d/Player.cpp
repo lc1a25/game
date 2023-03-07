@@ -24,9 +24,12 @@ void Player::Init(Model* model,Model* bulletModel)
 	//player->matWorld.r[3].m128_f32[1] = cameraPos.y;
 	//player->matWorld.r[3].m128_f32[2] = cameraPos.z;
 
-	player->matWorld.r[3].m128_f32[0] = -500;
+	//player->matWorld.r[3].m128_f32[0] = -500;
+	//player->matWorld.r[3].m128_f32[1] = 0;
+	//player->matWorld.r[3].m128_f32[2] = -50;
+	player->matWorld.r[3].m128_f32[0] = 0;
 	player->matWorld.r[3].m128_f32[1] = 0;
-	player->matWorld.r[3].m128_f32[2] = -50;
+	player->matWorld.r[3].m128_f32[2] = 30;
 
 	player->SetPosition({ player->matWorld.r[3].m128_f32[0],player->matWorld.r[3].m128_f32[1],player->matWorld.r[3].m128_f32[2] });
 
@@ -35,20 +38,6 @@ void Player::Init(Model* model,Model* bulletModel)
 
 void Player::Update()
 {
-	
-	if (gameStartFlag == false)
-	{
-		if (playerSet == true)
-		{
-			player->matWorld.r[3].m128_f32[0] = cameraPos.x;
-			player->matWorld.r[3].m128_f32[1] = cameraPos.y;
-			player->matWorld.r[3].m128_f32[2] = cameraPos.z + 30;
-		}
-		player->matWorld.r[3].m128_f32[0] += cameraEyeVec.x;
-		player->matWorld.r[3].m128_f32[1] += cameraEyeVec.y;
-		player->matWorld.r[3].m128_f32[2] += cameraEyeVec.z;
-		playerSet == false;
-	}
 	
 	//player->SetPosition({ player->matWorld.r[3].m128_f32[0],player->matWorld.r[3].m128_f32[1],player->matWorld.r[3].m128_f32[2] });
 //2dレティクル
@@ -105,9 +94,13 @@ void Player::Update()
 
 	//player->matWorld.r[3].m128_f32[2] = cameraPos.z +	30;
 
+	player->matWorld.r[3].m128_f32[0] += cameraEyeVec.x;
+	player->matWorld.r[3].m128_f32[1] += cameraEyeVec.y;
+	player->matWorld.r[3].m128_f32[2] += cameraEyeVec.z;
 
-	
-
+	player->position.x = player->matWorld.r[3].m128_f32[0];
+	player->position.y = player->matWorld.r[3].m128_f32[1];
+	player->position.z = player->matWorld.r[3].m128_f32[2];
 	cameraTargetVec = XMVector3Normalize(cameraTargetVec);
 	//player->position.x = cameraPos.x + cameraTargetVec.m128_f32[0] * 10;
 	//player->position.y = cameraPos.y + cameraTargetVec.m128_f32[1] * 10;
@@ -120,23 +113,23 @@ void Player::Update()
 		});
 
 //移動制御(画面外に行かないように)
-	if (player->position.x <= cameraPos.x - playerMoveRange.x)
+	if (player->position.x <= cameraPos.x - playerMoveRange.x && gameStartFlag == true)
 	{
 		player->position.x += playerVelocity;
 		player->rotation.y += playerVelocity / 2;
 	}
-	if (player->position.x >= cameraPos.x + playerMoveRange.x)
+	if (player->position.x >= cameraPos.x + playerMoveRange.x && gameStartFlag == true)
 	{
 		player->position.x -= playerVelocity;
 		player->rotation.y -= playerVelocity / 2;
 	}
 
-	if (player->position.y <= cameraPos.y - playerMoveRange.y && playerDieFlag == false)
+	if (player->position.y <= cameraPos.y - playerMoveRange.y && gameStartFlag == true  && playerDieFlag == false)
 	{
 		player->position.y += playerVelocity;
 		player->rotation.x -= playerVelocity / 4;	
 	}
-	if (player->position.y >= cameraPos.y + playerMoveRange.y )
+	if (player->position.y >= cameraPos.y + playerMoveRange.y && gameStartFlag == true)
 	{
 		player->position.y -= playerVelocity;
 		player->rotation.x += playerVelocity / 4;
