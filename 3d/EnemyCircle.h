@@ -1,15 +1,6 @@
 #pragma once
 #include "Enemy.h"
 
-enum class PhaseCircle
-{
-	Approach,//ê⁄ãﬂ
-	ApproachL,
-	Leave,	//ó£íE
-	Stop,  //é~Ç‹ÇÈ
-	CircleR,//â~â^ìÆâEÇ©ÇÁÇ≠ÇÈ
-	CircleL,//ç∂Ç©ÇÁÇ≠ÇÈ
-};
 
 class EnemyCircle
 {
@@ -29,7 +20,7 @@ class EnemyCircle
 
 public:
 
-	void Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue);
+	void Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue, bool attackFlag);
 
 	void Update();
 

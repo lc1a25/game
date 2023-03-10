@@ -1,20 +1,23 @@
 #include "EnemyCircle.h"
 
-void EnemyCircle::Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue)
+void EnemyCircle::Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue,bool attackFlag)
 {
 	enemyModel_ = enemyModel;
 	enemy = new Enemy();
 	this->position = position;
-	enemy->Init(enemyModel_, position, enemyModel_);
+	enemy->Init(enemyModel_, position, enemyModel_,{2,2,2},attackFlag);
 	PhaseInit(rightMoveTrue);
 }
 
 void EnemyCircle::Update()
 {
-	position = enemy->GetPosition();
+	//position = enemy->GetPosition();
 
-	enemy->SetPlayerPosition(playerWorldPos);
-	enemy->SetPosition(position);
+	if (playerWorldPos.z <= enemy->GetWorldPosition().z)
+	{
+		enemy->SetPlayerPosition(playerWorldPos);
+	}
+	//enemy->SetPosition(position);
 	enemy->Update();
 }
 

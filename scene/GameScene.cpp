@@ -105,10 +105,10 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	enemyL->Init(enemyModel, { 50.0f, 50.0f, -200.0f }, enemyModel);
 
 	enemyCircle = new EnemyCircle();
-	enemyCircle->Init(enemyRotateModel, { -50.0f, 50.0f, -200.0f }, false);//-50.0f, 50.0f, 400.0f
+	enemyCircle->Init(enemyRotateModel, { 0.0f, -10.0f, -150.0f }, false,false);//-50.0f, 50.0f, 400.0f
 
 	enemyCircle2 = new EnemyCircle();
-	enemyCircle2->Init(enemyRotateModel, { 30.0f, -10.0f, -200.0f }, true);
+	enemyCircle2->Init(enemyRotateModel, { 30.0f, -10.0f, -200.0f }, true,false);
 
 	enemyOneWay = new EnemyOneWay();
 	enemyOneWay->Init(enemyModel, { 0.0f,0.0f,-300.0f }, false);
@@ -149,26 +149,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	road->SetModel(roadModel);
 	road->scale = { 10,7,300 };
 	road->SetPosition({ 0,-55,650 });
-				
-	/*pillar->SetModel(pillarModel);
-	pillar->scale = { 4,13,1 };
-	pillar->SetPosition({ -30,-32,280 });
-
-	pillar2->SetModel(pillarModel);
-	pillar2->scale = { 4,20,1 };
-	pillar2->SetPosition({ 40,-32,280 });
-
-	pillar3->SetModel(pillarModel);
-	pillar3->scale = { 4,20,1 };
-	pillar3->SetPosition({ -50,-32,480 });
-
-	pillar4->SetModel(pillarModel);
-	pillar4->scale = { 4,18,1 };
-	pillar4->SetPosition({ 40,-32,480 });
-
-	pillar5->SetModel(pillarModel);
-	pillar5->scale = { 4,18,1 };
-	pillar5->SetPosition({ -50,-32,680 });*/
 
 	Object3d::SetCamera(camera);
 
@@ -192,17 +172,35 @@ void GameScene::Update()
 	{
 		player->OnCollision();
 	}
-
+	//デバッグ用スタートムービースキップ
 	if (input->isKeyTrigger(DIK_K))
 	{
 		cameraObj->SetStartMovieSkip(false);
 		startPlayer->SetPosition({ 0,-200,600 });
 	}
+	//デバッグ用無敵
+	if (input->isKeyTrigger(DIK_C) && mutekiFlag == true)
+	{
+		mutekiFlag = false;
+	}
+	else if (input->isKeyTrigger(DIK_C))
+	{
+		mutekiFlag = true;
+	}
+	//デバッグ用ボス一撃
+	if (input->isKeyTrigger(DIK_Q))
+	{
+		for (int i = 0; i < 50; i++)
+		{
+			boss->GetEnemy()->OnBossCollision();
+		}
+	}
 
 	//スタートムービー後の自機(仮)の場所
-	if (startPlayer->GetPosition().z >= 600)
+	if (startPlayer->GetPosition().z >= 600 && boss->GetBossDead() == false)
 	{
 		startPlayer->SetPosition({0,-200,600});
+		player->SetkeyInput(true);
 	}
 
 	//ビルがカメラの後ろ行ったら消える
@@ -240,21 +238,19 @@ void GameScene::Update()
 	skydomeZ += cameraObj->GetEyeVec().z * 0.8;
 	skydome->SetPosition({ 0,-220,skydomeZ });
 	skydome->Update();
-
+	//設置物の更新
 	wallFloor->Update();
 	road->Update();
-
 	shotObj->Update();
 	shotHibiObj->Update();
-
 	kanbanObj->Update();
 	kanbanPlaneObj->Update();
 
+	//弾の発射説明
 	if (cameraObj->GetStartGameFlag() == true)
 	{
 		kanbanTime++;
 	}
-	
 	if (kanbanTime >= 31)
 	{
 		kanbanShotObj->SetPosition({ kanbanShotPosDown });
@@ -299,21 +295,21 @@ void GameScene::Update()
 	
 	startPlayer->Update();
 
-	/*pillar->Update();
-	pillar2->Update();
-	pillar3->Update();
-	pillar4->Update();
-	pillar5->Update();*/
-
 	//2dレティクルスプライトの座標
 	mouseX = player->GetMouseX();
 	mouseY = player->GetMouseY();
 
 	//デバッグ用
-	sprintf_s(moji, "%d", kanbanTime);
+	sprintf_s(moji, "%f", player->GetWorldPosition().z);
+
+	//カメラの注視点セット
+	cameraObj->SetTargetS(startPlayer->GetPosition());
+	cameraObj->SetPlayerDieFlag(player->GetHp0());
+	cameraObj->SetTarget(player->GetWorldPosition());
+	cameraObj->SetBoss(boss->GetPos(), boss->GetBossDead());
+	cameraObj->UpdateCamera();
 
 	//カメラ
-	cameraObj->UpdateCamera();
 	camera->SetEye({ cameraObj->GetEye() });
 	camera->SetTarget({ cameraObj->GetTarget() });
 	camera->SetUp({ cameraObj->GetUp() });
@@ -329,7 +325,6 @@ void GameScene::Update()
 	player->SetEnemyFlag(enemyL->IsDead());
 	player->SetCameraObj(cameraObj->GetWorldTransform());
 	player->SetCameraPos(cameraObj->GetEye());
-	player->SetCameraTargetVec(cameraObj->GetTargetVec());
 	player->SetCameraEyeVec(cameraObj->GetEyeVec());
 	player->SetPlayerHpBar(hpBar);
 	player->Update();
@@ -413,22 +408,25 @@ void GameScene::Update()
 	bossChildRDB->SetChildShotRange(cameraObj->GetEye());
 
 	//当たり判定
-	CheckAllCollision(enemyCircle->GetEnemy());
-	CheckAllCollision(enemyCircle2->GetEnemy());
-	CheckAllCollision(enemy);
-	CheckAllCollision(enemyL);
-	CheckAllCollision(enemyOneWay->GetEnemy());
-	CheckAllCollision(enemyOneWay2->GetEnemy());
-	CheckAllCollision(boss->GetEnemy());
-	CheckBossANDChildCollision(bossChildLUF->GetEnemy());
-	CheckBossANDChildCollision(bossChildLUB->GetEnemy());
-	CheckBossANDChildCollision(bossChildRUF->GetEnemy());
-	CheckBossANDChildCollision(bossChildRUB->GetEnemy());
-	CheckBossANDChildCollision(bossChildLDF->GetEnemy());
-	CheckBossANDChildCollision(bossChildLDB->GetEnemy());
-	CheckBossANDChildCollision(bossChildRDF->GetEnemy());
-	CheckBossANDChildCollision(bossChildRDB->GetEnemy());
-	CheckPillarCollision();
+	if (mutekiFlag == false)
+	{
+		CheckAllCollision(enemyCircle->GetEnemy());
+		CheckAllCollision(enemyCircle2->GetEnemy());
+		CheckAllCollision(enemy);
+		CheckAllCollision(enemyL);
+		CheckAllCollision(enemyOneWay->GetEnemy());
+		CheckAllCollision(enemyOneWay2->GetEnemy());
+		CheckAllCollision(boss->GetEnemy());
+		CheckBossANDChildCollision(bossChildLUF->GetEnemy());
+		CheckBossANDChildCollision(bossChildLUB->GetEnemy());
+		CheckBossANDChildCollision(bossChildRUF->GetEnemy());
+		CheckBossANDChildCollision(bossChildRUB->GetEnemy());
+		CheckBossANDChildCollision(bossChildLDF->GetEnemy());
+		CheckBossANDChildCollision(bossChildLDB->GetEnemy());
+		CheckBossANDChildCollision(bossChildRDF->GetEnemy());
+		CheckBossANDChildCollision(bossChildRDB->GetEnemy());
+		CheckPillarCollision();
+	}
 
 	//hp
 	bossHpBar = boss->GetEnemy()->GetHpBarX();
@@ -442,19 +440,26 @@ void GameScene::Update()
 	//ボスが倒されたら
 	if (boss->GetEnemy()->IsDead() == true)
 	{
-
+		player->SetkeyInput(false);
+		//ボスの演出がおわったら
 		if (boss->GetEnemy()->GetWorldPosition().y <= floorY)
 		{
-			//フラグをついか　カメラにわたす　ぷれいやーをとばす
-			
-			//bossのやられた演出まち用
+			//シーンチェンジまち用
 			dieTimer--;
 			if (dieTimer <= 0)
 			{
+				player->SetEndFlag(true);
 				//シーンチェンジ
-				pointsLast = true;
-			
-				dieTimer = 120;
+				if (player->GetWorldPosition().z >= 1400)
+				{
+						pointsLast = true;
+				}
+				//
+				//dieTimer = 120;
+			}
+			else
+			{
+				cameraObj->SetEndMovieFlag(true);
 			}
 		}
 		else
@@ -464,11 +469,8 @@ void GameScene::Update()
 		
 	}
 
-	//カメラの注視点セット
-	cameraObj->SetTargetS(startPlayer->GetPosition());
-	cameraObj->SetPlayerDieFlag(player->GetHp0());
-	cameraObj->SetTarget(player->GetWorldPosition());
-	cameraObj->SetBoss(boss->GetPos(), boss->GetBossDead());
+	
+
 	//プレイヤーのhpが０になったら
 	if (player->GetHp0() == true)
 	{
@@ -590,10 +592,7 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 
 	pos1 = enemy->GetWorldPosition();
 	//自弾と敵当たり判定
-	if (input->isKeyTrigger(DIK_Q))
-	{
-		enemy->OnBossCollision();
-	}
+	
 
 	//当たり判定の調整
 	float pos1Add = 4;
@@ -606,7 +605,7 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 			pos2.x <= pos1.x + pos1Add && pos2.x >= pos1.x - pos1Add &&
 			pos2.y <= pos1.y + pos1Add && pos2.y >= pos1.y - pos1Add)
 		{
-			if (cameraObj->GetRaleIndex() <= 4)
+			if (cameraObj->GetRaleIndex() <= 5)
 			{
 				enemy->OnCollision();
 
@@ -614,29 +613,8 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 				//パーティクル生成
 				EnemyCreateParticle(enemy->GetWorldPosition());
 			}
-		}
-		length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
-			((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
-			((pos2.z - pos1.z) * (pos2.z - pos1.z));
-		if (cameraObj->GetRaleIndex() >= 7)
-		{
-			length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
-				((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
-				((pos2.z - pos1.z) * (pos2.z - pos1.z));
-		}
-		if (length <= size)
-		{
-			if (cameraObj->GetRaleIndex() <= 4)
+			else
 			{
-				//enemy->OnCollision();
-
-				//bullet->OnCollision();
-				////パーティクル生成
-				//EnemyCreateParticle(enemy->GetWorldPosition());
-			}
-			if (cameraObj->GetRaleIndex() >= 5)
-			{
-				
 				enemy->OnBossCollision();
 
 				if (boss->GetEnemy()->IsDead() == true)
@@ -645,7 +623,6 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 				}
 				bullet->OnCollision();
 			}
-			
 		}
 	}
 
@@ -676,11 +653,10 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 {
 	XMFLOAT3 pos1, pos2;
-
 	//敵弾リスト
 	const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = bossChild->GetBullets();
 
-	pos1 = boss->GetEnemy()->GetWorldPosition();
+	pos1 = player->GetWorldPosition();
 	//自キャラと敵弾当たり判定
 	for (const std::unique_ptr<EnemyBullet>& bullet : enemyBullets)
 	{
@@ -688,13 +664,18 @@ void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 		length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
 			((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
 			((pos2.z - pos1.z) * (pos2.z - pos1.z));
-		if (length <= size + 25)
+		if (length <= size)
 		{
-			//player->OnCollision();
+			if (boss->GetEnemy()->IsDead() == false)
+			{
+				player->OnCollision();
+
+			}
 
 			bullet->OnCollision();
 		}
 	}
+	
 }
 
 void GameScene::CheckPillarCollision()
@@ -818,9 +799,20 @@ void GameScene::UpdateEnemyPop()
 			{
 				LorR = true;
 			}
+			//0が攻撃　1が攻撃しない
+			int attack = std::atof(word.c_str());
+			bool attackFlag = false;
+			if (attack == 1)
+			{
+				attackFlag = false;
+			}
+			else
+			{
+				attackFlag = true;
+			}
 
 			enemyCircle = new EnemyCircle();
-			enemyCircle->Init(enemyRotateModel, pos, LorR);
+			enemyCircle->Init(enemyRotateModel, pos, LorR, attackFlag);
 		}
 		else if (word.find("OUTWAY") == 0)
 		{

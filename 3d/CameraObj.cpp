@@ -151,17 +151,6 @@ void CameraObj::UpdateCamera()
 			eyeVecTemp.y = eye.m128_f32[1];
 			eyeVecTemp.z = eye.m128_f32[2];
 
-			//カメラの移動量
-			targetVec.x = target.m128_f32[0] - eye.m128_f32[0];
-			targetVec.y = target.m128_f32[1] - eye.m128_f32[1];
-			targetVec.z = target.m128_f32[2] - eye.m128_f32[2];
-
-			targetVecTemp.x = target.m128_f32[0];
-			targetVecTemp.y = target.m128_f32[1];
-			targetVecTemp.z = target.m128_f32[2];
-
-
-
 			target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
 			target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
 			target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
@@ -187,7 +176,7 @@ void CameraObj::UpdateCamera()
 			target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
 			targetEnd = eye + forward;
 
-			if (playerDieFlag == true)
+			if (playerDieFlag == true || endMovieFlag == true)
 			{
 				target.m128_f32[0] = playerPos.x + forward.m128_f32[0];
 				target.m128_f32[1] = playerPos.y + forward.m128_f32[1];
@@ -201,17 +190,6 @@ void CameraObj::UpdateCamera()
 			}
 		}
 	}
-	//else
-	//{
-	//	//前方ベクトル
-	//	XMVECTOR forward({ 0, 0, 1 });
-	//	//回転(前方ベクトル)
-	//	forward = Matrix4::transform(forward, cameraObj->matWorld);
-	//	target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
-	//	target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
-	//	target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
-	//	targetEnd = eye + forward;
-	//}
 
 	
 	//上方ベクトル
@@ -238,7 +216,6 @@ void CameraObj::UpdateCamera()
 	targetView.y = target.m128_f32[1];
 	targetView.z = target.m128_f32[2];
 
-	
 	// ビュー行列の更新
 	matView = XMMatrixLookAtLH(XMLoadFloat3(&eyeView), XMLoadFloat3(&targetView), XMLoadFloat3(&up));
 

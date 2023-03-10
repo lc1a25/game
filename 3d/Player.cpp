@@ -12,21 +12,12 @@ void Player::Init(Model* model,Model* bulletModel)
 
 	reticle->matWorld.r[3].m128_f32[0] = player->matWorld.r[3].m128_f32[0];
 	reticle->matWorld.r[3].m128_f32[1] = player->matWorld.r[3].m128_f32[1];
-	reticle->matWorld.r[3].m128_f32[2] = player->matWorld.r[3].m128_f32[2] + 60;
+	reticle->matWorld.r[3].m128_f32[2] = player->matWorld.r[3].m128_f32[2] + 70;
 
 	reticle->SetModel(model_);
 	reticle->SetPosition({ reticle->matWorld.r[3].m128_f32[0], reticle->matWorld.r[3].m128_f32[1], reticle->matWorld.r[3].m128_f32[2]});
 	reticle->scale = { 1,1,1 }; 
 
-	
-	//playerの座標をワールド座標に カメラの前に
-	//player->matWorld.r[3].m128_f32[0] = cameraPos.x;
-	//player->matWorld.r[3].m128_f32[1] = cameraPos.y;
-	//player->matWorld.r[3].m128_f32[2] = cameraPos.z;
-
-	//player->matWorld.r[3].m128_f32[0] = -500;
-	//player->matWorld.r[3].m128_f32[1] = 0;
-	//player->matWorld.r[3].m128_f32[2] = -50;
 	player->matWorld.r[3].m128_f32[0] = 0;
 	player->matWorld.r[3].m128_f32[1] = 0;
 	player->matWorld.r[3].m128_f32[2] = 30;
@@ -39,7 +30,6 @@ void Player::Init(Model* model,Model* bulletModel)
 void Player::Update()
 {
 	
-	//player->SetPosition({ player->matWorld.r[3].m128_f32[0],player->matWorld.r[3].m128_f32[1],player->matWorld.r[3].m128_f32[2] });
 //2dレティクル
 	POINT mousePosition;
 	GetCursorPos(&mousePosition);
@@ -83,16 +73,11 @@ void Player::Update()
 	reticle->matWorld.r[3].m128_f32[0] = posNear.m128_f32[0] + mouseDirection.m128_f32[0] * 100;
 	reticle->matWorld.r[3].m128_f32[1] = posNear.m128_f32[1] + mouseDirection.m128_f32[1] * 100;
 	reticle->matWorld.r[3].m128_f32[2] = posNear.m128_f32[2] + mouseDirection.m128_f32[2] * 100;
-	//reticle->matWorld.r[3].m128_f32[0] = (mouseDirection - posNear).m128_f32[0] * 100;
-	//reticle->matWorld.r[3].m128_f32[1] = (mouseDirection - posNear).m128_f32[1] * 100;
-	//reticle->matWorld.r[3].m128_f32[2] = cameraObj.r[3].m128_f32[2] + 100;//player->matWorld.r[3].m128_f32[2] + 100;//(mouseDirection - posNear).m128_f32[2] * 10;
-
+	
 	//ワールド座標に
 	reticle->position.x = reticle->matWorld.r[3].m128_f32[0];
 	reticle->position.y = reticle->matWorld.r[3].m128_f32[1];
 	reticle->position.z = reticle->matWorld.r[3].m128_f32[2];
-
-	//player->matWorld.r[3].m128_f32[2] = cameraPos.z +	30;
 
 	player->matWorld.r[3].m128_f32[0] += cameraEyeVec.x;
 	player->matWorld.r[3].m128_f32[1] += cameraEyeVec.y;
@@ -101,10 +86,8 @@ void Player::Update()
 	player->position.x = player->matWorld.r[3].m128_f32[0];
 	player->position.y = player->matWorld.r[3].m128_f32[1];
 	player->position.z = player->matWorld.r[3].m128_f32[2];
+
 	cameraTargetVec = XMVector3Normalize(cameraTargetVec);
-	//player->position.x = cameraPos.x + cameraTargetVec.m128_f32[0] * 10;
-	//player->position.y = cameraPos.y + cameraTargetVec.m128_f32[1] * 10;
-	//player->position.z = cameraPos.z + cameraTargetVec.m128_f32[2] * 10;
 												
 //デスフラグが立っている弾を消す
 	bullets_.remove_if([](std::unique_ptr<PlayerBullet>& bullet)
@@ -113,46 +96,46 @@ void Player::Update()
 		});
 
 //移動制御(画面外に行かないように)
-	if (player->position.x <= cameraPos.x - playerMoveRange.x && gameStartFlag == true)
+	if (player->position.x <= cameraPos.x - playerMoveRange.x && keyInput == true)
 	{
 		player->position.x += playerVelocity;
 		player->rotation.y += playerVelocity / 2;
 	}
-	if (player->position.x >= cameraPos.x + playerMoveRange.x && gameStartFlag == true)
+	if (player->position.x >= cameraPos.x + playerMoveRange.x && keyInput == true)
 	{
 		player->position.x -= playerVelocity;
 		player->rotation.y -= playerVelocity / 2;
 	}
 
-	if (player->position.y <= cameraPos.y - playerMoveRange.y && gameStartFlag == true  && playerDieFlag == false)
+	if (player->position.y <= cameraPos.y - playerMoveRange.y && keyInput == true && playerDieFlag == false)
 	{
 		player->position.y += playerVelocity;
 		player->rotation.x -= playerVelocity / 4;	
 	}
-	if (player->position.y >= cameraPos.y + playerMoveRange.y && gameStartFlag == true)
+	if (player->position.y >= cameraPos.y + playerMoveRange.y && keyInput == true)
 	{
 		player->position.y -= playerVelocity;
 		player->rotation.x += playerVelocity / 4;
 	}
 
 //移動処理
-	if (input->isKey(DIK_W))
+	if (input->isKey(DIK_W) && keyInput == true)
 	{
 		player->position.y += playerVelocity;
 		player->rotation.x -= playerVelocity / 4;
 	}
-	if (input->isKey(DIK_D))
+	if (input->isKey(DIK_D) && keyInput == true)
 	{
 		player->position.x += playerVelocity;
 		player->rotation.y += playerVelocity / 2;
 	
 	}
-	if (input->isKey(DIK_A))
+	if (input->isKey(DIK_A) && keyInput == true)
 	{
 		player->position.x -= playerVelocity;
 		player->rotation.y -= playerVelocity / 2;
 	}
-	if (input->isKey(DIK_S))
+	if (input->isKey(DIK_S) && keyInput == true)
 	{
 		player->position.y -= playerVelocity;
 		player->rotation.x += playerVelocity / 4;
@@ -171,6 +154,13 @@ void Player::Update()
 		player->position.y-=0.1;
 		player->rotation.x++;
 		player->rotation.z++;
+	}
+	if (gameEndFlag == true)
+	{
+		player->position.z += 2;
+		player->position.y += 0.5;
+		player->rotation.z += 2;
+
 	}
 //更新
 	
@@ -254,7 +244,7 @@ void Player::OnCollision()
 
 void Player::Attack()
 {
-	if (input->isMouseKey())
+	if (input->isMouseKey() && keyInput == true)
 	{
 		coolTimer--;
 		if (coolTimer <= 0)

@@ -273,169 +273,7 @@ void Enemy::Update()
 		PChild();//ƒ{ƒX‚É’Ç]
 		PShotMinor();//’e‚ð‘O‚É”­ŽË
 		enemy->rotation.y++;
-		//PCircleZ();
-		/*if (childNumber == 1)
-		{
-			enemy->position.x = 0;
-			angle = 90;
-
-			PWait();
-		}
-		else if (childNumber == 2)
-		{
-			enemy->position.x = 0;
-			angle = 180;
-			PWaitLB();
-		}
-		else if (childNumber == 3)
-		{
-			enemy->position.x = 0;
-			angle = 270;
-			PWaitR();
-		}
-		else if (childNumber == 4)
-		{
-			enemy->position.x = 0;
-			angle = 0;
-			PWaitRB();
-		}
-		else if (childNumber == 5)
-		{
-			angle = 60;
-			PWait();
-		}
-		else if (childNumber == 6)
-		{
-			angle = 60;
-			PWaitLB();
-		}
-		else if (childNumber == 7)
-		{
-			angle = 60;
-			PWaitR();
-		}
-		else if (childNumber == 8)
-		{
-			angle = 60;
-			PWaitRB();
-		}*/
-
-		break;
-	case BossPhase::MiniVerticalLUF:
-
-		//EasingTime();
-		//MiniPosLUF = ease_in({ MiniPosLUF }, { -15,MiniPosLUF.m128_f32[1], MiniPosLUF.m128_f32[2] }, timeRate);
-
-		//enemy->position.x = MiniPosLUF.m128_f32[0];
-		//enemy->position.y = MiniPosLUF.m128_f32[1];
-		//enemy->position.z = MiniPosLUF.m128_f32[2];
-
-
-		if (circleZFlag == true)
-		{
-			PCircleZ();
-			if (childShotRange.x - 25 <= enemy->position.x && childShotRange.x + 25 >= enemy->position.x
-				&& childShotRange.z >= enemy->position.z)
-			{
-			}
-			else
-			{
-				PChildHoming();
-			}
-		}
-		else
-		{
-			enemy->position.x = -90;
-			circleZFlag = true;
-		}
-		//flag	wo tatete PcircleZ wo tukau
-
-		/*enemy->position.y = MiniPosLUF.m128_f32[1];
-		enemy->position.z = MiniPosLUF.m128_f32[2];*/
-
-		break;
-	case BossPhase::MiniVerticalLUB:
-		if (circleZFlag == true)
-		{
-			PCircleZ();
-			if (childShotRange.x - 25 <= enemy->position.x && childShotRange.x + 25 >= enemy->position.x
-				&& childShotRange.z >= enemy->position.z)
-			{
-			}
-			else
-			{
-
-				PChildHoming();
-			}
-		}
-		else
-		{
-			enemy->position.z = 930;
-			circleZFlag = true;
-		}
-		break;
-	case BossPhase::MiniVerticalRUF:
-		if (circleZFlag == true)
-		{
-			PCircleZ();
-			if (childShotRange.x - 25 <= enemy->position.x && childShotRange.x + 25 >= enemy->position.x
-				&& childShotRange.z >= enemy->position.z)
-			{
-			}
-			else
-			{
-				//PChildHoming();
-			}
-		}
-		else
-		{
-			enemy->position.x = 90;
-			circleZFlag = true;
-		}
-		break;
-	case BossPhase::MiniVerticalRUB:
-		if (circleZFlag == true)
-		{
-			PCircleZ();
-			if (childShotRange.x - 25 <= enemy->position.x && childShotRange.x + 25 >= enemy->position.x
-				&& childShotRange.z >= enemy->position.z)
-			{
-			}
-			else
-			{
-				PChildHoming();
-			}
-		}
-		else
-		{
-			enemy->position.z = 990;
-			circleZFlag = true;
-		}
-		break;
-	case BossPhase::MiniVerticalLDF:
-		break;
-	case BossPhase::MiniVerticalLDB:
-		break;
-	case BossPhase::MiniVerticalRDF:
-		break;
-	case BossPhase::MiniVerticalRDB:
-		break;
-	case BossPhase::MiniSideLUF:
-		break;
-	case BossPhase::MiniSideLUB:
-		break;
-	case BossPhase::MiniSideRUF:
-		break;
-	case BossPhase::MiniSideRUB:
-		break;
-	case BossPhase::MiniSideLDF:
-		break;
-	case BossPhase::MiniSideLDB:
-		break;
-	case BossPhase::MiniSideRDF:
-		break;
-	case BossPhase::MiniSideRDB:
-		break;
+		
 	default:
 		break;
 	}
@@ -521,6 +359,7 @@ void Enemy::CircleR()
 	PCircleR();
 	PShot();
 	enemy->position.z += cameraZ;
+	enemy->rotation.z++;
 	PLeaveR();
 }
 
@@ -529,6 +368,7 @@ void Enemy::CircleL()
 	PCircleL();
 	PShot();
 	enemy->position.z += cameraZ;
+	enemy->rotation.z++;
 	PLeaveR();
 }
 

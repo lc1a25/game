@@ -12,6 +12,11 @@ void EnemyOneWay::Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue,
 
 void EnemyOneWay::Update()
 {
+	if (playerWorldPos.z <= enemy->GetWorldPosition().z)
+	{
+		enemy->SetPlayerPosition(playerWorldPos);
+	}
+	
 	enemy->Update();
 }
 

@@ -236,6 +236,8 @@ private: // メンバ変数
 	XMFLOAT3 kanbanShotPos = { 90,-30,115 };
 	XMFLOAT3 kanbanShotPosDown = { 90,-90,115 };
 
+	bool mutekiFlag = false;
+
 	//チュートリアル文字のｈｐ
 	int mojiHp = 20;
 };

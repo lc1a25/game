@@ -71,6 +71,8 @@ public:
 		bossPos = target;
 		this->bossDieFlag = bossDieFlag;
 	}
+
+	void SetEndMovieFlag(bool endMovieFlag) { this->endMovieFlag = endMovieFlag; }
 		
 	/// <summary>
 	/// ムービースキップ用
@@ -85,7 +87,7 @@ private:
 
 	bool playerDieFlag = false;
 	bool bossDieFlag = false;
-
+	bool endMovieFlag = false;
 
 	float distance = 20.0f;
 	// ビュー行列

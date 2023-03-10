@@ -74,7 +74,8 @@ private:
 
 	bool gameStartFlag = false;
 	bool playerSet = true;
-	
+	bool keyInput = false;
+	bool gameEndFlag = false;
 public:
 
 	//プレイヤーの弾　当たり判定でつかう
@@ -102,6 +103,7 @@ public:
 	/// </summary>
 	void Draw();
 
+	//void gameEnd();
 
 	XMVECTOR transform(const XMVECTOR& v, const DirectX::XMMATRIX& m);
 	XMVECTOR transform2(const XMVECTOR& v, const DirectX::XMMATRIX& m);
@@ -122,14 +124,16 @@ public:
 	void SetCameraPos(XMFLOAT3 cameraPos) { this->cameraPos = cameraPos; }
 
 	void SetCameraEyeVec(XMFLOAT3 cameraEyeV) { this->cameraEyeVec = cameraEyeV; }
-	void SetCameraTargetVec(XMFLOAT3 cameraTargetV) { this->cameraTargetVec.m128_f32[0] = cameraTargetV.x; 
-	this->cameraTargetVec.m128_f32[1] = cameraTargetV.y;
-	this->cameraTargetVec.m128_f32[2] = cameraTargetV.z;
-	}
 
 	void SetPlayerHpBar(float hpBar) { this->hpBar = hpBar; }
 
 	void SetStartFlag(bool gameStartFlag) { this->gameStartFlag = gameStartFlag; }
+
+	void SetkeyInput(bool keyInput) { this->keyInput = keyInput; }
+
+	void SetPlayerPos(XMFLOAT3 pos) {player->position.y -= pos.y; }
+
+	void SetEndFlag(bool gameEndFlag) { this->gameEndFlag = gameEndFlag; }
 
 	FLOAT GetHpBar() { return hpBar; }
 
