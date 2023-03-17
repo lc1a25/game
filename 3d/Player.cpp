@@ -12,7 +12,7 @@ void Player::Init(Model* model,Model* bulletModel)
 
 	reticle->matWorld.r[3].m128_f32[0] = player->matWorld.r[3].m128_f32[0];
 	reticle->matWorld.r[3].m128_f32[1] = player->matWorld.r[3].m128_f32[1];
-	reticle->matWorld.r[3].m128_f32[2] = player->matWorld.r[3].m128_f32[2] + 70;
+	reticle->matWorld.r[3].m128_f32[2] = player->matWorld.r[3].m128_f32[2] + reticleZ;
 
 	reticle->SetModel(model_);
 	reticle->SetPosition({ reticle->matWorld.r[3].m128_f32[0], reticle->matWorld.r[3].m128_f32[1], reticle->matWorld.r[3].m128_f32[2]});
@@ -20,15 +20,42 @@ void Player::Init(Model* model,Model* bulletModel)
 
 	player->matWorld.r[3].m128_f32[0] = 0;
 	player->matWorld.r[3].m128_f32[1] = 0;
-	player->matWorld.r[3].m128_f32[2] = 30;
+	player->matWorld.r[3].m128_f32[2] = 0;
 
 	player->SetPosition({ player->matWorld.r[3].m128_f32[0],player->matWorld.r[3].m128_f32[1],player->matWorld.r[3].m128_f32[2] });
+
+	playerStartPos = { player->matWorld.r[3].m128_f32[0],player->matWorld.r[3].m128_f32[1],player->matWorld.r[3].m128_f32[2] };
+	playerStartPos2 = { player->matWorld.r[3].m128_f32[0],player->matWorld.r[3].m128_f32[1],player->matWorld.r[3].m128_f32[2] + playerZ};
 
 }
 
 
 void Player::Update()
 {
+	if (player->position.z >= 30)
+		{
+			gameStartFlag = false;
+			keyInput = true;
+		}
+	else if (gameStartFlag == true)
+	{
+		keyInput = false;
+		player->matWorld.r[3].m128_f32[2]++;
+		player->position.z = player->matWorld.r[3].m128_f32[2];
+	/*	player->matWorld.r[3].m128_f32[0]  = ease_in(playerStartPos,
+			playerStartPos2,
+			65.0f).m128_f32[0];
+		
+		player->matWorld.r[3].m128_f32[1] = ease_in(playerStartPos,
+			playerStartPos2,
+			65.0f).m128_f32[1];
+
+		player->matWorld.r[3].m128_f32[2] = ease_in(playerStartPos,
+			playerStartPos2,
+			65.0f).m128_f32[2];
+		player->SetPosition({ player->matWorld.r[3].m128_f32[0],player->matWorld.r[3].m128_f32[1],player->matWorld.r[3].m128_f32[2] });*/
+
+	}
 	
 //2dƒŒƒeƒBƒNƒ‹
 	POINT mousePosition;
@@ -298,6 +325,12 @@ XMVECTOR Player::transform2(const XMVECTOR& v, const DirectX::XMMATRIX& m)
 
 	};
 	return result;
+}
+
+XMVECTOR Player::ease_in(const XMVECTOR& start, const XMVECTOR& end, float t)
+{
+	t = t * t;
+	return start * (1.0f - t) + end * t;
 }
 
 

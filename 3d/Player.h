@@ -19,6 +19,12 @@ private:
 	Object3d* player = player->Create();
 	Object3d* reticle = reticle->Create();
 
+	//プレイヤーのz座標(カメラのz座標にプラスする)
+	XMVECTOR playerStartPos = { 0 };
+	XMVECTOR playerStartPos2 = { 0 };
+	float playerZ = 30;
+	//レティクルのz座標(プレイヤーのz座標にプラスする)
+	float reticleZ = 70;
 	//弾
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 	//入力　初期化
@@ -107,6 +113,8 @@ public:
 
 	XMVECTOR transform(const XMVECTOR& v, const DirectX::XMMATRIX& m);
 	XMVECTOR transform2(const XMVECTOR& v, const DirectX::XMMATRIX& m);
+
+	XMVECTOR ease_in(const XMVECTOR& start, const XMVECTOR& end, float t);
 
 	//ゲームシーンからマウス座標をうけとる
 	void SetReticleWorldPos(XMVECTOR reticlePos);

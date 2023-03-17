@@ -27,8 +27,6 @@ void Boss::Update()
 	bossVecTemp.y = boss->GetPosition().y;
 	bossVecTemp.z = boss->GetPosition().z;
 
-
-
 	boss->SetPlayerPosition(playerWorldPos);
 	boss->SetPosition(position);
 	boss->Update();

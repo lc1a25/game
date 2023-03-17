@@ -334,13 +334,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		else if (gameflag == 1)
 		{
 			reticleSprite->Draw();
-			//explanSprite->Draw();
-			//backBlack->Draw();
 			if (gameScene->tutorialFlag == true)
-			{
-				//tyutoRial->Draw();
-				//tyutoRialMove->Draw();
-			}
+			{}
 			else
 			{
 				playerHpSprite->Draw();
@@ -351,9 +346,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				bossHpWakuSprite->Draw();
 			}
 			
-
-			debugtext_minute->DrawAll();
-			debugtext_minute2->DrawAll();
+			//デバッグテキスト
+		/*	debugtext_minute->DrawAll();
+			debugtext_minute2->DrawAll();*/
 			
 		}
 		else if (gameflag == 2)

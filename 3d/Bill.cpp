@@ -11,11 +11,6 @@ void Bill::Init(Model* model, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 scal
 
 void Bill::Update()
 {
-	//ƒJƒƒ‰‚ÌŒã‚ës‚Á‚½‚çÁ‚¦‚é
-	if (cameraZ >= bill->position.z)
-	{
-		billDeadFlag = true;
-	}
 	bill->Update();
 }
 

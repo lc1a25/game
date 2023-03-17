@@ -112,9 +112,13 @@ private:
 
 	float radius = angle * 3.14f / 180.0f;//‰~‚ÌŠp“x
 	float length = 0.3f;//‰~‚Ì”¼Œa
+	float lengthBoss = 10.3f;//‰~‚Ì”¼Œa
 	float addCircleX = cos(radius) * length;//‰~ã‚ÌˆÊ’u x
 	float addCircleY = sin(radius) * length;//‰~ã‚ÌˆÊ’u y
 	float addCircleZ = sin(radius) * length;//‰~ã‚ÌˆÊ’u z
+	float addCircleX2 = cos(radius) * lengthBoss;//‰~ã‚ÌˆÊ’u x
+	float addCircleY2 = sin(radius) * lengthBoss;//‰~ã‚ÌˆÊ’u y
+	float addCircleZ2 = sin(radius) * lengthBoss;//‰~ã‚ÌˆÊ’u z
 	float angleVec = 1.0f;
 
 
@@ -129,6 +133,7 @@ private:
 
 	int childNumber;
 	XMFLOAT3 bossVec;
+
 	float waitTimer = 120;
 
 	const float waitTimerInterval = 120;
@@ -167,6 +172,8 @@ private:
 
 	void PCircleZ();
 
+	void PCircleBoss();
+
 	void PCircleZInverce();
 
 	void PChild();
@@ -188,9 +195,6 @@ public:
 	float angle = 90.0f;//Å‰‚ÌŠp“x
 	Phase phase = Phase::OutApproach;
 	BossPhase phaseMini = BossPhase::None;
-
-
-
 	//bool bossDamage = false;
 
 	//“–‚½‚è”»’è—p@’e
@@ -295,6 +299,8 @@ public:
 		hpBar = bossHpBar;
 		hpBarMax = bossHpBarMax;
 	}
+
+	void SetBossChildAngle(float angle) { this->angle = angle; }
 	FLOAT GetHpBarX() { return hpBar; }
 
 	void EasingTime();

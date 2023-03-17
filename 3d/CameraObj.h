@@ -138,11 +138,14 @@ private:
 
 	XMVECTOR end{ 0.0f, 0.0f, 800.0f };
 
-	XMVECTOR startT{ 500.0f, 0.0f, 0.0f };
-	//XMVECTOR start2{ 0.0f, 0.0f, 0.0f };
-	XMVECTOR p2T{ 450.0f, 0.0f, -50.0f };
-	XMVECTOR p3T{ 500.0f, 0.0f, -100.0f };
+	XMVECTOR startT{ 0.0f, 0.0f, -500.0f };
+	XMVECTOR p2T{ -30.0f, 0.0f, -550.0f };
+	XMVECTOR p3T{ 0.0f, 0.0f, -600.0f };
 
+	//XMVECTOR startT{ 500.0f, 0.0f, 0.0f };
+	////XMVECTOR start2{ 0.0f, 0.0f, 0.0f };
+	//XMVECTOR p2T{ 450.0f, 0.0f, -50.0f };
+	//XMVECTOR p3T{ 500.0f, 0.0f, -100.0f };
 	XMVECTOR targetEnd{};
 	float maxTime = 10.0f;
 	float timeRate = 0.0f;

@@ -21,6 +21,79 @@ void(Enemy::*Enemy::spFuncTable[])() = {
 	&Enemy::BossDead,
 	&Enemy::None
 };
+
+void Enemy::Init(Model* enemyModel, XMFLOAT3 position, Model* bulletModel, XMFLOAT3 scale, bool attackFlag)
+{
+	enemyModel_ = enemyModel;
+	bulletModel_ = bulletModel;
+	enemy->SetModel(enemyModel);
+	enemy->scale = { scale };
+	this->attackFlag = attackFlag;
+
+	enemy->matWorld.r[3].m128_f32[0] = position.x;
+	enemy->matWorld.r[3].m128_f32[1] = position.y;
+	enemy->matWorld.r[3].m128_f32[2] = position.z;
+
+	enemy->SetPosition({ enemy->matWorld.r[3].m128_f32[0] ,enemy->matWorld.r[3].m128_f32[1] ,enemy->matWorld.r[3].m128_f32[2] });
+
+	ShotInit();
+
+}
+
+
+void Enemy::Update()
+{
+	//ƒfƒXƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚é’e‚ğÁ‚·
+	bullets_.remove_if([](std::unique_ptr<EnemyBullet>& bullet)
+		{
+			return bullet->IsDead();
+		});
+	phaseNumber = static_cast<int>(phase);
+	(this->*spFuncTable[phaseNumber])();
+
+
+	switch (phaseMini)
+	{
+
+	case BossPhase::None:
+
+		break;
+	case BossPhase::BossDead:
+		//enemy->position.y -= 0.1;
+		PChild();
+		
+		enemy->rotation.x++;
+		enemy->rotation.z++;
+		break;
+	case BossPhase::MiniStop:
+		PChild();//ƒ{ƒX‚É’Ç]
+		PShotMinor();//’e‚ğ‘O‚É”­Ë
+		PCircleBoss();
+		enemy->rotation.y++;
+
+	default:
+		break;
+	}
+
+	//’e‚ÌXV
+	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
+	{
+		//bullet->SetLockOnPosition(GetWorldPosition(), playerWorldPos);
+		bullet->Update();
+	}
+
+	enemy->Update();
+}
+
+void Enemy::Draw()
+{
+	enemy->Draw();
+	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
+	{
+		bullet->Draw();
+	}
+}
+
 void Enemy::PCircleR()
 {
 	//‰~‚ÌŠp“x
@@ -138,12 +211,29 @@ void Enemy::PCircleZ()
 	radius = angle * 3.14f / 180.0f;
 
 	//‰~ó‚ÌêŠ
-	addCircleX = cos(radius) * (length + 1.8);
-	addCircleZ = sin(radius) * (length + 1.8);
+	addCircleX = cos(radius) * (lengthBoss + 1.8);
+	addCircleZ = sin(radius) * (lengthBoss + 1.8);
 
 	//“G‚ÌÀ•W‚É‘«‚·
 	enemy->position.x -= addCircleX;
 	enemy->position.z -= addCircleZ;
+
+	//Šp“x‚ğ‚½‚µ‚Ä‰~ó‚É“®‚©‚·
+	angle += angleVec;
+}
+
+void Enemy::PCircleBoss()
+{
+	//‰~‚ÌŠp“x
+	radius = angle * 3.14f / 180.0f;
+
+	//‰~ó‚ÌêŠ
+	addCircleX = cos(radius) * (lengthBoss + 1.8);
+	addCircleZ = sin(radius) * (lengthBoss + 1.8);
+
+	//“G‚ÌÀ•W‚É‘«‚·
+	enemy->position.x = bossPos.x - addCircleX;
+	enemy->position.z = bossPos.z - addCircleZ;
 
 	//Šp“x‚ğ‚½‚µ‚Ä‰~ó‚É“®‚©‚·
 	angle += angleVec;
@@ -220,82 +310,7 @@ XMVECTOR Enemy::ease_in(const XMVECTOR& start, const XMVECTOR& end, float t)
 	return start * (1.0f - t) + end * t;
 }
 
-void Enemy::Init(Model* enemyModel, XMFLOAT3 position, Model *bulletModel ,XMFLOAT3 scale,bool attackFlag)
-{
-	enemyModel_ = enemyModel;
-	bulletModel_ = bulletModel;
-	enemy->SetModel(enemyModel);
-	enemy->scale = { scale };
-	this->attackFlag = attackFlag;
 
-	enemy->matWorld.r[3].m128_f32[0] = position.x;
-	enemy->matWorld.r[3].m128_f32[1] = position.y;
-	enemy->matWorld.r[3].m128_f32[2] = position.z;
-
-	enemy->SetPosition({ enemy->matWorld.r[3].m128_f32[0] ,enemy->matWorld.r[3].m128_f32[1] ,enemy->matWorld.r[3].m128_f32[2] });
- 
-	ShotInit();
-	//PhaseInit(rightMoveTrue);
-	OneWayPos.m128_f32[0] = enemy->position.x;
-	OneWayPos.m128_f32[1] = enemy->position.y;
-	OneWayPos.m128_f32[2] = enemy->position.z;
-
-	MiniPosLUF.m128_f32[0] = enemy->position.x;
-	MiniPosLUF.m128_f32[1] = enemy->position.y;
-	MiniPosLUF.m128_f32[2] = enemy->position.z;
-}
-
-
-void Enemy::Update()
-{
-	//ƒfƒXƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚é’e‚ğÁ‚·
-	bullets_.remove_if([](std::unique_ptr<EnemyBullet>& bullet)
-		{
-			return bullet->IsDead();
-		});
-	phaseNumber = static_cast<int>(phase);
-	(this->*spFuncTable[phaseNumber])(); 
-	
-
-	switch (phaseMini)
-	{
-
-	case BossPhase::None:
-		
-		break;
-	case BossPhase::BossDead:
-		//enemy->position.y -= 0.1;
-		PChild();
-		enemy->rotation.x++;
-		enemy->rotation.z++;
-		break;
-	case BossPhase::MiniStop:
-		PChild();//ƒ{ƒX‚É’Ç]
-		PShotMinor();//’e‚ğ‘O‚É”­Ë
-		enemy->rotation.y++;
-		
-	default:
-		break;
-	}
-
-	//’e‚ÌXV
-	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
-	{
-		//bullet->SetLockOnPosition(GetWorldPosition(), playerWorldPos);
-		bullet->Update();
-	}
-
-	enemy->Update();
-}
-
-void Enemy::Draw()
-{
-	enemy->Draw();
-	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
-	{
-		bullet->Draw();
-	}
-}
 
 void Enemy::Approach()
 {

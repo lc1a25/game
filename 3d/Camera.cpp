@@ -13,7 +13,7 @@ void Camera::Init()
 	matProjection = XMMatrixPerspectiveFovLH(
 		XMConvertToRadians(60.0f),
 		(float)Win::window_width / Win::window_height,
-		0.1f, 1800.0f
+		0.1f, 2100.0f
 	);
 	UpdateViewMatrix();
 	matViewProjection = matView * matProjection;
@@ -29,7 +29,7 @@ void Camera::UpdateCamera()
 	matProjection = XMMatrixPerspectiveFovLH(
 		XMConvertToRadians(60.0f),
 		(float)Win::window_width / Win::window_height,
-		0.1f, 1800.0f
+		0.1f, 2100.0f
 	);
 
 	matViewProjection = matView * matProjection;

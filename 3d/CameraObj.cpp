@@ -80,7 +80,7 @@ void CameraObj::UpdateCamera()
 		target.m128_f32[1] = startPlayerObj.y + forward.m128_f32[1];
 		target.m128_f32[2] = startPlayerObj.z + forward.m128_f32[2];
 	}
-	else if (startMovie == false && startPlayerObj.z >= 500)
+	else if (startMovie == false && startPlayerObj.z >= 600)
 	{
 		eye = { start };
 		

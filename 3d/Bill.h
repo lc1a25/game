@@ -31,6 +31,8 @@ public:
 
 	void SetCameraZ(float cameraZ) { this->cameraZ = cameraZ; }
 
+	void SetBillDeadFlag(bool billDeadFlag) { this->billDeadFlag = billDeadFlag; }
+
 	BOOL billDead()
 	{
 		return billDeadFlag;
