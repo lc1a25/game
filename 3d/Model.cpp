@@ -14,15 +14,16 @@ using namespace DirectX;
 
 ID3D12Device* Model::device = nullptr;
 
-Model* Model::LoadFromOBJ(const std::string& modelname)
+Model* Model::LoadFromOBJ(const std::string& modelname, float alpha)
 {
 	Model* model = new Model();
+	
 
 	model->InitializeDescriptorHeap();
 
 	model->LoadFromOBJInternal(modelname);
 
-	model->CreateBuffer();
+	model->CreateBuffer(alpha);
 
 	return model;
 }
@@ -190,7 +191,7 @@ bool Model::InitializeDescriptorHeap()
 	return true;
 }
 
-void Model::CreateBuffer()
+void Model::CreateBuffer(float alpha)
 {
 	HRESULT result;
 
@@ -278,7 +279,7 @@ void Model::CreateBuffer()
 		constMap1->ambient = material.ambient;
 		constMap1->diffuse = material.diffuse;
 		constMap1->specular = material.specular;
-		constMap1->alpha = material.alpha;
+		constMap1->alpha = alpha;
 		constBuffB1->Unmap(0, nullptr);
 	}
 }

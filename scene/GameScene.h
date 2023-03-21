@@ -3,10 +3,11 @@
 #include <DirectXMath.h>
 #include "Input.h"
 #include "Sprite.h"
+#include "SpriteCommon.h"
 #include "DebugText.h"
 #include "Audio.h"
 #include "Matrix4.h"
-
+#include "Win.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "EnemyCircle.h"
@@ -17,6 +18,7 @@
 #include "ParticleManager.h"
 #include <sstream>
 #include "Bill.h"
+
 
 class GameScene
 {
@@ -45,7 +47,7 @@ public: // メンバ関数
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Init(DirectXCommon* dxCommon, Input* input, Audio* audio);
+	void Init(DirectXCommon* dxCommon, Input* input, Audio* audio, Win* win);
 
 	/// <summary>
 	/// 毎フレーム処理
@@ -80,7 +82,7 @@ public: // メンバ関数
 	void EnemyCreateParticle(XMFLOAT3 position);
 	void BossCreateParticle(XMFLOAT3 position);
 	void MojiCreateParticle(XMFLOAT3 position);
-
+	void SetGameFlag(int gameFlag) { this->gameflag = gameFlag; }
 	//hpバー
 	FLOAT GetbossHpBar() { return bossHpBar; }
 	FLOAT GetHpBar() { return hpBar; }
@@ -137,6 +139,7 @@ private: // メンバ変数
 	DirectXCommon* dxcommon = nullptr;
 	Input* input = nullptr;
 	Audio* audio = nullptr;
+	Win* win = nullptr;
 
 	//カメラ
 	Camera* camera = nullptr;
@@ -170,6 +173,8 @@ private: // メンバ変数
 	Object3d* kanbanShot3Obj = kanbanShot3Obj->Create();
 	Object3d* kanbanShot4Obj = kanbanShot4Obj->Create();
 
+	Object3d* barrier = barrier->Create();
+	Object3d* barrier2 = barrier2->Create();
 	//プレイヤー
 	Player* player = nullptr;
 	
@@ -218,6 +223,9 @@ private: // メンバ変数
 	Model* kanbanShot3Model = nullptr;
 	Model* kanbanShot4Model = nullptr;
 
+	Model* barrierModel = nullptr;
+	Model* barrier2Model = nullptr;
+
 	//パーティクル
 	ParticleManager* Particle = nullptr;
 
@@ -240,5 +248,27 @@ private: // メンバ変数
 
 	//チュートリアル文字のｈｐ
 	int mojiHp = 20;
+
+	float bossHpX = 733.0f;
+	float hp = 288;
+	int gameflag = 0;
+	float backBlackX = -640.0f;
+
+	Sprite* reticleSprite;
+	Sprite* explanSprite;
+	Sprite* titleSprite;
+	Sprite* endSprite;
+	Sprite* bossHpWakuSprite;
+	Sprite* bossHpBarSprite;
+	Sprite* playerHpSprite;
+	Sprite* gameOverSprite;
+	Sprite* tyutoRial;
+	Sprite* tyutoRialMove;
+	Sprite* backBlack;
+
+	DebugText* debugtext_minute = nullptr;
+	DebugText* debugtext_minute2 = nullptr;
+
+	SpriteCommon* spriteCommon = nullptr;
 };
 

@@ -50,7 +50,9 @@ public:
 
 	void SetBossDead(bool bossDead) { this->bossDead = bossDead; }
 
+	void SetBarrierPhaseFlag(bool barrierPhaseFlag) { bossChild->SetBarrierPhaseFlag(barrierPhaseFlag); }
 
+	bool GetMiniDead() { return bossChild->IsDead(); }
 	Enemy* GetEnemy() { return bossChild; }
 };
 

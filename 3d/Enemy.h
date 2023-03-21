@@ -26,35 +26,17 @@ enum class Phase
 	BossVerticalL,
 	BossSide,//bossのミニが横方向に動く
 	BossSideUp,
+	BossBarrier,
 	BossStop,
 	BossDead,
+	BossMiniStop,
+	BossMiniBarrier,
+	BossMiniDead,
+	BossPhaseChange,
 	None,
 };
 
-enum class BossPhase
-{
-	None,
-	BossDead,
-	MiniStop,
-	MiniVerticalLUF,
-	MiniVerticalLUB,
-	MiniVerticalRUF,
-	MiniVerticalRUB,
-	MiniVerticalLDF,
-	MiniVerticalLDB,
-	MiniVerticalRDF,
-	MiniVerticalRDB,
-	MiniSideLUF,
-	MiniSideLUB,
-	MiniSideRUF,
-	MiniSideRUB,
-	MiniSideLDF,
-	MiniSideLDB,
-	MiniSideRDF,
-	MiniSideRDB,
 
-
-};
 
 class Enemy
 {
@@ -68,9 +50,6 @@ private:
 	
 	Object3d* enemy = enemy->Create();
 	std::list<std::unique_ptr<EnemyBullet>> bullets_;
-
-	//GameScene* gameScene = nullptr;
-	//Player* player_ = nullptr;
 	
 	//OneWayの敵のスピード
 	float OWRSpeed = 0.5f;
@@ -124,6 +103,8 @@ private:
 
 	bool isDead = false;
 
+	int bossMiniHp = 10;
+
 	int bossHp = 50;
 	float hpBar = 0;
 	float hpBarMax = 0;
@@ -148,10 +129,15 @@ private:
 	XMFLOAT3 cameraVec;
 
 	bool attackFlag = true;
+	bool barrierFlag = false;
+	bool barrierPhaseFlag = false;
 
 	//敵が死んだ数 (チュートリアルに使う)
 	int enemyDown = 0;
 
+	int changeTime = 0;
+
+	XMFLOAT3 barrierPos;
 
 	//Pが最初についているのはPhase用
 	void PCircleR();
@@ -172,7 +158,7 @@ private:
 
 	void PCircleZ();
 
-	void PCircleBoss();
+	void PCircleBoss(float addCircleSize = 0);
 
 	void PCircleZInverce();
 
@@ -190,11 +176,11 @@ private:
 
 	void PChangeBossDead();
 
+
 	XMVECTOR ease_in(const XMVECTOR& start, const XMVECTOR& end, float t);
 public:
 	float angle = 90.0f;//最初の角度
 	Phase phase = Phase::OutApproach;
-	BossPhase phaseMini = BossPhase::None;
 	//bool bossDamage = false;
 
 	//当たり判定用　弾
@@ -239,8 +225,13 @@ public:
 	void BossVerticalL();
 	void BossSide();//bossのミニが横方向に動く
 	void BossSideUp();
+	void BossBarrier();
 	void BossStop();	
 	void BossDead();
+	void BossMiniStop();
+	void BossMiniBarrier();
+	void BossMiniDead();
+	void BossPhaseChange();
 	void None();
 
 	
@@ -301,6 +292,11 @@ public:
 	}
 
 	void SetBossChildAngle(float angle) { this->angle = angle; }
+
+	void SetBarrierFlag(bool barrierFlag) { this->barrierFlag = barrierFlag; }
+	void SetBarrierPhaseFlag(bool barrierPhaseFlag) { this->barrierPhaseFlag = barrierPhaseFlag; }
+
+	void SetBossHp(int bossHp) { this->bossHp = bossHp; }
 	FLOAT GetHpBarX() { return hpBar; }
 
 	void EasingTime();
@@ -317,6 +313,8 @@ public:
 
 	void OnBossCollision();
 
+	void OnBossMiniCollision();
+
 	void ShotInit();
 
 	//発射タイマーをへらす
@@ -326,7 +324,8 @@ public:
 
 	bool IsDead() const { return isDead; }
 
-	void SetBossHp(int bossHp) { this->bossHp = bossHp; }
+	bool GetBarrierFlag() { return barrierFlag; }
+	bool GetBarrierPhaseFlag() { return barrierPhaseFlag; }
 
 	INT GetBossHp() { return bossHp; }
 

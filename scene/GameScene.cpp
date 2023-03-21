@@ -9,7 +9,7 @@ GameScene::~GameScene()
 {
 }
 
-void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
+void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* win)
 {
 	// nullptrチェック
 	assert(dxCommon);
@@ -19,6 +19,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	this->dxcommon = dxCommon;
 	this->input = input;
 	this->audio = audio;
+	this->win = win;
 
 	//モデル読み込み
 	skydome_model = Model::LoadFromOBJ("skydome");
@@ -42,7 +43,8 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	kanbanShot2Model = Model::LoadFromOBJ("kanbanShot2");
 	kanbanShot3Model = Model::LoadFromOBJ("kanbanShot3");
 	kanbanShot4Model = Model::LoadFromOBJ("kanbanShot4");
-
+	barrierModel = Model::LoadFromOBJ("barrier",0.7);
+	barrier2Model = Model::LoadFromOBJ("barrier2");
 
 	bossHpBar = 733;
 	bossHpBarMax = 733;
@@ -91,8 +93,17 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	kanbanShot4Obj->scale = { 1.5,1.5,1.5 };
 	kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
 	
+	barrier->SetModel(barrierModel);
+	barrier->scale = { 1.8,1.8,1.8 };
+	barrier->SetPosition({ 0,0,20 });
+
+	barrier2->SetModel(barrier2Model);
+	barrier2->scale = { 1.8,1.8,1.8 };
+	barrier2->SetPosition({ 0,0,20 });
+
 	player = new Player();
 	player->Init(playerModel, bulletModel);
+
 
 	startPlayer->SetModel(playerModel);
 	startPlayer->scale = { 1,1,1 };
@@ -164,11 +175,177 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 	//ビル生成
 	BillCreate();
+
+	//描画初期化処理　ここから
+	//スプライト初期化
+	spriteCommon = new SpriteCommon;
+	spriteCommon->Init(dxcommon->GetDev(), dxcommon->GetCmdlist(), win->window_width, win->window_height);
+
+	//レティクル
+	spriteCommon->LoadTexture(0, L"Resource/target.png");
+	
+	reticleSprite = Sprite::Create(spriteCommon, 0);
+	//説明のテキスト
+	spriteCommon->LoadTexture(1, L"Resource/setu.png");
+	explanSprite = Sprite::Create(spriteCommon, 1);
+
+	//タイトル
+	spriteCommon->LoadTexture(2, L"Resource/title.png");
+	titleSprite = Sprite::Create(spriteCommon, 2);
+
+	//エンド
+	spriteCommon->LoadTexture(3, L"Resource/end.png");
+	endSprite = Sprite::Create(spriteCommon, 3);
+
+	//ボスのhpバーの枠
+	spriteCommon->LoadTexture(4, L"Resource/hpWaku.png");
+	bossHpWakuSprite = Sprite::Create(spriteCommon, 4);
+
+	//ボスのhpバー
+	spriteCommon->LoadTexture(5, L"Resource/hpBar.png");
+	bossHpBarSprite = Sprite::Create(spriteCommon, 5, { 0,0 });
+
+	//プレイヤーのhp
+	spriteCommon->LoadTexture(6, L"Resource/heart.png");
+	playerHpSprite = Sprite::Create(spriteCommon, 6);
+
+	//ゲームオーバー
+	spriteCommon->LoadTexture(7, L"Resource/gameover.png");
+	gameOverSprite = Sprite::Create(spriteCommon, 7);
+
+	//チュートリアル攻撃方法
+	spriteCommon->LoadTexture(8, L"Resource/tyutorial.png");
+	tyutoRial = Sprite::Create(spriteCommon, 8);
+
+	//チュートリアル移動方法
+	spriteCommon->LoadTexture(9, L"Resource/tyutorialMove.png");
+	tyutoRialMove = Sprite::Create(spriteCommon, 9);
+
+	//シーン遷移用
+	spriteCommon->LoadTexture(10, L"Resource/backBlack.png");
+	backBlack = Sprite::Create(spriteCommon, 10);
+
+	//デバッグテキスト
+	
+	debugtext_minute = new DebugText();
+
+	const int debugTextTexNumber3 = 20;
+	spriteCommon->LoadTexture(debugTextTexNumber3, L"Resource/ASC_White.png");
+	debugtext_minute->debugTextInit(spriteCommon, debugTextTexNumber3);
+
+	
+	debugtext_minute2 = new DebugText();
+
+	const int debugTextTexNumber4 = 21;
+	spriteCommon->LoadTexture(debugTextTexNumber4, L"Resource/ASC_White.png");
+	debugtext_minute2->debugTextInit(spriteCommon, debugTextTexNumber4);
+	
+	reticleSprite->SetPosition({ 0.0f,0.0f,0.0f });
+	reticleSprite->SetSize({ 100,100 });
+	reticleSprite->TransVertexBuffer();
+
+	explanSprite->SetPosition({ 640.0f,360.0f,0.0f });
+	explanSprite->SetSize({ 1280,720 });
+	explanSprite->TransVertexBuffer();
+
+	titleSprite->SetPosition({ 640.0f,360.0f,0.0f });
+	titleSprite->SetSize({ 1280,720 });
+	titleSprite->TransVertexBuffer();
+
+	endSprite->SetPosition({ 640.0f,360.0f,0.0f });
+	endSprite->SetSize({ 1280,720 });
+	endSprite->TransVertexBuffer();
+
+	gameOverSprite->SetPosition({ 640.0f,360.0f,0.0f });
+	gameOverSprite->SetSize({ 1280,720 });
+	gameOverSprite->TransVertexBuffer();
+
+	bossHpWakuSprite->SetPosition({ 640.0f,50.0f,0.0f });
+	bossHpWakuSprite->SetSize({ 769,38 });
+	bossHpWakuSprite->TransVertexBuffer();
+
+
+	playerHpSprite->SetPosition({ 1112.0f,640.0f,0.0f });
+	playerHpSprite->SetSize({ 288,96 });
+	playerHpSprite->SetTexsize({ 288,96 });
+	playerHpSprite->TransVertexBuffer();
+
+	tyutoRial->SetPosition({ 620.0f,120.0f,0.0f });
+	tyutoRial->SetSize({ 750,108 });
+	tyutoRial->TransVertexBuffer();
+
+	tyutoRialMove->SetPosition({ 620.0f,600.0f,0.0f });
+	tyutoRialMove->SetSize({ 750,190 });
+	tyutoRialMove->TransVertexBuffer();
+
+
+	
+	backBlack->SetPosition({ backBlackX,360.0f,0.0f });
+	backBlack->SetSize({ 1280,720 });
+
+
+	
+
+	bossHpBarSprite->SetPosition({ 273.0f,34.0f,0.0f });
+
 	
 }
 
 void GameScene::Update()
 {
+	if (boss->GetBarrierFlag() == true)
+	{
+		barrier->SetPosition({ boss->GetPos().x,boss->GetPos().y -10 , boss->GetPos().z - 5});
+		barrier->scale = { 9,9,9 };
+	}
+	else if(boss->GetBarrierFlag() == false)
+	{
+		barrier->scale = { 0,0,0 };
+	}
+	barrier->Update();
+	barrier2->Update();
+
+	bossHpX = GetbossHpBar();
+	hp = GetHpBar();
+
+	bossHpBarSprite->SetSize({ bossHpX,32 });
+	bossHpBarSprite->TransVertexBuffer();
+
+
+	playerHpSprite->SetPosition({ 1112.0f,640.0f,0.0f });
+	playerHpSprite->SetSize({ hp,96 });
+	playerHpSprite->SetTexsize({ hp,96 });
+	playerHpSprite->TransVertexBuffer();
+
+	
+	explanSprite->Update();
+	titleSprite->Update();
+	endSprite->Update();
+	gameOverSprite->Update();
+	bossHpBarSprite->Update();
+	bossHpWakuSprite->Update();
+
+	tyutoRial->Update();
+	tyutoRialMove->Update();
+
+	backBlack->SetPosition({ backBlackX,360.0f,0.0f });
+	backBlack->Update();
+	backBlack->TransVertexBuffer();
+
+	//照準
+	reticleSprite->Update();
+	reticleSprite->SetPosition({ mouseX,mouseY,0 });
+
+	playerHpSprite->Update();
+	//デバッグテキスト
+	debugtext_minute->Print(moji, 0, 0, 1.0f);
+	debugtext_minute2->Print(moji2, 0, 100, 1.0f);
+
+	if (sceneChange == true)
+	{
+		backBlackX += 100;
+	}
+
 	if (input->isKeyTrigger(DIK_P))
 	{
 		player->OnCollision();
@@ -184,7 +361,7 @@ void GameScene::Update()
 	if (input->isKeyTrigger(DIK_Q))
 		if (cameraObj->GetStartMovieFlag() == false)
 		{
-			for (int i = 0; i < 50; i++)
+			for (int i = 0; i < 35; i++)
 			{
 				boss->GetEnemy()->OnBossCollision();
 			}
@@ -297,13 +474,13 @@ void GameScene::Update()
 	kanbanShot3Obj->Update();
 	kanbanShot4Obj->Update();
 	
-
 	//2dレティクルスプライトの座標
 	mouseX = player->GetMouseX();
 	mouseY = player->GetMouseY();
 
 	//デバッグ用
-	sprintf_s(moji, "%f", player->GetWorldPosition().z);
+	sprintf_s(moji, "%f", boss->GetPos().y);
+	sprintf_s(moji2, "%f", boss->GetPos().z);
 
 	//カメラの注視点セット
 	cameraObj->SetTargetS(startPlayer->GetPosition());
@@ -410,6 +587,15 @@ void GameScene::Update()
 	bossChildRDF->SetChildShotRange(cameraObj->GetEye());
 	bossChildRDB->SetChildShotRange(cameraObj->GetEye());
 
+	bossChildLUF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildLUB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildRUF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildRUB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildLDF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildLDB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildRDF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildRDB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+
 	//当たり判定
 	if (mutekiFlag == false)
 	{
@@ -429,6 +615,20 @@ void GameScene::Update()
 		CheckBossANDChildCollision(bossChildRDF->GetEnemy());
 		CheckBossANDChildCollision(bossChildRDB->GetEnemy());
 		CheckPillarCollision();
+	}
+
+	if (
+		bossChildLUF->GetMiniDead() == true&&
+		bossChildLUB->GetMiniDead() == true &&
+		bossChildRUF->GetMiniDead() == true &&
+		bossChildRUB->GetMiniDead() == true &&
+		bossChildLDF->GetMiniDead() == true &&
+		bossChildLDB->GetMiniDead() == true &&
+		bossChildRDF->GetMiniDead() == true &&
+		bossChildRDB->GetMiniDead() == true
+		)
+	{
+		boss->SetBarrierFlag(false);
 	}
 
 	//hp
@@ -506,9 +706,11 @@ void GameScene::Update()
 
 void GameScene::Draw()
 {
+	
+	
 	/// ここに3Dオブジェクトの描画処理
 	Object3d::PreDraw(dxcommon->GetCmdlist());
-	
+
 	//スカイドーム
 	skydome->Draw();
 
@@ -566,11 +768,54 @@ void GameScene::Draw()
 		bossChildRDF->Draw();
 		bossChildRDB->Draw();
 	}
+
+	barrier->Draw();
 	
 	Particle->Draw(dxcommon->GetCmdlist());
 	
 	Object3d::PostDraw();
 // 3Dオブクジェクトの描画おわり
+
+	spriteCommon->PreDraw();
+	if (gameflag == 0)
+	{
+
+		titleSprite->Draw();
+		reticleSprite->Draw();
+	
+		debugtext_minute->DrawAll();
+		debugtext_minute2->DrawAll();
+	}
+	else if (gameflag == 1)
+	{
+		reticleSprite->Draw();
+		if (tutorialFlag == true)
+		{
+		}
+		else
+		{
+			playerHpSprite->Draw();
+		}
+		if (bossFlag == true)
+		{
+			bossHpBarSprite->Draw();
+			bossHpWakuSprite->Draw();
+		}
+
+		//デバッグテキスト
+		debugtext_minute->DrawAll();
+		debugtext_minute2->DrawAll();
+
+	}
+	else if (gameflag == 2)
+	{
+		endSprite->Draw();
+	}
+	else if (gameflag == 3)
+	{
+		gameOverSprite->Draw();
+
+	}
 }
 
 void GameScene::CheckAllCollision(Enemy* enemy)
@@ -603,9 +848,11 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 		}
 	}
 
-	pos1 = enemy->GetWorldPosition();
-	//自弾と敵当たり判定
 	
+
+	
+	//自弾と敵当たり判定
+	pos1 = enemy->GetWorldPosition();
 
 	//当たり判定の調整
 	float pos1Add = 4;
@@ -638,36 +885,30 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 			}
 		}
 	}
-
-	
-	//自弾と敵弾当たり判定
-	for (const std::unique_ptr<PlayerBullet>& playerBullet : playerBullets)
-	{
-	
-		pos1 = playerBullet->GetWorldPosition();
-		for (const std::unique_ptr<EnemyBullet>& enemyBullet : enemyBullets)
-		{
-			pos2 = enemyBullet->GetWorldPosition();
-
-			length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
-				((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
-				((pos2.z - pos1.z) * (pos2.z - pos1.z));
-			if (length <= size + 3)
-			{
-				/*enemy->OnCollision();
-
-				playerBullet->OnCollision();
-				enemyBullet->OnCollision();*/
-			}
-		}
-	}
 }
 
 void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 {
 	XMFLOAT3 pos1, pos2;
+	//自弾リスト
+	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player->GetBullets();
 	//敵弾リスト
 	const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = bossChild->GetBullets();
+
+
+	pos1 = boss->GetEnemy()->GetWorldPosition();
+	//bossとbossmini 弾当たり判定
+	for (const std::unique_ptr<EnemyBullet>& bullet : enemyBullets)
+	{
+		pos2 = bullet->GetWorldPosition();
+		length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
+			((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
+			((pos2.z - pos1.z) * (pos2.z - pos1.z));
+		if (length <= size)
+		{
+			bullet->OnCollision();
+		}
+	}
 
 	pos1 = player->GetWorldPosition();
 	//自キャラと敵弾当たり判定
@@ -682,10 +923,42 @@ void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 			if (boss->GetEnemy()->IsDead() == false)
 			{
 				player->OnCollision();
-
+				//パーティクル生成
+				PlayerCreateParticle(player->GetWorldPosition());
 			}
 
 			bullet->OnCollision();
+		}
+	}
+
+	//自弾と敵当たり判定
+	pos1 = bossChild->GetWorldPosition();
+
+	//当たり判定の調整
+	float pos1Add = 4;
+
+	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
+	{
+		pos2 = bullet->GetWorldPosition();
+
+		if (pos1.z >= cameraObj->GetEye().z && pos2.z >= pos1.z &&
+			pos2.x <= pos1.x + pos1Add && pos2.x >= pos1.x - pos1Add &&
+			pos2.y <= pos1.y + pos1Add && pos2.y >= pos1.y - pos1Add)
+		{
+			if(boss->GetBarrierPhaseFlag() == true)
+			{
+				
+				if (bossChild->IsDead() == true)
+				{
+					BossCreateParticle(bossChild->GetWorldPosition());
+				}
+				else
+				{
+					bossChild->OnBossMiniCollision();
+					BossCreateParticle(bossChild->GetWorldPosition());
+				}
+				bullet->OnCollision();
+			}
 		}
 	}
 	

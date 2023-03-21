@@ -51,6 +51,8 @@ public:
 	/// <param name="playerPos">プレイヤーの座標</param>
 	void SetPlayerWorldPos(XMFLOAT3 playerPos) { this->playerWorldPos = playerPos; }
 
+	void SetBarrierFlag(bool barrierFlag) { boss->SetBarrierFlag(barrierFlag); }
+
 	/// <summary>
 	/// ボスの移動量
 	/// </summary>
@@ -71,4 +73,7 @@ public:
 	/// </summary>
 	/// <returns>ボスの生死</returns>
 	BOOL GetBossDead() { return boss->IsDead(); }
+
+	BOOL GetBarrierFlag() { return boss->GetBarrierFlag(); }
+	BOOL GetBarrierPhaseFlag() { return boss->GetBarrierPhaseFlag(); }
 };

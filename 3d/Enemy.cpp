@@ -13,12 +13,17 @@ void(Enemy::*Enemy::spFuncTable[])() = {
 	&Enemy::CircleInfinity,//Åáè„Ç…Ç‹ÇÌÇÈ
 	&Enemy::OneWayR,//âEÇ©ÇÁç∂Ç…çsÇ≠
 	&Enemy::OneWayL,
-	&Enemy::BossVertical,//bossÇÃÉ~ÉjÇ™ècï˚å¸Ç…ìÆÇ≠
+	&Enemy::BossVertical,//bossÇ™ècï˚å¸Ç…ìÆÇ≠
 	&Enemy::BossVerticalL,
-	&Enemy::BossSide,//bossÇÃÉ~ÉjÇ™â°ï˚å¸Ç…ìÆÇ≠
+	&Enemy::BossSide,//bossÇ™â°ï˚å¸Ç…ìÆÇ≠
 	&Enemy::BossSideUp,
+	&Enemy::BossBarrier,
 	&Enemy::BossStop,
 	&Enemy::BossDead,
+	&Enemy::BossMiniStop,
+	&Enemy::BossMiniBarrier,
+	&Enemy::BossMiniDead,
+	&Enemy::BossPhaseChange,
 	&Enemy::None
 };
 
@@ -52,28 +57,7 @@ void Enemy::Update()
 	(this->*spFuncTable[phaseNumber])();
 
 
-	switch (phaseMini)
-	{
-
-	case BossPhase::None:
-
-		break;
-	case BossPhase::BossDead:
-		//enemy->position.y -= 0.1;
-		PChild();
-		
-		enemy->rotation.x++;
-		enemy->rotation.z++;
-		break;
-	case BossPhase::MiniStop:
-		PChild();//É{ÉXÇ…í«è]
-		PShotMinor();//íeÇëOÇ…î≠éÀ
-		PCircleBoss();
-		enemy->rotation.y++;
-
-	default:
-		break;
-	}
+	
 
 	//íeÇÃçXêV
 	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
@@ -211,8 +195,8 @@ void Enemy::PCircleZ()
 	radius = angle * 3.14f / 180.0f;
 
 	//â~èÛÇÃèÍèä
-	addCircleX = cos(radius) * (lengthBoss + 1.8);
-	addCircleZ = sin(radius) * (lengthBoss + 1.8);
+	addCircleX = cos(radius) * (lengthBoss);
+	addCircleZ = sin(radius) * (lengthBoss);
 
 	//ìGÇÃç¿ïWÇ…ë´Ç∑
 	enemy->position.x -= addCircleX;
@@ -222,14 +206,14 @@ void Enemy::PCircleZ()
 	angle += angleVec;
 }
 
-void Enemy::PCircleBoss()
+void Enemy::PCircleBoss(float addCircleSize)
 {
 	//â~ÇÃäpìx
 	radius = angle * 3.14f / 180.0f;
 
 	//â~èÛÇÃèÍèä
-	addCircleX = cos(radius) * (lengthBoss + 1.8);
-	addCircleZ = sin(radius) * (lengthBoss + 1.8);
+	addCircleX = cos(radius) * (lengthBoss + addCircleSize);
+	addCircleZ = sin(radius) * (lengthBoss + addCircleSize);
 
 	//ìGÇÃç¿ïWÇ…ë´Ç∑
 	enemy->position.x = bossPos.x - addCircleX;
@@ -252,7 +236,7 @@ void Enemy::PWait()
 	waitTimer--;
 	if (waitTimer <= 0)
 	{
-		phaseMini = BossPhase::MiniVerticalLUF;
+		//phaseMini = BossPhase::MiniVerticalLUF;
 	}
 }
 
@@ -261,7 +245,7 @@ void Enemy::PWaitLB()
 	waitTimer--;
 	if (waitTimer <= 0)
 	{
-		phaseMini = BossPhase::MiniVerticalLUB;
+		//phaseMini = BossPhase::MiniVerticalLUB;
 	}
 }
 
@@ -270,7 +254,7 @@ void Enemy::PWaitR()
 	waitTimer--;
 	if (waitTimer <= 0)
 	{
-		phaseMini = BossPhase::MiniVerticalRUF;
+		//phaseMini = BossPhase::MiniVerticalRUF;
 	}
 }
 
@@ -279,7 +263,7 @@ void Enemy::PWaitRB()
 	waitTimer--;
 	if (waitTimer <= 0)
 	{
-		phaseMini = BossPhase::MiniVerticalRUB;
+		//phaseMini = BossPhase::MiniVerticalRUB;
 	}
 }
 
@@ -297,10 +281,9 @@ void Enemy::PChildHoming()
 
 void Enemy::PChangeBossDead()
 {
-	if (bossHp <= 0)
+	if (bossHp <= 15)
 	{
-		phase = Phase::BossDead;
-		phaseMini = BossPhase::BossDead;
+		phase = Phase::BossPhaseChange;
 	}
 }
 
@@ -387,29 +370,6 @@ void Enemy::CircleL()
 	PLeaveR();
 }
 
-void Enemy::CircleInfinity()
-{
-	time++;
-	PCircleR();
-	PShot();
-
-	if (angle >= 450)
-	{
-		angleVec = -2;
-		isL = true;
-	}
-	if (angle <= 90 && isL == true)
-	{
-		angleVec = 2;
-		isL = false;
-	}
-
-	if (bossHp <= 25)
-	{
-		phase = Phase::BossSide;
-	}
-}
-
 void Enemy::OneWayR()
 {
 	enemy->position.x += OWRSpeed;
@@ -453,6 +413,27 @@ void Enemy::OneWayL()
 	if (attackFlag == true)
 	{
 		PLeaveF();
+	}
+}
+
+void Enemy::CircleInfinity()
+{
+	PCircleR();
+	PShot();
+
+	if (angle >= 450)
+	{
+		angleVec = -2;
+		isL = true;
+	}
+	if (angle <= 90 && isL == true)
+	{
+		angleVec = 2;
+		isL = false;
+	}
+	if (bossHp <= 25)
+	{
+		phase = Phase::BossPhaseChange;
 	}
 }
 
@@ -501,6 +482,16 @@ void Enemy::BossSideUp()
 	PChangeBossDead();
 }
 
+void Enemy::BossBarrier()
+{
+	enemy->position.x = 0;
+	enemy->position.y = 0;
+	if (bossHp <= 0)
+	{
+		phase = Phase::BossDead;
+	}
+}
+
 void Enemy::BossStop()
 {
 }
@@ -508,8 +499,73 @@ void Enemy::BossStop()
 void Enemy::BossDead()
 {
 	enemy->position.y -= 0.1;
+	enemy->rotation.x += 0.1;
+	enemy->rotation.z += 0.1;
+}
+
+void Enemy::BossMiniStop()
+{
+	PChild();//É{ÉXÇ…í«è]
+	PShotMinor();//íeÇëOÇ…î≠éÀ
+	PCircleBoss();//É{ÉXÇÃé¸ÇËÇÇ‹ÇÌÇÈ
+	enemy->rotation.y++;
+
+	if (barrierPhaseFlag == true)
+	{
+		time++;
+		if (time >= 60)
+		{
+			phase = Phase::BossMiniBarrier;
+		}
+	}
+}
+
+void Enemy::BossMiniBarrier()
+{
+	PShotMinor();//íeÇëOÇ…î≠éÀ
+	PCircleBoss(25.0f); //É{ÉXÇÃé¸ÇËÇÇ‹ÇÌÇÈ
+	PChildHoming();
+}
+
+void Enemy::BossMiniDead()
+{
+	enemy->position.y--;
 	enemy->rotation.x++;
 	enemy->rotation.z++;
+}
+
+void Enemy::BossPhaseChange()
+{
+	if (bossHp <= 15)
+	{
+		if (barrierFlag == false)
+		{
+			barrierPos = enemy->GetPosition();
+		}
+		barrierFlag = true;
+		enemy->rotation.y += 3;
+		changeTime++;
+		if (changeTime >= 120)
+		{
+			barrierPhaseFlag = true;
+			phase = Phase::BossBarrier;
+			changeTime = 0;
+		}
+	}
+
+	if (bossHp <= 25)
+	{
+		barrierFlag = true;
+		enemy->rotation.y+=3;
+		changeTime++;
+		if (changeTime >= 180)
+		{
+			barrierFlag = false;
+			phase = Phase::BossSide;
+			changeTime = 0;
+		}
+	}
+	
 }
 
 void Enemy::None()
@@ -587,8 +643,6 @@ void Enemy::PhaseInit(bool rightMoveTrue)
 
 void Enemy::EasingTime()
 {
-	
-
 	nowCount = timeGetTime();
 
 	elapsedCount = nowCount - startCount;
@@ -617,10 +671,23 @@ void Enemy::OnCollision()
 
 void Enemy::OnBossCollision()
 {
-	bossHp--;
-	hpBar -= hpBarMax / 50;
-	if (bossHp <= 0)
+	if (barrierFlag == false)
 	{
+		bossHp--;
+		hpBar -= hpBarMax / 50;
+		if (bossHp <= 0)
+		{
+			isDead = true;
+		}
+	}
+}
+
+void Enemy::OnBossMiniCollision()
+{
+	bossMiniHp--;
+	if (bossMiniHp <= 0)
+	{
+		phase = Phase::BossMiniDead;
 		isDead = true;
 	}
 }

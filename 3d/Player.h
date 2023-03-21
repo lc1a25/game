@@ -24,7 +24,7 @@ private:
 	XMVECTOR playerStartPos2 = { 0 };
 	float playerZ = 30;
 	//レティクルのz座標(プレイヤーのz座標にプラスする)
-	float reticleZ = 70;
+	float reticleZ = 100;
 	//弾
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 	//入力　初期化

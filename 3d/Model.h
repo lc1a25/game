@@ -18,7 +18,7 @@ private:
 public:
 
 
-	static Model* LoadFromOBJ(const std::string& modelname);
+	static Model* LoadFromOBJ(const std::string& modelname,float alpha = 1.0f);
 
 	static void SetDevice(ID3D12Device* device)
 	{
@@ -82,7 +82,7 @@ public:
 	/// <summary>
 	/// 各種バッファ生成
 	/// </summary>
-	void CreateBuffer();
+	void CreateBuffer(float alpha);
 
 	/// <summary>
 	/// 描画
