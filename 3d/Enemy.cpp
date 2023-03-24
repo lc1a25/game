@@ -281,7 +281,7 @@ void Enemy::PChildHoming()
 
 void Enemy::PChangeBossDead()
 {
-	if (bossHp <= 15)
+	if (bossHp <= 5)
 	{
 		phase = Phase::BossPhaseChange;
 	}
@@ -293,7 +293,10 @@ XMVECTOR Enemy::ease_in(const XMVECTOR& start, const XMVECTOR& end, float t)
 	return start * (1.0f - t) + end * t;
 }
 
-
+XMVECTOR Enemy::lerp(const XMVECTOR& start, const XMVECTOR& end, const float t)
+{
+	return start * (1.0f - t) + end * t;
+}
 
 void Enemy::Approach()
 {
@@ -330,16 +333,28 @@ void Enemy::OutApproach()
 void Enemy::LeaveL()
 {
 	enemy->position.x -= outApproachSpeed;
+	if (enemy->position.z <= cameraZ)
+	{
+		isDead = true;
+	}
 }
 
 void Enemy::LeaveR()
 {
 	enemy->position.x += outApproachSpeed;
+	if (enemy->position.z <= cameraZ)
+	{
+		isDead = true;
+	}
 }
 
 void Enemy::LeaveF()
 {
 	enemy->position.z -= outApproachSpeed;
+	if (enemy->position.z <= cameraZ)
+	{
+		isDead = true;
+	}
 }
 
 void Enemy::Stop()
@@ -376,11 +391,11 @@ void Enemy::OneWayR()
 
 	enemy->position.z += cameraZ;
 
-	if (enemy->position.x <= -100)
+	if (enemy->position.x <= -80)
 	{
 		OWRSpeed *= -1;
 	}
-	if (enemy->position.x >= 100)
+	if (enemy->position.x >= 80)
 	{
 		OWRSpeed *= -1;
 	}
@@ -399,11 +414,11 @@ void Enemy::OneWayL()
 
 	enemy->position.z += cameraZ;
 
-	if (enemy->position.x <= -100)
+	if (enemy->position.x <= -80)
 	{
 		OWRSpeed *= -1;
 	}
-	if (enemy->position.x >= 100)
+	if (enemy->position.x >= 80)
 	{
 		OWRSpeed *= -1;
 	}
@@ -536,7 +551,7 @@ void Enemy::BossMiniDead()
 
 void Enemy::BossPhaseChange()
 {
-	if (bossHp <= 15)
+	if (bossHp <= 5)
 	{
 		if (barrierFlag == false)
 		{
@@ -545,6 +560,13 @@ void Enemy::BossPhaseChange()
 		barrierFlag = true;
 		enemy->rotation.y += 3;
 		changeTime++;
+		/*EasingTime();
+		enemy->position.x = ease_in({ barrierPos.x,barrierPos.y,barrierPos.z },
+			{ 0,0,920 }, timeRate).m128_f32[0];
+		enemy->position.y = ease_in({ barrierPos.x,barrierPos.y,barrierPos.z },
+			{ 0,0,920 }, timeRate).m128_f32[1];
+		enemy->position.z = ease_in({ barrierPos.x,barrierPos.y,barrierPos.z },
+			{ 0,0,920 }, timeRate).m128_f32[2];*/
 		if (changeTime >= 120)
 		{
 			barrierPhaseFlag = true;
@@ -577,21 +599,24 @@ void Enemy::Homing()
 	//assert(player_);
 	const float speed = 1.5f;//1フレーム進む距離
 
+	playerPos = { playerWorldPos.x,playerWorldPos.y ,playerWorldPos.z };
+
 	//差分ベクトル
 	lockOn.m128_f32[0] = playerWorldPos.x - GetWorldPosition().x;
 	lockOn.m128_f32[1] = playerWorldPos.y - GetWorldPosition().y;
 	lockOn.m128_f32[2] = playerWorldPos.z - GetWorldPosition().z;
 
 	//正規化
+	playerPos = XMVector3Normalize(playerPos);
 	lockOn = XMVector3Normalize(lockOn);
 
+	EasingTime();
 	//正規化ベクトルと1フレーム進む距離をかける
-	lockOn *= speed;
+	lockOn = lerp(lockOn,playerPos,timeRate) * speed;
+	
 	//弾生成
 	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
 	newBullet->Init(bulletModel_, enemy->position,lockOn);
-	//newBullet->SetDiffVec(GetWorldPosition(), playerWorldPos);
-
 
 	//弾登録
 	bullets_.push_back(std::move(newBullet));//move はユニークから譲渡するため
@@ -626,8 +651,6 @@ void Enemy::ChildHoming()
 	//弾生成
 	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
 	newBullet->Init(bulletModel_, enemy->position, lockOn);
-	//newBullet->SetDiffVec(GetWorldPosition(), playerWorldPos);
-
 
 	//弾登録
 	bullets_.push_back(std::move(newBullet));//move はユニークから譲渡するため
@@ -652,20 +675,12 @@ void Enemy::EasingTime()
 	timeRate = elapsedTime / maxTime;
 }
 
-XMFLOAT3 Enemy::GetWorldPosition()
-{
-	XMFLOAT3 worldPos;
-	worldPos.x = enemy->matWorld.r[3].m128_f32[0];
-	worldPos.y = enemy->matWorld.r[3].m128_f32[1];
-	worldPos.z = enemy->matWorld.r[3].m128_f32[2];
-	return worldPos;
-}
-
 void Enemy::OnCollision()
 {
 	enemyDown += 1;
 	isDead = true;
 	enemy->position.z = -350;
+	enemy->position.y = -200;
 	phase = Phase::None;
 }
 
@@ -713,4 +728,13 @@ bool Enemy::IsTimer()
 	{
 		return false;
 	}
+}
+
+XMFLOAT3 Enemy::GetWorldPosition()
+{
+	XMFLOAT3 worldPos;
+	worldPos.x = enemy->matWorld.r[3].m128_f32[0];
+	worldPos.y = enemy->matWorld.r[3].m128_f32[1];
+	worldPos.z = enemy->matWorld.r[3].m128_f32[2];
+	return worldPos;
 }

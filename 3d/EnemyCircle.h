@@ -31,4 +31,6 @@ public:
 	void SetPlayerPosition(XMFLOAT3 position) { playerWorldPos = position; }
 
 	Enemy* GetEnemy() { return enemy; }
+
+	BOOL GetIsDead() { return enemy->IsDead(); }
 };

@@ -162,6 +162,8 @@ private: // ƒƒ“ƒo•Ï”
 	Object3d* pillar5 = pillar5->Create();
 
 	std::list<std::unique_ptr<Bill>> bills;
+	std::list<std::unique_ptr<EnemyOneWay>> oneWays;
+	std::list<std::unique_ptr<EnemyCircle>> circles;
 
 	Object3d* shotObj = shotObj->Create();
 	Object3d* shotHibiObj = shotHibiObj->Create();

@@ -113,19 +113,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	enemy->Init(enemyModel, { 30.0f, -300.0f, -200.0f }, enemyModel);//30,0,100
 	
 	enemyL = new Enemy();
-	enemyL->Init(enemyModel, { 50.0f, -50.0f, -200.0f }, enemyModel);
-
-	enemyCircle = new EnemyCircle();
-	enemyCircle->Init(enemyRotateModel, { 0.0f, -10.0f, -150.0f }, false,false);//-50.0f, 50.0f, 400.0f
-
-	enemyCircle2 = new EnemyCircle();
-	enemyCircle2->Init(enemyRotateModel, { 30.0f, -10.0f, -200.0f }, true,false);
-
-	enemyOneWay = new EnemyOneWay();
-	enemyOneWay->Init(enemyModel, { 0.0f,0.0f,-300.0f }, false);
-
-	enemyOneWay2 = new EnemyOneWay();
-	enemyOneWay2->Init(enemyModel, { 30.0f,-300.0f,-200.0f }, true);//30.0f,-100.0f,650.0f
+	enemyL->Init(enemyModel, { 50.0f, -300.0f, -200.0f }, enemyModel);
 
 	boss = new Boss();
 	boss->Init(bossModel, enemyBulletModel, { 0,0,-200.0f });
@@ -226,7 +214,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	backBlack = Sprite::Create(spriteCommon, 10);
 
 	//デバッグテキスト
-	
 	debugtext_minute = new DebugText();
 
 	const int debugTextTexNumber3 = 20;
@@ -264,7 +251,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	bossHpWakuSprite->SetSize({ 769,38 });
 	bossHpWakuSprite->TransVertexBuffer();
 
-
 	playerHpSprite->SetPosition({ 1112.0f,640.0f,0.0f });
 	playerHpSprite->SetSize({ 288,96 });
 	playerHpSprite->SetTexsize({ 288,96 });
@@ -278,13 +264,8 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	tyutoRialMove->SetSize({ 750,190 });
 	tyutoRialMove->TransVertexBuffer();
 
-
-	
 	backBlack->SetPosition({ backBlackX,360.0f,0.0f });
 	backBlack->SetSize({ 1280,720 });
-
-
-	
 
 	bossHpBarSprite->SetPosition({ 273.0f,34.0f,0.0f });
 
@@ -390,10 +371,20 @@ void GameScene::Update()
 		player->SetkeyInput(true);
 	}
 
-	//billをけす
+	//けす
 	bills.remove_if([](std::unique_ptr<Bill>& bill)
 	{
 			return bill->billDead();
+	});
+
+	oneWays.remove_if([](std::unique_ptr<EnemyOneWay>& oneWay)
+	{
+		return oneWay->GetIsDead();
+	});
+
+	circles.remove_if([](std::unique_ptr<EnemyCircle>& circle)
+	{
+		return circle->GetIsDead();
 	});
 	
 	//ビル更新処理
@@ -510,9 +501,6 @@ void GameScene::Update()
 	player->Update();
 
 	enemy->SetCameraZ(cameraObj->GetEyeVec().z);
-	enemyOneWay->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
-	enemyCircle->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
-
 	// 敵
 	enemy->SetPlayerPosition(player->GetWorldPosition());
 	player->SetEnemyPosition(enemy->GetWorldPosition());
@@ -522,15 +510,23 @@ void GameScene::Update()
 	player->SetEnemyPosition(enemyL->GetWorldPosition());
 	enemyL->Update();
 
-	enemyCircle->SetPlayerPosition(player->GetWorldPosition());
-	enemyCircle->Update();
-
-	enemyCircle2->SetPlayerPosition(player->GetWorldPosition());
-	enemyCircle2->Update();
-
-	enemyOneWay->SetPlayerPosition(player->GetWorldPosition());
-	enemyOneWay->Update();
-	enemyOneWay2->Update();
+	//oneway更新処理
+	for (std::unique_ptr<EnemyOneWay>& oneWay : oneWays)
+	{
+		CheckAllCollision(oneWay->GetEnemy());
+		oneWay->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
+		oneWay->SetPlayerPosition(player->GetWorldPosition());
+		oneWay->Update();
+	}
+	
+	//circle更新処理
+	for (std::unique_ptr<EnemyCircle>& circle : circles)
+	{
+		CheckAllCollision(circle->GetEnemy());
+		circle->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
+		circle->SetPlayerPosition(player->GetWorldPosition());
+		circle->Update();
+	}
 
 	//ボス
 	boss->SetPlayerWorldPos(player->GetWorldPosition());
@@ -597,14 +593,10 @@ void GameScene::Update()
 	bossChildRDB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
 
 	//当たり判定
-	if (mutekiFlag == false)
-	{
-		CheckAllCollision(enemyCircle->GetEnemy());
-		CheckAllCollision(enemyCircle2->GetEnemy());
+	
+		//CheckAllCollision(enemyCircle->GetEnemy());
 		CheckAllCollision(enemy);
 		CheckAllCollision(enemyL);
-		CheckAllCollision(enemyOneWay->GetEnemy());
-		CheckAllCollision(enemyOneWay2->GetEnemy());
 		CheckAllCollision(boss->GetEnemy());
 		CheckBossANDChildCollision(bossChildLUF->GetEnemy());
 		CheckBossANDChildCollision(bossChildLUB->GetEnemy());
@@ -615,7 +607,7 @@ void GameScene::Update()
 		CheckBossANDChildCollision(bossChildRDF->GetEnemy());
 		CheckBossANDChildCollision(bossChildRDB->GetEnemy());
 		CheckPillarCollision();
-	}
+	
 
 	if (
 		bossChildLUF->GetMiniDead() == true&&
@@ -749,12 +741,15 @@ void GameScene::Draw()
 	player->Draw();
 	
 	enemy->Draw();
-	//enemyL->Draw();
-	enemyCircle->Draw();
-	//enemyCircle2->Draw();
-	enemyOneWay->Draw();
-	//enemyOneWay2->Draw();
-
+	
+	for (std::unique_ptr<EnemyOneWay>& oneWay : oneWays)
+	{
+		oneWay->Draw();
+	}
+	for (std::unique_ptr<EnemyCircle>& circle : circles)
+	{
+		circle->Draw();
+	}
 	
 	if(cameraObj->GetEndFlag() == true)
 	{ 
@@ -783,8 +778,8 @@ void GameScene::Draw()
 		titleSprite->Draw();
 		reticleSprite->Draw();
 	
-		debugtext_minute->DrawAll();
-		debugtext_minute2->DrawAll();
+		//debugtext_minute->DrawAll();
+		//debugtext_minute2->DrawAll();
 	}
 	else if (gameflag == 1)
 	{
@@ -803,8 +798,8 @@ void GameScene::Draw()
 		}
 
 		//デバッグテキスト
-		debugtext_minute->DrawAll();
-		debugtext_minute2->DrawAll();
+		//debugtext_minute->DrawAll();
+		//debugtext_minute2->DrawAll();
 
 	}
 	else if (gameflag == 2)
@@ -820,6 +815,10 @@ void GameScene::Draw()
 
 void GameScene::CheckAllCollision(Enemy* enemy)
 {
+	if (mutekiFlag == true)
+	{
+		return;
+	}
 	XMFLOAT3 pos1, pos2;
 
 	//自弾リスト
@@ -889,6 +888,10 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 
 void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 {
+	if (mutekiFlag == true)
+	{
+		return;
+	}
 	XMFLOAT3 pos1, pos2;
 	//自弾リスト
 	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player->GetBullets();
@@ -966,6 +969,10 @@ void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 
 void GameScene::CheckPillarCollision()
 {
+	if (mutekiFlag == true)
+	{
+		return;
+	}
 	XMFLOAT3 pos1, pos2;
 
 	//自弾リスト
@@ -1070,8 +1077,12 @@ void GameScene::UpdateEnemyPop()
 				attackFlag = false;
 			}
 
-			enemyOneWay = new EnemyOneWay();
-			enemyOneWay->Init(enemyModel,pos , LorR,attackFlag);
+			//生成
+			std::unique_ptr<EnemyOneWay> newOneWay = std::make_unique<EnemyOneWay>();
+			newOneWay->Init(enemyModel, pos, LorR, attackFlag);
+
+			//登録
+			oneWays.push_back(std::move(newOneWay));//move はユニークから譲渡するため
 		}
 		else if (word.find("CIRCLE") == 0)
 		{
@@ -1097,8 +1108,15 @@ void GameScene::UpdateEnemyPop()
 				attackFlag = true;
 			}
 
-			enemyCircle = new EnemyCircle();
-			enemyCircle->Init(enemyRotateModel, pos, LorR, attackFlag);
+			//生成
+			std::unique_ptr<EnemyCircle> newCircle = std::make_unique<EnemyCircle>();
+			newCircle->Init(enemyRotateModel, pos, LorR, attackFlag);
+
+			//登録
+			circles.push_back(std::move(newCircle));//move はユニークから譲渡するため
+
+		/*	enemyCircle = new EnemyCircle();
+			enemyCircle->Init(enemyRotateModel, pos, LorR, attackFlag);*/
 		}
 		else if (word.find("OUTWAY") == 0)
 		{

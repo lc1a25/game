@@ -22,6 +22,8 @@ public:
 	void PhaseInit(bool rightMoveTrue);
 
 	void SetPlayerPosition(XMFLOAT3 position) { playerWorldPos = position; }
+	
+	BOOL GetIsDead() { return enemy->IsDead(); }
 
 	Enemy* GetEnemy() { return enemy; }
 };

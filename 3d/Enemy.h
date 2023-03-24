@@ -64,11 +64,11 @@ private:
 	int leaveTime = leaveTimeInit;
 	
 
-	long long startCount = 0;
+	long long startCount = timeGetTime();
 	long long nowCount = 0;
 	long long elapsedCount = 0;
 
-	float maxTime = 10.0f;
+	float maxTime = 1.0f;
 	float timeRate = 0.0f;
 
 	//別Phaseに移行するまでに移動しているスピード
@@ -80,6 +80,7 @@ private:
 	//自機の座標(ホーミング用)
 	XMFLOAT3 playerWorldPos;
 	XMVECTOR lockOn;
+	XMVECTOR playerPos;
 
 	XMFLOAT3 bossPos;
 	XMFLOAT3 childShotRange;
@@ -178,6 +179,7 @@ private:
 
 
 	XMVECTOR ease_in(const XMVECTOR& start, const XMVECTOR& end, float t);
+	XMVECTOR lerp(const XMVECTOR& start, const XMVECTOR& end, const float t);
 public:
 	float angle = 90.0f;//最初の角度
 	Phase phase = Phase::OutApproach;
