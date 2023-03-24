@@ -146,10 +146,7 @@ XMMATRIX Matrix4::matrixMatrix(XMMATRIX& m1, const XMMATRIX& m2)
 
 XMMATRIX Matrix4::matrixInverse(XMMATRIX& m)
 {
-	/*XMMATRIX Identity = { 1,0,0,0,
-						    0,1,0,0,
-						    0,0,1,0,
-						    0,0,0,1 };*/
+
 	float mInverse = 
 		+m.r[0].m128_f32[0] * (
 			(m.r[1].m128_f32[1] * m.r[2].m128_f32[2] * m.r[3].m128_f32[3]) +
@@ -316,41 +313,4 @@ XMMATRIX Matrix4::matrixInverse(XMMATRIX& m)
 			   
 		 return (1/mInverse) * m1;
 }
-
-
-
-//XMMATRIX& operator*=(XMMATRIX& m1, const XMMATRIX& m2)
-//{
-//	
-//	XMMATRIX result =
-//	  { 0.0f,0.0f,0.0f,0.0f,
-//		0.0f,0.0f,0.0f,0.0f,
-//		0.0f,0.0f,0.0f,0.0f,
-//		0.0f,0.0f,0.0f,0.0f };
-//
-//	for (int i = 0; i < 4; i++)
-//	{
-//		for (int j = 0; j < 4; j++)
-//		{
-//			for (int k = 0; k < 4; k++)
-//			{
-//				result.r[i].m128_f32[j] += m1.r[i].m128_f32[k] * m2.r[k].m128_f32[j];
-//			}
-//		}
-//	}
-//	m1 = result;
-//
-//	return m1;
-//}
-//
-//XMMATRIX operator*(const XMMATRIX& m1, const XMMATRIX& m2)
-//{
-//	return XMMATRIX();
-//}
-//
-//Vector3 operator*(const Vector3 &v, const XMMATRIX&m)
-//{
-//	return transform(v, m);
-//}
-
 

@@ -301,22 +301,22 @@ XMVECTOR Enemy::lerp(const XMVECTOR& start, const XMVECTOR& end, const float t)
 void Enemy::Approach()
 {
 	leaveTime = leaveTimeInit;
-	enemy->position.x -= ApproachSpeed;
+	enemy->position.x += ApproachSpeed;
 
 	if (enemy->position.x >= 0)
 	{
-		phase = Phase::CircleR;
+		phase = Phase::CircleL;
 	}
 }
 
 void Enemy::ApproachL()
 {
 	leaveTime = leaveTimeInit;
-	enemy->position.x += ApproachSpeed;
+	enemy->position.x -= ApproachSpeed;
 
 	if (enemy->position.x >= 0)
 	{
-		phase = Phase::CircleL;
+		phase = Phase::CircleR;
 	}
 }
 

@@ -76,8 +76,6 @@ void Player::Update()
 	//XMMATRIX matVPV = viewPort;
 	//逆行列を計算
 	XMMATRIX matInverse = XMMatrixInverse(nullptr, matVPV);
-	//XMMATRIX matInverse = Matrix4::matrixInverse(matVPV);
-
 	
 	//スクリーン座標
 	posNear = XMVECTOR{ mouseX, mouseY, 0 };
@@ -86,8 +84,6 @@ void Player::Update()
 	//スクリーンからワールド座標に
 	posNear = XMVector3TransformCoord(posNear, matInverse);
 	posFar = XMVector3TransformCoord(posFar, matInverse);
-	//posNear = Matrix4::transformScreenToWorld(posNear, matInverse);
-	//posFar = Matrix4::transformScreenToWorld(posFar, matInverse);
 
 	//マウスレイの方向
 	XMVECTOR mouseDirection;
@@ -95,7 +91,6 @@ void Player::Update()
 	mouseDirection = XMVector3Normalize(mouseDirection);
 
 	//カメラから3dレティクルの距離
-	//const float distanceObject = 280.0f;
 	//near から mouseDirection(near->far) に　distanceObject 分進んだ距離
 	reticle->matWorld.r[3].m128_f32[0] = posNear.m128_f32[0] + mouseDirection.m128_f32[0] * 100;
 	reticle->matWorld.r[3].m128_f32[1] = posNear.m128_f32[1] + mouseDirection.m128_f32[1] * 100;

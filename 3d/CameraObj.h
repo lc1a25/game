@@ -161,7 +161,7 @@ private:
 	bool startGame = false;
 	
 
-	std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,p6,p7,end,end };
+	std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,end,end,end,end };
 
 	std::vector<XMVECTOR>tyutoPoints{ startT,startT,p2T,p3T,p3T };
 
