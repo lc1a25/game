@@ -142,10 +142,6 @@ private:
 	XMVECTOR p2T{ -30.0f, 0.0f, -550.0f };
 	XMVECTOR p3T{ 0.0f, 0.0f, -600.0f };
 
-	//XMVECTOR startT{ 500.0f, 0.0f, 0.0f };
-	////XMVECTOR start2{ 0.0f, 0.0f, 0.0f };
-	//XMVECTOR p2T{ 450.0f, 0.0f, -50.0f };
-	//XMVECTOR p3T{ 500.0f, 0.0f, -100.0f };
 	XMVECTOR targetEnd{};
 	float maxTime = 10.0f;
 	float timeRate = 0.0f;
@@ -155,11 +151,11 @@ private:
 
 	XMFLOAT3 targetVecTemp = { 0.0f,0.0f,0.0f };
 	XMFLOAT3 targetVec = { 0.0f,0.0f,0.0f };
+
 	bool pointsLast = false;
 	bool pointsStart = true;
-	bool startMovie = true;
+	bool startMovie = false;
 	bool startGame = false;
-	
 
 	std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,end,end,end,end };
 
@@ -167,7 +163,6 @@ private:
 
 	int startIndex = 0;
 	int targetIndex = 2;
-
 	int startTIndex = 0;
 
 };

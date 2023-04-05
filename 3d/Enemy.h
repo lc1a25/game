@@ -22,6 +22,7 @@ enum class Phase
 	CircleInfinity,//∞上にまわる
 	OneWayR,//右から左に行く
 	OneWayL,//左から右に行く
+	BossApproach,
 	BossVertical,//bossのミニが縦方向に動く
 	BossVerticalL,
 	BossSide,//bossのミニが横方向に動く
@@ -59,10 +60,10 @@ private:
 
 	XMVECTOR LUFPosVertical = { -40, MiniPosLUF.m128_f32[1], MiniPosLUF.m128_f32[2] };
 	
-	int time = 0;
+	
 	int leaveTimeInit = 300;
 	int leaveTime = leaveTimeInit;
-	
+	int barrierTime = 0;
 
 	long long startCount = timeGetTime();
 	long long nowCount = 0;
@@ -137,6 +138,8 @@ private:
 	int enemyDown = 0;
 
 	int changeTime = 0;
+
+	float randAdd;
 
 	XMFLOAT3 barrierPos;
 
@@ -223,6 +226,7 @@ public:
 	void CircleInfinity();//∞上にまわる
 	void OneWayR();//右から左に行く
 	void OneWayL();
+	void BossApproach();
 	void BossVertical();//bossのミニが縦方向に動く
 	void BossVerticalL();
 	void BossSide();//bossのミニが横方向に動く

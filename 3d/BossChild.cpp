@@ -9,7 +9,6 @@ void BossChild::Init(Model* enemyModel, XMFLOAT3 position, int childNumber)
 	bossChild->Init(enemyModel_, this->position,  enemyModel_ ,{ 2,2,2 });
 
 	bossChild->phase = Phase::BossMiniStop;
-	//bossChild->phaseMini = BossPhase::MiniStop;
 
 	//LF
 	if (childNumber == 1 || childNumber == 5)

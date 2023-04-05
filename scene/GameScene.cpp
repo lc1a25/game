@@ -23,7 +23,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 
 	//モデル読み込み
 	skydome_model = Model::LoadFromOBJ("skydome");
-	playerModel = Model::LoadFromOBJ("zikistar");
+	playerModel = Model::LoadFromOBJ("player");
 	bulletModel = Model::LoadFromOBJ("ene-0");
 	enemyModel = Model::LoadFromOBJ("oneWay");
 	enemyRotateModel = Model::LoadFromOBJ("rotate");
@@ -44,7 +44,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	kanbanShot3Model = Model::LoadFromOBJ("kanbanShot3");
 	kanbanShot4Model = Model::LoadFromOBJ("kanbanShot4");
 	barrierModel = Model::LoadFromOBJ("barrier",0.7);
-	barrier2Model = Model::LoadFromOBJ("barrier2");
 
 	bossHpBar = 733;
 	bossHpBarMax = 733;
@@ -97,16 +96,12 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	barrier->scale = { 1.8,1.8,1.8 };
 	barrier->SetPosition({ 0,0,20 });
 
-	barrier2->SetModel(barrier2Model);
-	barrier2->scale = { 1.8,1.8,1.8 };
-	barrier2->SetPosition({ 0,0,20 });
-
 	player = new Player();
 	player->Init(playerModel, bulletModel);
 
 
 	startPlayer->SetModel(playerModel);
-	startPlayer->scale = { 1,1,1 };
+	startPlayer->scale = { 2,2,2 };
 	startPlayer->SetPosition({0,0,-550});//500,0,-50
 
 	enemy = new Enemy();
@@ -201,17 +196,13 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	spriteCommon->LoadTexture(7, L"Resource/gameover.png");
 	gameOverSprite = Sprite::Create(spriteCommon, 7);
 
-	//チュートリアル攻撃方法
-	spriteCommon->LoadTexture(8, L"Resource/tyutorial.png");
-	tyutoRial = Sprite::Create(spriteCommon, 8);
-
-	//チュートリアル移動方法
-	spriteCommon->LoadTexture(9, L"Resource/tyutorialMove.png");
-	tyutoRialMove = Sprite::Create(spriteCommon, 9);
-
 	//シーン遷移用
 	spriteCommon->LoadTexture(10, L"Resource/backBlack.png");
 	backBlack = Sprite::Create(spriteCommon, 10);
+
+	//シーン遷移skip用
+	spriteCommon->LoadTexture(11, L"Resource/kSkip.png");
+	kSkipSprite = Sprite::Create(spriteCommon, 11);
 
 	//デバッグテキスト
 	debugtext_minute = new DebugText();
@@ -256,16 +247,12 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	playerHpSprite->SetTexsize({ 288,96 });
 	playerHpSprite->TransVertexBuffer();
 
-	tyutoRial->SetPosition({ 620.0f,120.0f,0.0f });
-	tyutoRial->SetSize({ 750,108 });
-	tyutoRial->TransVertexBuffer();
-
-	tyutoRialMove->SetPosition({ 620.0f,600.0f,0.0f });
-	tyutoRialMove->SetSize({ 750,190 });
-	tyutoRialMove->TransVertexBuffer();
-
 	backBlack->SetPosition({ backBlackX,360.0f,0.0f });
 	backBlack->SetSize({ 1280,720 });
+
+	kSkipSprite->SetPosition({ 1200.0f,20.0f,0.0f });
+	kSkipSprite->SetSize({ 140,32 });
+	kSkipSprite->TransVertexBuffer();
 
 	bossHpBarSprite->SetPosition({ 273.0f,34.0f,0.0f });
 
@@ -274,17 +261,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 
 void GameScene::Update()
 {
-	if (boss->GetBarrierFlag() == true)
-	{
-		barrier->SetPosition({ boss->GetPos().x,boss->GetPos().y -10 , boss->GetPos().z - 5});
-		barrier->scale = { 9,9,9 };
-	}
-	else if(boss->GetBarrierFlag() == false)
-	{
-		barrier->scale = { 0,0,0 };
-	}
-	barrier->Update();
-	barrier2->Update();
+	
 
 	bossHpX = GetbossHpBar();
 	hp = GetHpBar();
@@ -306,9 +283,6 @@ void GameScene::Update()
 	bossHpBarSprite->Update();
 	bossHpWakuSprite->Update();
 
-	tyutoRial->Update();
-	tyutoRialMove->Update();
-
 	backBlack->SetPosition({ backBlackX,360.0f,0.0f });
 	backBlack->Update();
 	backBlack->TransVertexBuffer();
@@ -318,6 +292,7 @@ void GameScene::Update()
 	reticleSprite->SetPosition({ mouseX,mouseY,0 });
 
 	playerHpSprite->Update();
+	kSkipSprite->Update();
 	//デバッグテキスト
 	debugtext_minute->Print(moji, 0, 0, 1.0f);
 	debugtext_minute2->Print(moji2, 0, 100, 1.0f);
@@ -327,54 +302,119 @@ void GameScene::Update()
 		backBlackX += 100;
 	}
 
+	//デバッグ用　プレイヤーのｈｐへる
 	if (input->isKeyTrigger(DIK_P))
 	{
 		player->OnCollision();
 	}
+	//デバッグ用　当たり判定けす
 	if (input->isKeyTrigger(DIK_C) && mutekiFlag == true)
 	{
 		mutekiFlag = false;
 	}
+	//デバッグ用　当たり判定戻す
 	else if (input->isKeyTrigger(DIK_C))
 	{
 		mutekiFlag = true;
 	}
+	//デバッグ用　ボスのhp けずる
+	int bossHpAttack = 35;
 	if (input->isKeyTrigger(DIK_Q))
-		if (cameraObj->GetStartMovieFlag() == false)
+	{
+		for (int i = 0; i < bossHpAttack; i++)
 		{
-			for (int i = 0; i < 35; i++)
-			{
-				boss->GetEnemy()->OnBossCollision();
-			}
-			startPlayer->position.z += 4;
-			startPlayer->position.y += 0.3;
+			boss->GetEnemy()->OnBossCollision();
+		}		
+	}
+
+	//自機の弾のパーティクル
+	//自弾リスト
+	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player->GetBullets();
+	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
+	{
+		bullet1 = bullet->GetWorldPosition();
+
+		if (input->isMouseKey())
+		{
+			attackParticleFlag = true;
+
 		}
+		if (attackParticleFlag == true)
+		{
+			PlayerCreateParticle(bullet1);
+		}
+	}
+
+	//ボスのバリア
+	if (boss->GetBarrierFlag() == true)
+	{
+		barrier->SetPosition({ boss->GetPos().x,boss->GetPos().y - 10 , boss->GetPos().z - 5 });
+		if (barrier->scale.x <= 8)
+		{
+			barrier->scale.x++;
+			barrier->scale.y++;
+			barrier->scale.z++;
+		}
+		else
+		{
+			barrier->scale = { 9,9,9 };
+		}
+
+	}
+	else if (boss->GetBarrierFlag() == false)
+	{
+		barrier->scale = { 0,0,0 };
+	}
+
+	barrier->Update();
+
+
+	//タイトルからスタートムービー演出へ
+	if (cameraObj->GetStartMovieFlag() == false && gameStart == false)
+	{
+		if (input->isMouseKey())
+		{
+			cameraObj->SetStartMovieSkip(true);
+			gameStart = true;
+		}
+	}
+	//スタートムービー
+	if (gameStart == true && cameraObj->GetStartMovieFlag() == false)
+	{
+		startPlayer->position.z += 4;
+		startPlayer->position.y += 0.3;
+	}
 
 	//ムービースキップ
 	if (input->isKeyTrigger(DIK_K))
 	{
 		cameraObj->SetStartMovieSkip(false);
 		startPlayer->SetPosition({ 0,-200,610 });
-	}
-
-	//スタートムービー
-	if (cameraObj->GetStartMovieFlag() == false)
-	{
-		startPlayer->position.z += 4;
-		startPlayer->position.y += 0.3;
+		movieSkipFlag = true;
 	}
 	
 	//スタートムービー後の自機(仮)の場所
 	if (startPlayer->GetPosition().z >= 600 && boss->GetBossDead() == false)
 	{
 		startPlayer->SetPosition({0,-200,610});
-		player->SetkeyInput(true);
+		movieSkipFlag = true;
 	}
 
-	//けす
+	//csvのenemy発生
+	UpdateEnemyPop();
+
+	//チュートリアル
+	if (mojiHp <= -1)
+	{
+		tutorialFlag = false;
+		sceneChange = true;	
+	}
+
+	cameraObj->SetTutorialFlag(tutorialFlag);
+	//リストけす
 	bills.remove_if([](std::unique_ptr<Bill>& bill)
 	{
-			return bill->billDead();
+		return bill->billDead();
 	});
 
 	oneWays.remove_if([](std::unique_ptr<EnemyOneWay>& oneWay)
@@ -394,18 +434,6 @@ void GameScene::Update()
 		bill->Update();
 	}
 
-	//csvのenemy発生
-	UpdateEnemyPop();
-
-	//チュートリアル
-	if (mojiHp <= 0)
-	{
-		tutorialFlag = false;
-		sceneChange = true;	
-	}
-
-	cameraObj->SetTutorialFlag(tutorialFlag);
-
 	//スカイドーム
 	 //カメラの移動量より少し遅く動く
 	skydomeZ += cameraObj->GetEyeVec().z * 0.8;
@@ -415,14 +443,15 @@ void GameScene::Update()
 	//設置物の更新
 	wallFloor->Update();
 	road->Update();
-	
 	shotHibiObj->Update();
 	kanbanObj->Update();
 	kanbanPlaneObj->Update();
 
-	if (cameraObj->GetStartGameFlag() == true)
+	if (cameraObj->GetStartGameFlag() == true && setObjectFlag == false)
 	{
 		shotObj->SetPosition({ 0,0,90 });
+		player->SetPlayerPos({ 0,0,0 });
+		setObjectFlag = true;
 	}
 	shotObj->Update();
 	//弾の発射説明
@@ -430,28 +459,28 @@ void GameScene::Update()
 	{
 		kanbanTime++;
 	}
-	if (kanbanTime >= 31)
+	if (kanbanTime >= kanbanTimeMax)
 	{
 		kanbanShotObj->SetPosition({ kanbanShotPosDown });
 		kanbanShot2Obj->SetPosition({ kanbanShotPos });
 		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
 		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
 	}
-	if (kanbanTime >= 61)
+	if (kanbanTime >= kanbanTimeMax * 2)
 	{
 		kanbanShotObj->SetPosition({ kanbanShotPosDown });
 		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
 		kanbanShot3Obj->SetPosition({ kanbanShotPos });
 		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
 	}
-	if (kanbanTime >= 91)
+	if (kanbanTime >= kanbanTimeMax * 3)
 	{
 		kanbanShotObj->SetPosition({ kanbanShotPosDown });
 		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
 		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
 		kanbanShot4Obj->SetPosition({ kanbanShotPos });
 	}
-	if (kanbanTime >= 121)
+	if (kanbanTime >= kanbanTimeMax * 4)
 	{
 		kanbanShotObj->SetPosition({ kanbanShotPos });
 		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
@@ -500,16 +529,7 @@ void GameScene::Update()
 	player->SetPlayerHpBar(hpBar);
 	player->Update();
 
-	enemy->SetCameraZ(cameraObj->GetEyeVec().z);
 	// 敵
-	enemy->SetPlayerPosition(player->GetWorldPosition());
-	player->SetEnemyPosition(enemy->GetWorldPosition());
-	enemy->Update();
-
-	enemyL->SetPlayerPosition(player->GetWorldPosition());
-	player->SetEnemyPosition(enemyL->GetWorldPosition());
-	enemyL->Update();
-
 	//oneway更新処理
 	for (std::unique_ptr<EnemyOneWay>& oneWay : oneWays)
 	{
@@ -594,9 +614,6 @@ void GameScene::Update()
 
 	//当たり判定
 	
-		//CheckAllCollision(enemyCircle->GetEnemy());
-		CheckAllCollision(enemy);
-		CheckAllCollision(enemyL);
 		CheckAllCollision(boss->GetEnemy());
 		CheckBossANDChildCollision(bossChildLUF->GetEnemy());
 		CheckBossANDChildCollision(bossChildLUB->GetEnemy());
@@ -635,7 +652,9 @@ void GameScene::Update()
 	//ボスが倒されたら
 	if (boss->GetEnemy()->IsDead() == true)
 	{
+		player->SetEndFlag(true);
 		player->SetkeyInput(false);
+		
 		//ボスの演出がおわったら
 		if (boss->GetEnemy()->GetWorldPosition().y <= floorY)
 		{
@@ -643,7 +662,7 @@ void GameScene::Update()
 			dieTimer--;
 			if (dieTimer <= 0)
 			{
-				player->SetEndFlag(true);
+				player->SetEndMovieFlag(true);
 				//シーンチェンジ
 				if (player->GetWorldPosition().z >= 1400)
 				{
@@ -667,7 +686,8 @@ void GameScene::Update()
 	//プレイヤーのhpが０になったら
 	if (player->GetHp0() == true)
 	{
-		
+		player->SetEndFlag(true);
+		player->SetkeyInput(false);
 		//パーティクル生成
 		PlayerCreateParticle(player->GetWorldPosition());
 		
@@ -713,7 +733,7 @@ void GameScene::Draw()
 	{
 		bill->Draw();
 	}
-	if (mojiHp >= 10)
+	if (mojiHp >= 9)
 	{
 		shotObj->Draw();
 	}
@@ -721,12 +741,6 @@ void GameScene::Draw()
 	{
 		shotHibiObj->Draw();
 	}
-
-	//pillar->Draw();
-	//pillar2->Draw();
-	//pillar3->Draw();
-	//pillar4->Draw();
-	//pillar5->Draw();
 
 	kanbanObj->Draw();
 
@@ -784,6 +798,10 @@ void GameScene::Draw()
 	else if (gameflag == 1)
 	{
 		reticleSprite->Draw();
+		if (movieSkipFlag == false)
+		{
+			kSkipSprite->Draw();
+		}
 		if (tutorialFlag == true)
 		{
 		}
@@ -809,7 +827,6 @@ void GameScene::Draw()
 	else if (gameflag == 3)
 	{
 		gameOverSprite->Draw();
-
 	}
 }
 
@@ -855,12 +872,12 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 
 	//当たり判定の調整
 	float pos1Add = 4;
-
+	float pos1BossAdd = 12;
 	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
 	{
 		pos2 = bullet->GetWorldPosition();
 		
-		if (pos1.z >= cameraObj->GetEye().z && pos2.z >= pos1.z && 
+		if (pos2.z <= pos1.z + pos1Add && pos2.z >= pos1.z - pos1Add &&
 			pos2.x <= pos1.x + pos1Add && pos2.x >= pos1.x - pos1Add &&
 			pos2.y <= pos1.y + pos1Add && pos2.y >= pos1.y - pos1Add)
 		{
@@ -872,10 +889,20 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 				//パーティクル生成
 				EnemyCreateParticle(enemy->GetWorldPosition());
 			}
-			else
+			
+		}
+		if (pos2.z <= pos1.z + pos1BossAdd && pos2.z >= pos1.z &&
+			pos2.x <= pos1.x + pos1BossAdd && pos2.x >= pos1.x - pos1BossAdd &&
+			pos2.y <= pos1.y + pos1BossAdd && pos2.y >= pos1.y - pos1Add)
+		{
+			if(cameraObj->GetRaleIndex() >= 6 )
 			{
 				enemy->OnBossCollision();
-				BossCreateParticle(enemy->GetWorldPosition());
+				if (boss->GetBarrierFlag() == false)
+				{
+					BossCreateParticle(enemy->GetWorldPosition());
+				}
+			
 				if (boss->GetEnemy()->IsDead() == true)
 				{
 					BossCreateParticle(enemy->GetWorldPosition());
@@ -944,7 +971,7 @@ void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 	{
 		pos2 = bullet->GetWorldPosition();
 
-		if (pos1.z >= cameraObj->GetEye().z && pos2.z >= pos1.z &&
+		if (pos2.z <= pos1.z + pos1Add && pos2.z >= pos1.z &&
 			pos2.x <= pos1.x + pos1Add && pos2.x >= pos1.x - pos1Add &&
 			pos2.y <= pos1.y + pos1Add && pos2.y >= pos1.y - pos1Add)
 		{
@@ -983,23 +1010,32 @@ void GameScene::CheckPillarCollision()
 
 	float pos1Addx = 32;
 	float pos1Addy = 16;
-	float shotObjAddy = 10;
+
 	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
 	{
 		pos2 = bullet->GetWorldPosition();
-
+		
 		if (pos2.z >= pos1.z && //z
 			pos2.x <= pos1.x + pos1Addx && pos2.x >= pos1.x - pos1Addx && //x
 			pos2.y <= pos1.y + pos1Addy && pos2.y >= pos1.y - pos1Addy && //y
-			mojiHp >= 0 //alive
+			mojiHp >= 1 //alive
 			)
 		{
 			bullet->OnCollision();
 			mojiHp--;
 			//パーティクル生成
-			MojiCreateParticle({ shotObj->GetPosition().x ,  shotObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z });
+			CreateParticle(30,48, bullet->GetWorldPosition(), 2.8f,0.02f,
+				12.0f,0.0f, { 1,0,0 }, { 0.5,0.3,0.17 });
 		}
-		
+		else if (pos2.z >= pos1.z && //z
+			pos2.x <= pos1.x + pos1Addx && pos2.x >= pos1.x - pos1Addx && //x
+			pos2.y <= pos1.y + pos1Addy && pos2.y >= pos1.y - pos1Addy && //y
+			mojiHp >= 0 //alive
+			)
+		{
+			mojiHp=-1;
+			MojiBreakParticle({ shotObj->GetPosition().x ,  shotObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z });
+		}
 	}
 }
 
@@ -1266,19 +1302,11 @@ void GameScene::PlayerCreateParticle(XMFLOAT3 position)
 	//パーティクル
 	for (int i = 0; i < 5; i++)
 	{
-
-		const float rnd_pos = 10.0f;
 		XMFLOAT3 pos{};
-
 
 		pos.x = position.x;
 		pos.y = position.y;
 		pos.z = position.z;
-
-		/*pos.x = (float)rand() / RAND_MAX * enemy->GetWorldPosition().x - enemy->GetWorldPosition().x / 2.0f;
-		pos.y = (float)rand() / RAND_MAX * enemy->GetWorldPosition().y - enemy->GetWorldPosition().y / 2.0f;
-		pos.z = (float)rand() / RAND_MAX * enemy->GetWorldPosition().z - enemy->GetWorldPosition().z / 2.0f;*/
-
 
 		const float rnd_vel = 0.8f;
 		XMFLOAT3 vel{};
@@ -1287,11 +1315,11 @@ void GameScene::PlayerCreateParticle(XMFLOAT3 position)
 		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
 
 		XMFLOAT3 acc{};
-		const float rnd_acc = 0.051f;
+		const float rnd_acc = 0.031f;
 		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
 
 		//Add(5, pos, vel, acc);
-		Particle->Add(32, pos, vel, acc, 3.0f, 0.0f, { 1,1,1 }, { 1,0,0 });
+		Particle->Add(32, pos, vel, acc, 5.0f, 1.0f, { 1,1,1 }, { 1,0,0 });
 	}
 
 }
@@ -1301,8 +1329,6 @@ void GameScene::EnemyCreateParticle(XMFLOAT3 position)
 	//パーティクル
 	for (int i = 0; i < 30; i++)
 	{
-
-		const float rnd_pos = 10.0f;
 		XMFLOAT3 pos{};
 
 
@@ -1310,15 +1336,16 @@ void GameScene::EnemyCreateParticle(XMFLOAT3 position)
 		pos.y = position.y;
 		pos.z = position.z;
 
-		const float rnd_vel = 0.1f;
+		const float rnd_vel = 0.5f;
 		XMFLOAT3 vel{};
 		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
 		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
 		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
 
 		XMFLOAT3 acc{};
-		const float rnd_acc = 0.011f;
-		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
+		const float rnd_acc = 0.02f;
+		acc.x = (float)rand() / RAND_MAX * rnd_acc - rnd_acc / 2.0f;
+		acc.y = (float)rand() / RAND_MAX * rnd_acc - rnd_acc / 2.0f;
 
 		//Add(5, pos, vel, acc);
 		Particle->Add(64, pos, vel, acc, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
@@ -1331,16 +1358,14 @@ void GameScene::BossCreateParticle(XMFLOAT3 position)
 	//パーティクル
 	for (int i = 0; i < 30; i++)
 	{
-
-		const float rnd_pos = 10.0f;
 		XMFLOAT3 pos{};
 
 
 		pos.x = position.x;
-		pos.y = position.y;
+		pos.y = position.y + 10;
 		pos.z = position.z;
 
-		const float rnd_vel = 0.8f;
+		const float rnd_vel = 1.3f;
 		XMFLOAT3 vel{};
 		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
 		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
@@ -1351,7 +1376,7 @@ void GameScene::BossCreateParticle(XMFLOAT3 position)
 		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
 
 		//Add(5, pos, vel, acc);
-		Particle->Add(32, pos, vel, acc, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		Particle->Add(32, pos, vel, acc, 25.0f, 2.0f, { 1,1,1 }, { 1,0.5,0 });
 	}
 }
 
@@ -1360,8 +1385,6 @@ void GameScene::MojiCreateParticle(XMFLOAT3 position)
 	//パーティクル
 	for (int i = 0; i < 30; i++)
 	{
-
-		const float rnd_pos = 10.0f;
 		XMFLOAT3 pos{};
 
 
@@ -1376,11 +1399,66 @@ void GameScene::MojiCreateParticle(XMFLOAT3 position)
 		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
 
 		XMFLOAT3 acc{};
-		const float rnd_acc = 0.011f;
+		const float rnd_acc = 0.02f;
 		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
 
 		//Add(5, pos, vel, acc);
-		Particle->Add(32, pos, vel, acc, 15.0f, 0.0f, { 1,0,0 }, { 0.5,0.3,0.17 });
+		Particle->Add(48, pos, vel, acc, 12.0f, 0.0f, { 1,0,0 }, { 0.5,0.3,0.17 });
+	}
+}
+
+void GameScene::MojiBreakParticle(XMFLOAT3 position)
+{
+	//パーティクル
+	for (int i = 0; i < 30; i++)
+	{
+
+		XMFLOAT3 pos{};
+
+
+		pos.x = position.x;
+		pos.y = position.y;
+		pos.z = position.z;
+
+		const float rnd_vel = 2.8f;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+
+		XMFLOAT3 acc{};
+		const float rnd_acc = 0.081f;
+		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
+
+		//Add(5, pos, vel, acc);
+		Particle->Add(64, pos, vel, acc, 10.0f, 0.0f, { 0,1,0 }, { 0.5,0.3,0.17 });
+	}
+}
+
+void GameScene::CreateParticle(int particleCount,int lifeTime, XMFLOAT3 position, float vec, float accel,
+	float start_scale, float end_scale,XMFLOAT3 start_color, XMFLOAT3 end_color)
+{
+	//パーティクル
+	for (int i = 0; i < particleCount; i++)
+	{
+		XMFLOAT3 pos{};
+
+
+		pos.x = position.x;
+		pos.y = position.y;
+		pos.z = position.z;
+
+		const float rnd_vel = vec;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+		vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+
+		XMFLOAT3 acc{};
+		const float rnd_acc = accel;
+		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
+
+		Particle->Add(lifeTime, pos, vel, acc, start_scale, end_scale, start_color, end_color);
 	}
 }
 

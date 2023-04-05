@@ -27,7 +27,6 @@
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
-//#pragma comment(lib, "DirectXTex.lib")
 
 using namespace Microsoft::WRL;
 
@@ -155,7 +154,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		dxcommon->BeginDraw();
 
 		// ４．描画コマンドここから
-		
 
 		gameScene->Draw();
 		
@@ -170,33 +168,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	win->WinFinalize();
 
 //解放
-
 	//Audio解放
 	audio->Finalize();
 	delete audio;
 	delete gameScene;
-	//デバッグテキスト解放
-	//debugtext_minute->Finalize();
-	//delete debugtext_minute;
-	//delete debugtext_minute2;
-
-	////スプライト解放
-	//delete reticleSprite;
-	//delete explanSprite;
-	//delete titleSprite;
-	//delete backBlack;
-	//delete tyutoRial;
-	//delete tyutoRialMove;
-	//delete gameOverSprite;
-	//delete bossHpBarSprite;
-	//delete playerHpSprite;
-	//delete endSprite;
-	//delete spriteCommon;
-
-
 	delete dxcommon;
 	delete input;
 	
 	return 0;
 }
-

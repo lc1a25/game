@@ -10,8 +10,6 @@ VSOutput main(float4 pos : POSITION, float3 normal : NORMAL, float2 uv : TEXCOOR
 
 	float3 diffuse = dot(-lightdir, wnormal.xyz) * m_diffuse;
 
-	//const float3 eye = float3(0, 0, -20);
-	//float3 eyedir = normalize(eye - pos.xyz);
 	float3 eyedir = normalize(cameraPos - wpos.xyz);
 
 	const float shininess = 4.0f;

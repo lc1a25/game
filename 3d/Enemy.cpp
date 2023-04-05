@@ -1,4 +1,6 @@
 #include "Enemy.h"
+#include <stdlib.h>
+#include <time.h>
 
 void(Enemy::*Enemy::spFuncTable[])() = {
 	&Enemy::Approach,//Ú‹ß
@@ -13,6 +15,7 @@ void(Enemy::*Enemy::spFuncTable[])() = {
 	&Enemy::CircleInfinity,//‡ã‚É‚Ü‚í‚é
 	&Enemy::OneWayR,//‰E‚©‚ç¶‚És‚­
 	&Enemy::OneWayL,
+	&Enemy::BossApproach,
 	&Enemy::BossVertical,//boss‚ªc•ûŒü‚É“®‚­
 	&Enemy::BossVerticalL,
 	&Enemy::BossSide,//boss‚ª‰¡•ûŒü‚É“®‚­
@@ -225,9 +228,11 @@ void Enemy::PCircleBoss(float addCircleSize)
 
 void Enemy::PChild()
 {
-	enemy->position.x += bossVec.x ;
-	enemy->position.y += bossVec.y ;
-	enemy->position.z += bossVec.z ;
+	srand(time(NULL));
+	randAdd = rand() % 1 + 0.8;
+	enemy->position.x += bossVec.x * randAdd;
+	enemy->position.y += bossVec.y * randAdd;
+	enemy->position.z += bossVec.z * randAdd;
 
 }
 
@@ -431,6 +436,15 @@ void Enemy::OneWayL()
 	}
 }
 
+void Enemy::BossApproach()
+{
+	enemy->position.y -=0.5;
+	if (enemy->position.y <= 0)
+	{
+		phase = Phase::CircleInfinity;
+	}
+}
+
 void Enemy::CircleInfinity()
 {
 	PCircleR();
@@ -527,8 +541,8 @@ void Enemy::BossMiniStop()
 
 	if (barrierPhaseFlag == true)
 	{
-		time++;
-		if (time >= 60)
+		barrierTime++;
+		if (barrierTime >= 60)
 		{
 			phase = Phase::BossMiniBarrier;
 		}

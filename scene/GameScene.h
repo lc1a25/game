@@ -77,11 +77,7 @@ public: // メンバ関数
 	
 	XMFLOAT3 CommandPositionSet(std::istream &line_stream, std::string &word);
 
-	//パーティクル
-	void PlayerCreateParticle(XMFLOAT3 position);
-	void EnemyCreateParticle(XMFLOAT3 position);
-	void BossCreateParticle(XMFLOAT3 position);
-	void MojiCreateParticle(XMFLOAT3 position);
+	
 	void SetGameFlag(int gameFlag) { this->gameflag = gameFlag; }
 	//hpバー
 	FLOAT GetbossHpBar() { return bossHpBar; }
@@ -175,11 +171,10 @@ private: // メンバ変数
 	Object3d* kanbanShot3Obj = kanbanShot3Obj->Create();
 	Object3d* kanbanShot4Obj = kanbanShot4Obj->Create();
 
+	//ボスのバリア
 	Object3d* barrier = barrier->Create();
-	Object3d* barrier2 = barrier2->Create();
 	//プレイヤー
 	Player* player = nullptr;
-	
 	Object3d* startPlayer = startPlayer->Create();
 
 	//敵
@@ -243,18 +238,29 @@ private: // メンバ変数
 	float skydomeZ = 0;
 
 	int kanbanTime = 0;
+	int kanbanTimeMax = 30;
 	XMFLOAT3 kanbanShotPos = { 90,-30,115 };
 	XMFLOAT3 kanbanShotPosDown = { 90,-90,115 };
 
 	bool mutekiFlag = false;
+	bool movieSkipFlag = false;
+	bool setObjectFlag = false;
 
 	//チュートリアル文字のｈｐ
-	int mojiHp = 20;
+	int mojiHp = 10;
 
 	float bossHpX = 733.0f;
 	float hp = 288;
 	int gameflag = 0;
 	float backBlackX = -640.0f;
+
+	//shotObjの当たり判定調整用
+	float shotObjAddy = 10;
+	XMFLOAT3 bullet1;
+
+	bool attackParticleFlag = false;
+	bool shotBreakFlag = false;
+	bool gameStart = false;
 
 	Sprite* reticleSprite;
 	Sprite* explanSprite;
@@ -267,10 +273,19 @@ private: // メンバ変数
 	Sprite* tyutoRial;
 	Sprite* tyutoRialMove;
 	Sprite* backBlack;
+	Sprite* kSkipSprite;
 
 	DebugText* debugtext_minute = nullptr;
 	DebugText* debugtext_minute2 = nullptr;
 
 	SpriteCommon* spriteCommon = nullptr;
+
+	//パーティクル
+	void PlayerCreateParticle(XMFLOAT3 position);
+	void EnemyCreateParticle(XMFLOAT3 position);
+	void BossCreateParticle(XMFLOAT3 position);
+	void MojiCreateParticle(XMFLOAT3 position);
+	void MojiBreakParticle(XMFLOAT3 position);
+	void CreateParticle(int particleCount ,int lifeTime, XMFLOAT3 position, float vec, float accel, float start_scale, float end_scale, XMFLOAT3 start_color, XMFLOAT3 end_color);
 };
 

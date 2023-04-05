@@ -31,7 +31,7 @@ private:
 	Input* input = nullptr;
 
 	//弾の速さ
-	const float playerVelocity = 1.2f;
+	const float playerVelocity = 1.0f;
 
 	//カメラの行列
 	XMMATRIX cameraObj;
@@ -79,9 +79,10 @@ private:
 	bool playerDieFlag = false;
 
 	bool gameStartFlag = false;
+	bool gameEndFlag = false;
 	bool playerSet = true;
 	bool keyInput = false;
-	bool gameEndFlag = false;
+	bool gameEndMovieFlag = false;
 public:
 
 	//プレイヤーの弾　当たり判定でつかう
@@ -139,9 +140,11 @@ public:
 
 	void SetkeyInput(bool keyInput) { this->keyInput = keyInput; }
 
-	void SetPlayerPos(XMFLOAT3 pos) {player->position.y -= pos.y; }
+	void SetPlayerPos(XMFLOAT3 pos) {player->position = pos; }
 
 	void SetEndFlag(bool gameEndFlag) { this->gameEndFlag = gameEndFlag; }
+
+	void SetEndMovieFlag(bool gameEndMovieFlag) { this->gameEndMovieFlag = gameEndMovieFlag; }
 
 	FLOAT GetHpBar() { return hpBar; }
 
