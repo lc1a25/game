@@ -618,13 +618,11 @@ void Enemy::Homing()
 	//差分ベクトル
 	lockOn.m128_f32[0] = playerWorldPos.x - GetWorldPosition().x;
 	lockOn.m128_f32[1] = playerWorldPos.y - GetWorldPosition().y;
-	lockOn.m128_f32[2] = playerWorldPos.z - GetWorldPosition().z;
+	lockOn.m128_f32[2] = playerWorldPos.z - GetWorldPosition().z + cameraZ;
 
 	//正規化
 	playerPos = XMVector3Normalize(playerPos);
 	lockOn = XMVector3Normalize(lockOn);
-
-	EasingTime();
 	//正規化ベクトルと1フレーム進む距離をかける
 	lockOn = lerp(lockOn,playerPos,timeRate) * speed;
 	

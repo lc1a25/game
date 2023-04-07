@@ -4,7 +4,7 @@ VSOutput main(float4 pos : POSITION, float3 normal : NORMAL, float2 uv : TEXCOOR
 {
 	float4 wnormal = normalize(mul(world,float4(normal,0)));
 	float4 wpos = mul(world, pos);
-	float3 lightdir = normalize(float3(0, -1, 1));
+	float3 lightdir = normalize(float3(1, -1.5, 1));
 	float3 lightcolor = float3(1, 1, 1);
 	float3 ambient = m_ambient;
 

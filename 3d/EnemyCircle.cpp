@@ -5,19 +5,16 @@ void EnemyCircle::Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue,
 	enemyModel_ = enemyModel;
 	enemy = new Enemy();
 	this->position = position;
-	enemy->Init(enemyModel_, position, enemyModel_,{2,2,2},attackFlag);
+	enemy->Init(enemyModel_, position, enemyModel_,{2.5,2.5,2.5},attackFlag);
 	PhaseInit(rightMoveTrue);
 }
 
 void EnemyCircle::Update()
 {
-	//position = enemy->GetPosition();
-
 	if (playerWorldPos.z <= enemy->GetWorldPosition().z)
 	{
 		enemy->SetPlayerPosition(playerWorldPos);
 	}
-	//enemy->SetPosition(position);
 	enemy->Update();
 }
 

@@ -242,7 +242,10 @@ private: // ƒƒ“ƒo•Ï”
 	XMFLOAT3 kanbanShotPos = { 90,-30,115 };
 	XMFLOAT3 kanbanShotPosDown = { 90,-90,115 };
 
+	bool mutekiFlagDeb = false;
 	bool mutekiFlag = false;
+	int mutekiCoolTimeMax = 120;
+	int mutekiCoolTime = mutekiCoolTimeMax;
 	bool movieSkipFlag = false;
 	bool setObjectFlag = false;
 
@@ -252,7 +255,6 @@ private: // ƒƒ“ƒo•Ï”
 	float bossHpX = 733.0f;
 	float hp = 288;
 	int gameflag = 0;
-	float backBlackX = -640.0f;
 
 	//shotObj‚Ì“–‚½‚è”»’è’²®—p
 	float shotObjAddy = 10;

@@ -31,16 +31,6 @@ void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
 	targetVec = { 0.0f,0.0f,0.0f };
 
 	eye = { startT };
-
-	////前方ベクトル
-	//XMVECTOR forward({ 0, 0, 1 });
-	////回転(前方ベクトル)
-	//forward = Matrix4::transform(forward, cameraObj->matWorld);
-	//target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
-	//target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
-	//target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
-	//targetEnd = eye + forward;
-
 }
 
 void CameraObj::UpdateCamera()

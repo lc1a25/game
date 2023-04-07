@@ -105,7 +105,7 @@ private:
 
 	bool isDead = false;
 
-	int bossMiniHp = 10;
+	int bossMiniHp = 5;
 
 	int bossHp = 50;
 	float hpBar = 0;
@@ -225,7 +225,7 @@ public:
 	void CircleL();//左からくる
 	void CircleInfinity();//∞上にまわる
 	void OneWayR();//右から左に行く
-	void OneWayL();
+	void OneWayL();//左から右に行く
 	void BossApproach();
 	void BossVertical();//bossのミニが縦方向に動く
 	void BossVerticalL();
@@ -283,12 +283,28 @@ public:
 	/// <param name="z">カメラのz座標</param>
 	void SetCameraZ(float z) { cameraZ = z; }
 
+	/// <summary>
+	/// ボスの周りをまわる敵の番号(全部で8体いる)セット
+	/// </summary>
+	/// <param name="childNumber"> ボスの周りをまわる敵の番号</param>
 	void SetChildNumber(int childNumber) { this->childNumber = childNumber; }
 
+	/// <summary>
+	/// ボスの移動量
+	/// </summary>
+	/// <param name="bossVec">ボスの移動量</param>
 	void SetBossVec(XMFLOAT3 bossVec) { this->bossVec = bossVec; }
 
+	/// <summary>
+	/// ボスの座標
+	/// </summary>
+	/// <param name="bossPos">ボスの座標</param>
 	void SetBossPos(XMFLOAT3 bossPos) { this->bossPos = bossPos; }
 
+	/// <summary>
+	/// 弾の発射間隔
+	/// </summary>
+	/// <param name="shotRange"></param>
 	void SetChildShotRange(XMFLOAT3 childShotRange) { this->childShotRange = childShotRange; }
 
 	//スプライトhpバー用

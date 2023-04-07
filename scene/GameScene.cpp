@@ -196,10 +196,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	spriteCommon->LoadTexture(7, L"Resource/gameover.png");
 	gameOverSprite = Sprite::Create(spriteCommon, 7);
 
-	//シーン遷移用
-	spriteCommon->LoadTexture(10, L"Resource/backBlack.png");
-	backBlack = Sprite::Create(spriteCommon, 10);
-
 	//シーン遷移skip用
 	spriteCommon->LoadTexture(11, L"Resource/kSkip.png");
 	kSkipSprite = Sprite::Create(spriteCommon, 11);
@@ -247,9 +243,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	playerHpSprite->SetTexsize({ 288,96 });
 	playerHpSprite->TransVertexBuffer();
 
-	backBlack->SetPosition({ backBlackX,360.0f,0.0f });
-	backBlack->SetSize({ 1280,720 });
-
 	kSkipSprite->SetPosition({ 1200.0f,20.0f,0.0f });
 	kSkipSprite->SetSize({ 140,32 });
 	kSkipSprite->TransVertexBuffer();
@@ -283,10 +276,6 @@ void GameScene::Update()
 	bossHpBarSprite->Update();
 	bossHpWakuSprite->Update();
 
-	backBlack->SetPosition({ backBlackX,360.0f,0.0f });
-	backBlack->Update();
-	backBlack->TransVertexBuffer();
-
 	//照準
 	reticleSprite->Update();
 	reticleSprite->SetPosition({ mouseX,mouseY,0 });
@@ -297,10 +286,7 @@ void GameScene::Update()
 	debugtext_minute->Print(moji, 0, 0, 1.0f);
 	debugtext_minute2->Print(moji2, 0, 100, 1.0f);
 
-	if (sceneChange == true)
-	{
-		backBlackX += 100;
-	}
+	
 
 	//デバッグ用　プレイヤーのｈｐへる
 	if (input->isKeyTrigger(DIK_P))
@@ -308,14 +294,14 @@ void GameScene::Update()
 		player->OnCollision();
 	}
 	//デバッグ用　当たり判定けす
-	if (input->isKeyTrigger(DIK_C) && mutekiFlag == true)
+	if (input->isKeyTrigger(DIK_C) && mutekiFlagDeb == true)
 	{
-		mutekiFlag = false;
+		mutekiFlagDeb = false;
 	}
 	//デバッグ用　当たり判定戻す
 	else if (input->isKeyTrigger(DIK_C))
 	{
-		mutekiFlag = true;
+		mutekiFlagDeb = true;
 	}
 	//デバッグ用　ボスのhp けずる
 	int bossHpAttack = 35;
@@ -341,7 +327,7 @@ void GameScene::Update()
 		}
 		if (attackParticleFlag == true)
 		{
-			PlayerCreateParticle(bullet1);
+			CreateParticle(30,8,bullet1,0.5,0.05,10.0f,0.0f,{1,1,1},{1,0,0});
 		}
 	}
 
@@ -406,8 +392,7 @@ void GameScene::Update()
 	//チュートリアル
 	if (mojiHp <= -1)
 	{
-		tutorialFlag = false;
-		sceneChange = true;	
+		tutorialFlag = false;	
 	}
 
 	cameraObj->SetTutorialFlag(tutorialFlag);
@@ -676,7 +661,8 @@ void GameScene::Update()
 		}
 		else
 		{
-			BossCreateParticle(boss->GetPos());
+			CreateParticle(30, 64, boss->GetPos(), 0.5f, 0.05f, 10.0f, 0,
+				{ 1,1,1 }, { 1,0.5,0 });
 		}
 		
 	}
@@ -828,13 +814,24 @@ void GameScene::Draw()
 	{
 		gameOverSprite->Draw();
 	}
+
+	
 }
 
 void GameScene::CheckAllCollision(Enemy* enemy)
 {
-	if (mutekiFlag == true)
+	if (mutekiFlagDeb == true)
 	{
 		return;
+	}
+	if (mutekiFlag == true)
+	{
+		mutekiCoolTime--;
+		if (mutekiCoolTime <= 0)
+		{
+			mutekiFlag = false;
+			mutekiCoolTime = mutekiCoolTimeMax;
+		}
 	}
 	XMFLOAT3 pos1, pos2;
 
@@ -853,11 +850,12 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 				 ((pos2.z - pos1.z) * (pos2.z - pos1.z));
 		if (length <= size)
 		{
-			if (boss->GetEnemy()->IsDead() == false)
+			if (boss->GetEnemy()->IsDead() == false && mutekiFlag == false)
 			{
 				player->OnCollision();
 				//パーティクル生成
 				PlayerCreateParticle(player->GetWorldPosition());
+				mutekiFlag = true;
 			}
 
 			bullet->OnCollision();
@@ -872,12 +870,13 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 
 	//当たり判定の調整
 	float pos1Add = 4;
-	float pos1BossAdd = 12;
+	float pos1AddZ = 4;//z座標に追加調整
+	float pos1BossAdd = 12;//ボスの調整
 	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
 	{
 		pos2 = bullet->GetWorldPosition();
 		
-		if (pos2.z <= pos1.z + pos1Add && pos2.z >= pos1.z - pos1Add &&
+		if (pos2.z <= pos1.z + pos1Add + pos1AddZ && pos2.z >= pos1.z - pos1Add - pos1AddZ &&
 			pos2.x <= pos1.x + pos1Add && pos2.x >= pos1.x - pos1Add &&
 			pos2.y <= pos1.y + pos1Add && pos2.y >= pos1.y - pos1Add)
 		{
@@ -901,12 +900,9 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 				if (boss->GetBarrierFlag() == false)
 				{
 					BossCreateParticle(enemy->GetWorldPosition());
+				
 				}
 			
-				if (boss->GetEnemy()->IsDead() == true)
-				{
-					BossCreateParticle(enemy->GetWorldPosition());
-				}
 				bullet->OnCollision();
 			}
 		}
@@ -915,7 +911,7 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 
 void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 {
-	if (mutekiFlag == true)
+	if (mutekiFlagDeb == true)
 	{
 		return;
 	}
@@ -996,7 +992,7 @@ void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 
 void GameScene::CheckPillarCollision()
 {
-	if (mutekiFlag == true)
+	if (mutekiFlagDeb == true)
 	{
 		return;
 	}
@@ -1456,7 +1452,8 @@ void GameScene::CreateParticle(int particleCount,int lifeTime, XMFLOAT3 position
 
 		XMFLOAT3 acc{};
 		const float rnd_acc = accel;
-		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
+		acc.x = (float)rand() / RAND_MAX * rnd_acc - rnd_acc / 2.0f;
+		acc.y = (float)rand() / RAND_MAX * rnd_acc - rnd_acc / 2.0f;
 
 		Particle->Add(lifeTime, pos, vel, acc, start_scale, end_scale, start_color, end_color);
 	}
