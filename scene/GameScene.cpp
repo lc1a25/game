@@ -1,5 +1,5 @@
 #include "GameScene.h"
-
+#include "time.h"
 
 GameScene::GameScene()
 {
@@ -32,7 +32,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	wallModel = Model::LoadFromOBJ("wallBig");
 	wallBossModel = Model::LoadFromOBJ("wallBoss");
 	wallFlatModel = Model::LoadFromOBJ("wallFlatGray");
-	pillarModel = Model::LoadFromOBJ("bill2");
+	pillarModel = Model::LoadFromOBJ("bill");
 	enemyBulletModel = Model::LoadFromOBJ("box_aka");
 	roadModel = Model::LoadFromOBJ("road");
 	shotObjModel = Model::LoadFromOBJ("shotObj");
@@ -103,12 +103,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	startPlayer->SetModel(playerModel);
 	startPlayer->scale = { 2,2,2 };
 	startPlayer->SetPosition({0,0,-550});//500,0,-50
-
-	enemy = new Enemy();
-	enemy->Init(enemyModel, { 30.0f, -300.0f, -200.0f }, enemyModel);//30,0,100
-	
-	enemyL = new Enemy();
-	enemyL->Init(enemyModel, { 50.0f, -300.0f, -200.0f }, enemyModel);
 
 	boss = new Boss();
 	boss->Init(bossModel, enemyBulletModel, { 0,0,-200.0f });
@@ -507,7 +501,6 @@ void GameScene::Update()
 
 	//©‹@
 	player->SetStartFlag(cameraObj->GetStartGameFlag());
-	player->SetEnemyFlag(enemyL->IsDead());
 	player->SetCameraObj(cameraObj->GetWorldTransform());
 	player->SetCameraPos(cameraObj->GetEye());
 	player->SetCameraEyeVec(cameraObj->GetEyeVec());
@@ -661,7 +654,7 @@ void GameScene::Update()
 		}
 		else
 		{
-			CreateParticle(30, 64, boss->GetPos(), 0.5f, 0.05f, 10.0f, 0,
+			CreateParticle(30, 48, boss->GetPos(), 0.5f, 0.05f, 10.0f, 2.0f,
 				{ 1,1,1 }, { 1,0.5,0 });
 		}
 		
@@ -703,9 +696,7 @@ void GameScene::Update()
 }
 
 void GameScene::Draw()
-{
-	
-	
+{	
 	/// ‚±‚±‚É3DƒIƒuƒWƒFƒNƒg‚Ì•`‰æˆ—
 	Object3d::PreDraw(dxcommon->GetCmdlist());
 
@@ -729,7 +720,6 @@ void GameScene::Draw()
 	}
 
 	kanbanObj->Draw();
-
 	kanbanPlaneObj->Draw();
 	kanbanShotObj->Draw();
 	kanbanShot2Obj->Draw();
@@ -740,7 +730,6 @@ void GameScene::Draw()
 
 	player->Draw();
 	
-	enemy->Draw();
 	
 	for (std::unique_ptr<EnemyOneWay>& oneWay : oneWays)
 	{
@@ -861,9 +850,6 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 			bullet->OnCollision();
 		}
 	}
-
-	
-
 	
 	//©’e‚Æ“G“–‚½‚è”»’è
 	pos1 = enemy->GetWorldPosition();
@@ -1459,34 +1445,144 @@ void GameScene::CreateParticle(int particleCount,int lifeTime, XMFLOAT3 position
 	}
 }
 
+FLOAT GameScene::BillScaleY(int randam)
+{
+	if (randam == 1)
+	{
+		billScaleY = 13;
+	}
+	else if (randam == 2)
+	{
+		billScaleY = 7;
+	}
+	else if (randam == 0)
+	{
+		billScaleY = 10;
+	}
+	return billScaleY;
+}
+
+XMFLOAT3 GameScene::BillRot(int randam)
+{
+	if (randam == 1)
+	{
+		billRotation.x = 90;
+		billRotation.y = 45;
+		billRotation.z = 20;
+	}
+	else if (randam == 2)
+	{
+		billRotation.x = -20;
+		billRotation.y = -45;
+		billRotation.z = -90;
+	}
+	else if (randam == 0)
+	{
+		billRotation.x = 90;
+		billRotation.y = 0;
+		billRotation.z = 45;
+	}
+	return billRotation;
+	
+}
+
 void GameScene::BillCreate()
 {
 	const float iMax = 600;
 	const float iAdd = 40;
 	const float startZ = 130;
-	const float iMax2 = 1000;
-
+	const float iMaxS = 1000;
+	const float iMaxE = 400;
+srand((1));
 	for (float i = 0; i < iMax; i += iAdd)
 	{
-		//bill¶¬
-		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(pillarModel, { 80,-32,startZ + i }, { 4,13,4 });
+		
 
-		//bill“o˜^
-		bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+		randBill = rand() % 3;
+	/*	randBillRot = rand() % 15;
+		if (randBillRot <= 0)
+		{
+			billRotation.z = 90;
+		}*/
+		BillScaleY(randBill);
+			//bill¶¬
+			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+			newBill->Init(pillarModel, { 40,-32,startZ + i }, { 4,billScaleY,4 }, billRotation);
+
+			//bill“o˜^
+			bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+		
 	}
 	for (float i = 0; i < iMax; i += iAdd)
 	{
-		//bill¶¬
-		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(pillarModel, { -80,-32,startZ + i }, { 4,13,4 });
+		randBill = rand() % 3;
 
-		//bill“o˜^
-		bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+		BillScaleY(randBill);
+			//bill¶¬
+			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+			newBill->Init(pillarModel, { -40,-32,startZ + i }, { 4,billScaleY,4 });
+
+			//bill“o˜^
+			bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+		
 	}
 
-	for (float i = 0; i < iMax2; i += iAdd)
+	for (float i = 0; i < iMax; i += iAdd)
 	{
+		randBill = rand() % 3;
+
+		BillScaleY(randBill);
+			//bill¶¬
+			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+			newBill->Init(pillarModel, { 80,-32,startZ + i }, { 4,billScaleY,4 });
+
+			//bill“o˜^
+			bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+		
+	}
+	for (float i = 0; i < iMax; i += iAdd)
+	{
+		randBill = rand() % 3;
+
+		BillScaleY(randBill);
+			//bill¶¬
+			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+			newBill->Init(pillarModel, { -80,-32,startZ + i }, { 4,billScaleY,4 });
+
+			//bill“o˜^
+			bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+		
+	}
+	for (float i = 0; i < iMax; i += iAdd)
+	{
+		randBill = rand() % 3;
+
+		BillScaleY(randBill);
+			//bill¶¬
+			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+			newBill->Init(pillarModel, { 120,-32,startZ + i }, { 4,billScaleY,4 });
+
+			//bill“o˜^
+			bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+		
+	}
+	for (float i = 0; i < iMax; i += iAdd)
+	{
+		randBill = rand() % 3;
+
+		BillScaleY(randBill);
+			//bill¶¬
+			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+			newBill->Init(pillarModel, { -120,-32,startZ + i }, { 4,billScaleY,4 });
+
+			//bill“o˜^
+			bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+		
+	}
+
+	for (float i = 0; i < iMaxS; i += iAdd)
+	{
+
 		//bill¶¬
 		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
 		newBill->Init(pillarModel, { 200,-32,0 - i }, { 4,13,4 });
@@ -1495,7 +1591,7 @@ void GameScene::BillCreate()
 		bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
 	}
 
-	for (float i = 0; i < iMax2; i += iAdd)
+	for (float i = 0; i < iMaxS; i += iAdd)
 	{
 		//bill¶¬
 		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
@@ -1505,7 +1601,7 @@ void GameScene::BillCreate()
 		bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
 	}
 
-	for (float i = 0; i < iMax2; i += iAdd)
+	for (float i = 0; i < iMaxS; i += iAdd)
 	{
 		//bill¶¬
 		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
@@ -1515,7 +1611,7 @@ void GameScene::BillCreate()
 		bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
 	}
 
-	for (float i = 0; i < iMax2; i += iAdd)
+	for (float i = 0; i < iMaxS; i += iAdd)
 	{
 		//bill¶¬
 		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
@@ -1524,7 +1620,76 @@ void GameScene::BillCreate()
 		//bill“o˜^
 		bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
 	}
+	for (float i = 0; i < iMaxE; i += iAdd)
+	{
 
+		randBill = rand() % 3;
+		randBillRot = rand() % 3;
+
+		BillScaleY(randBill);
+		billRotation = BillRot(randBillRot);
+		//bill¶¬
+		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+		newBill->Init(pillarModel, { -200 + i,-32,990 }, { 4,billScaleY,4 },billRotation);
+		
+		//bill¶¬
+		std::unique_ptr<Bill> newBill2 = std::make_unique<Bill>();
+		newBill2->Init(pillarModel, { 200 - i,-32,990 }, { 4,billScaleY,4 }, billRotation);
+
+		//bill¶¬
+		std::unique_ptr<Bill> newBill3 = std::make_unique<Bill>();
+		newBill3->Init(pillarModel, { 200 + i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
+
+		//bill¶¬
+		std::unique_ptr<Bill> newBill4 = std::make_unique<Bill>();
+		newBill4->Init(pillarModel, { 200 - i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
+
+		//bill¶¬
+		std::unique_ptr<Bill> newBill5 = std::make_unique<Bill>();
+		newBill5->Init(pillarModel, { 200 + i,-32,1230 }, { 4,billScaleY,4 }, billRotation);
+
+		//bill¶¬
+		std::unique_ptr<Bill> newBill6 = std::make_unique<Bill>();
+		newBill6->Init(pillarModel, { 200 - i,-32,1230 }, { 4,billScaleY,4 }, billRotation);
+
+
+		//bill“o˜^
+		bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+		//bill“o˜^
+		bills.push_back(std::move(newBill2));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+
+		//bill“o˜^
+		bills.push_back(std::move(newBill3));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+		//bill“o˜^
+		bills.push_back(std::move(newBill4));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+		//bill“o˜^
+		bills.push_back(std::move(newBill5));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+		//bill“o˜^
+		bills.push_back(std::move(newBill6));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+	}
+
+	//for (float i = 0; i < iMax; i += iAdd)
+	//{
+
+	//	randBill = rand() % 3;
+	//	randBillRot = rand() % 3;
+
+	//	BillScaleY(randBill);
+	//	billRotation = BillRot(randBillRot);
+	//	//bill¶¬
+	//	std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
+	//	newBill->Init(pillarModel, { 160 + i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
+
+	//	//bill¶¬
+	//	std::unique_ptr<Bill> newBill2 = std::make_unique<Bill>();
+	//	newBill2->Init(pillarModel, { 160 - i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
+
+
+	//	//bill“o˜^
+	//	bills.push_back(std::move(newBill));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+	//	//bill“o˜^
+	//	bills.push_back(std::move(newBill2));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+	//}
 
 }
 

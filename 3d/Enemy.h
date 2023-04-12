@@ -5,7 +5,7 @@
 #include <memory>
 #include <list>
 
-//class Player;//依存しないでポインタもてる
+//依存しないでポインタもてる
 class GameScene;
 
 enum class Phase
@@ -128,7 +128,6 @@ private:
 	bool circleZFlag = false;
 
 	float cameraZ = 0.0f;
-	XMFLOAT3 cameraVec;
 
 	bool attackFlag = true;
 	bool barrierFlag = false;
@@ -163,8 +162,6 @@ private:
 	void PCircleZ();
 
 	void PCircleBoss(float addCircleSize = 0);
-
-	void PCircleZInverce();
 
 	void PChild();
 

@@ -612,13 +612,13 @@ void Enemy::Homing()
 {
 	//assert(player_);
 	const float speed = 1.5f;//1フレーム進む距離
-
+	const float cameraZAdd = 10;
 	playerPos = { playerWorldPos.x,playerWorldPos.y ,playerWorldPos.z };
 
 	//差分ベクトル
 	lockOn.m128_f32[0] = playerWorldPos.x - GetWorldPosition().x;
 	lockOn.m128_f32[1] = playerWorldPos.y - GetWorldPosition().y;
-	lockOn.m128_f32[2] = playerWorldPos.z - GetWorldPosition().z + cameraZ;
+	lockOn.m128_f32[2] = playerWorldPos.z - GetWorldPosition().z + cameraZAdd;
 
 	//正規化
 	playerPos = XMVector3Normalize(playerPos);

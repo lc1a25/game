@@ -264,6 +264,11 @@ private: // ƒƒ“ƒo•Ï”
 	bool shotBreakFlag = false;
 	bool gameStart = false;
 
+	int randBill = 0;
+	float billScaleY = 13;
+	int randBillRot = 0;
+	XMFLOAT3 billRotation;
+
 	Sprite* reticleSprite;
 	Sprite* explanSprite;
 	Sprite* titleSprite;
@@ -289,5 +294,8 @@ private: // ƒƒ“ƒo•Ï”
 	void MojiCreateParticle(XMFLOAT3 position);
 	void MojiBreakParticle(XMFLOAT3 position);
 	void CreateParticle(int particleCount ,int lifeTime, XMFLOAT3 position, float vec, float accel, float start_scale, float end_scale, XMFLOAT3 start_color, XMFLOAT3 end_color);
+
+	FLOAT BillScaleY(int randam);
+	XMFLOAT3 BillRot(int randam);
 };
 

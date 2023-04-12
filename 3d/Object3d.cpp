@@ -34,15 +34,8 @@ ComPtr<ID3D12Resource> Object3d::indexBuff;
 ComPtr<ID3D12Resource> Object3d::texbuff;
 CD3DX12_CPU_DESCRIPTOR_HANDLE Object3d::cpuDescHandleSRV;
 CD3DX12_GPU_DESCRIPTOR_HANDLE Object3d::gpuDescHandleSRV;
-//XMMATRIX Object3d::matView{};
-//XMMATRIX Object3d::matProjection{};
-//XMFLOAT3 Object3d::eye = { 0, 0, -50.0f };
-//XMFLOAT3 Object3d::target = { 0, 0, 0 };
-//XMFLOAT3 Object3d::up = { 0, 1, 0 };
 D3D12_VERTEX_BUFFER_VIEW Object3d::vbView{};
 D3D12_INDEX_BUFFER_VIEW Object3d::ibView{};
-//Object3d::VertexPosNormalUv Object3d::vertices[vertexCount];
-//unsigned short Object3d::indices[planeCount * 3];
 std::vector<Object3d::VertexPosNormalUv>Object3d::vertices;
 std::vector<unsigned short>Object3d::indices;
 
@@ -195,8 +188,6 @@ bool Object3d::InitializeGraphicsPipeline()
 	gpipeline.SampleMask = D3D12_DEFAULT_SAMPLE_MASK; // 標準設定
 	// ラスタライザステート
 	gpipeline.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	//gpipeline.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-	//gpipeline.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 	// デプスステンシルステート
 	gpipeline.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 
@@ -335,7 +326,6 @@ void Object3d::Update( bool flag)
 	ConstBufferDataB0* constMap = nullptr;
 	result = constBuffB0->Map(0, nullptr, (void**)&constMap);
 	//constMap->color = color;
-	
 	//constMap->mat = matWorld * camera->GetMatViewProjection();	// 行列の合成
 	constMap->cameraPos = cameraPos;
 	constMap->viewProj = viewProj;
@@ -354,14 +344,11 @@ void Object3d::Draw()
 	{
 		return;
 	}
-
+	
 	// 定数バッファビューをセット
 	cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0->GetGPUVirtualAddress());
 
 	model->Draw(cmdList, 1);
-	//light->Draw(cmdList, 3);
-	
-
 }
 
 

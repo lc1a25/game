@@ -19,10 +19,13 @@ private:
 	XMVECTOR lockOn = { 0,0,0 };
 
 	XMVECTOR diff = { 0,0,0 };
+
+	XMFLOAT3 playerPos;
 public:
 	XMVECTOR velocity_ = { 0,0,0 };
 
-	void Init(Model* model, XMFLOAT3 enemyPosition,XMVECTOR velocity,XMFLOAT3 scale = { 0.5,0.5,0.5 });
+	void Init(Model* model, XMFLOAT3 enemyPosition,XMVECTOR velocity,
+		XMFLOAT3 scale = { 0.5,0.5,0.5 }, XMFLOAT3 playerPosition = {0.0f,0.0f,0.0f });
 
 	void Update();
 
@@ -35,6 +38,8 @@ public:
 	XMFLOAT3 GetWorldPosition();
 
 	void SetLockOnPosition(XMFLOAT3 enemyPosition, XMFLOAT3 playerPosition);
+
+	void SetPlayerPos(XMFLOAT3 playerPos) { this->playerPos = playerPos; }
 
 	void SetDiffVec(XMFLOAT3 enemyPosition, XMFLOAT3 playerPosition);
 

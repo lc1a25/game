@@ -1,5 +1,6 @@
 #pragma once
 #include "Object3d.h"
+#include <DirectXMath.h>
 
 
 class Bill
@@ -10,6 +11,7 @@ class Bill
 
 	float cameraZ;
 	bool billDeadFlag = false;
+	DirectX::XMFLOAT3 billRotation;
 public:
 	/// <summary>
 	/// 初期化
@@ -17,7 +19,7 @@ public:
 	/// <param name="model">モデル</param>
 	/// <param name="position">座標</param>
 	/// <param name="scale">大きさ</param>
-	void Init(Model* model, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 scale);
+	void Init(Model* model, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 scale, DirectX::XMFLOAT3 billRotation = {0.0f,0.0f,0.0f });
 
 	/// <summary>
 	/// 更新
