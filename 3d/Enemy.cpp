@@ -308,7 +308,7 @@ void Enemy::Approach()
 	leaveTime = leaveTimeInit;
 	enemy->position.x += ApproachSpeed;
 
-	if (enemy->position.x >= 0)
+	if (enemy->position.x >= -10)
 	{
 		phase = Phase::CircleL;
 	}
@@ -319,7 +319,7 @@ void Enemy::ApproachL()
 	leaveTime = leaveTimeInit;
 	enemy->position.x -= ApproachSpeed;
 
-	if (enemy->position.x >= 0)
+	if (enemy->position.x >= 10)
 	{
 		phase = Phase::CircleR;
 	}
@@ -346,7 +346,10 @@ void Enemy::LeaveL()
 
 void Enemy::LeaveR()
 {
+
 	enemy->position.x += outApproachSpeed;
+
+	
 	if (enemy->position.z <= cameraZ)
 	{
 		isDead = true;
@@ -400,7 +403,7 @@ void Enemy::OneWayR()
 	{
 		OWRSpeed *= -1;
 	}
-	if (enemy->position.x >= 80)
+	if (enemy->position.x >= 20)
 	{
 		OWRSpeed *= -1;
 	}
@@ -419,7 +422,7 @@ void Enemy::OneWayL()
 
 	enemy->position.z += cameraZ;
 
-	if (enemy->position.x <= -80)
+	if (enemy->position.x <= -20)
 	{
 		OWRSpeed *= -1;
 	}
@@ -438,10 +441,12 @@ void Enemy::OneWayL()
 
 void Enemy::BossApproach()
 {
+	bossMovieFlag = true;
 	enemy->position.y -=0.5;
 	if (enemy->position.y <= 0)
 	{
 		phase = Phase::CircleInfinity;
+		bossMovieFlag = false;
 	}
 }
 
@@ -689,7 +694,6 @@ void Enemy::EasingTime()
 
 void Enemy::OnCollision()
 {
-	enemyDown += 1;
 	isDead = true;
 	enemy->position.z = -350;
 	enemy->position.y = -200;
@@ -698,7 +702,7 @@ void Enemy::OnCollision()
 
 void Enemy::OnBossCollision()
 {
-	if (barrierFlag == false)
+	if (barrierFlag == false || bossMovieFlag == false)
 	{
 		bossHp--;
 		hpBar -= hpBarMax / 50;

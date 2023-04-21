@@ -35,6 +35,8 @@ public:
 
 	void SetBillDeadFlag(bool billDeadFlag) { this->billDeadFlag = billDeadFlag; }
 
+	DirectX::XMFLOAT3 GetPos() { return bill->GetPosition(); }
+
 	BOOL billDead()
 	{
 		return billDeadFlag;

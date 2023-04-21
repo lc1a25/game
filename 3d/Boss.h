@@ -76,4 +76,6 @@ public:
 
 	BOOL GetBarrierFlag() { return boss->GetBarrierFlag(); }
 	BOOL GetBarrierPhaseFlag() { return boss->GetBarrierPhaseFlag(); }
+	//ボスがムービー中か
+	BOOL GetBossMovieFlag() { return boss->GetBossMovieFlag(); }
 };

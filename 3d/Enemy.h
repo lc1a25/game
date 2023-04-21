@@ -44,7 +44,6 @@ class Enemy
 private:
 	
 	int phaseNumber = static_cast<int>(phase);
-	int phaseBossNumber = static_cast<int>(phase);
 	static void (Enemy::*spFuncTable[])();
 	Model* enemyModel_ = nullptr;
 	Model* bulletModel_ = nullptr;
@@ -88,6 +87,10 @@ private:
 
 	//発射タイマー
 	int32_t shotTimer = 0;
+
+	int worldZ = 170;
+	int worldZRange = 20;
+	int worldZAdd = 40;
 	
 	//円運動
 
@@ -132,9 +135,7 @@ private:
 	bool attackFlag = true;
 	bool barrierFlag = false;
 	bool barrierPhaseFlag = false;
-
-	//敵が死んだ数 (チュートリアルに使う)
-	int enemyDown = 0;
+	bool bossMovieFlag = false;
 
 	int changeTime = 0;
 
@@ -324,8 +325,6 @@ public:
 
 	XMFLOAT3 GetPosition() { return enemy->position; }
 
-	INT GetEnemyDownCount() { return enemyDown; }
-
 	INT GetphaseNumber() { return phaseNumber; }
 
 	void OnCollision();
@@ -345,6 +344,7 @@ public:
 
 	bool GetBarrierFlag() { return barrierFlag; }
 	bool GetBarrierPhaseFlag() { return barrierPhaseFlag; }
+	bool GetBossMovieFlag() { return bossMovieFlag; }
 
 	INT GetBossHp() { return bossHp; }
 

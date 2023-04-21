@@ -62,8 +62,8 @@ public: // メンバ関数
 	//当たり判定
 	void CheckAllCollision(Enemy* enemy);
 	void CheckBossANDChildCollision(Enemy* bossChild);
-	void CheckPillarCollision();
-
+	void CheckMojiCollision();
+	void CheckBillCollision(Bill* bill);
 	//hwndの取得
 	void SetHwnd(HWND winHwnd) { hwnd = winHwnd; }
 
@@ -77,11 +77,7 @@ public: // メンバ関数
 	
 	XMFLOAT3 CommandPositionSet(std::istream &line_stream, std::string &word);
 
-	
-	void SetGameFlag(int gameFlag) { this->gameflag = gameFlag; }
-	//hpバー
-	FLOAT GetbossHpBar() { return bossHpBar; }
-	FLOAT GetHpBar() { return hpBar; }
+	void SetGameFlag(int gameFlag) { this->gameScene = gameFlag; }
 
 	//ビル生成
 	void BillCreate();
@@ -118,8 +114,6 @@ public: // メンバ関数
 	int  coll = 0;
 
 	bool tutorialFlag = true;
-
-	bool tutorialFlag2 = true;
 
 	bool sceneChange = false;
 
@@ -208,7 +202,7 @@ private: // メンバ変数
 	Model* wallModel = nullptr;
 	Model* wallBossModel = nullptr;
 	Model* wallFlatModel = nullptr;
-	Model* pillarModel = nullptr;
+	Model* billModel = nullptr;
 	Model* enemyBulletModel = nullptr;
 	Model* roadModel = nullptr;
 	Model* shotObjModel = nullptr;
@@ -219,9 +213,7 @@ private: // メンバ変数
 	Model* kanbanShot2Model = nullptr;
 	Model* kanbanShot3Model = nullptr;
 	Model* kanbanShot4Model = nullptr;
-
 	Model* barrierModel = nullptr;
-	Model* barrier2Model = nullptr;
 
 	//パーティクル
 	ParticleManager* Particle = nullptr;
@@ -231,55 +223,60 @@ private: // メンバ変数
 	float size = 25.0f;
 	float wallColliLength = 0.0f;
 
+	float startPlayerAddZ = 4.0f;
+	float startPlayerAddY = 0.3f;
+	XMFLOAT3 startPlayerAfterPos = { 0,-200,610 };
+
 	//床のy
 	float floorY = -55.0f;
 
 	//skydome z
 	float skydomeZ = 0;
 
+	//看板のアニメーション
 	int kanbanTime = 0;
 	int kanbanTimeMax = 30;
 	XMFLOAT3 kanbanShotPos = { 90,-30,115 };
 	XMFLOAT3 kanbanShotPosDown = { 90,-90,115 };
 
 	bool mutekiFlagDeb = false;
+	//無敵時間
 	bool mutekiFlag = false;
 	int mutekiCoolTimeMax = 120;
 	int mutekiCoolTime = mutekiCoolTimeMax;
-	bool movieSkipFlag = false;
-	bool setObjectFlag = false;
+	int tenmetuCount;//無敵時間中に点滅させるため
+	int tenmetuAliveCount = 10;//無敵時間中にキャラを出す時間
+	int tenmetuDeadCount = 20;//無敵時間中にキャラを出さない時間
+
+	bool movieSkipFlag = false;//ムービースキップ用
+	bool setObjectFlag = false;//ムービー後にオブジェクトをセットする用
 
 	//チュートリアル文字のｈｐ
 	int mojiHp = 10;
+	int mojiChangeHp = mojiHp - 1;
 
-	float bossHpX = 733.0f;
-	float hp = 288;
-	int gameflag = 0;
+	int gameScene = 0;//スプライトのゲームシーン
 
-	//shotObjの当たり判定調整用
-	float shotObjAddy = 10;
-	XMFLOAT3 bullet1;
+	
+	float shotObjAddy = 10;//shotObjの当たり判定調整用
+	XMFLOAT3 bullet1;//プレイヤーの弾の座標をいれる用
 
-	bool attackParticleFlag = false;
-	bool shotBreakFlag = false;
-	bool gameStart = false;
+	bool attackParticleFlag = false;//プレイヤーの弾のパーティクルがでるときに使うflag
+	bool gameStartFlag = false;//タイトルからゲームシーンに入ったことがわかるflag
 
-	int randBill = 0;
-	float billScaleY = 13;
-	int randBillRot = 0;
-	XMFLOAT3 billRotation;
+	int randBill = 0;//ビルをランダム配置するときにrandの数値をいれる(scale用)
+	float billScaleY = 13;//ビルの縦方向のスケール
+	int randBillRot = 0;//ビルをランダム配置するときにrandの数値をいれる(rotation用)
+	XMFLOAT3 billRotation;//ビルのローテーション
 
-	Sprite* reticleSprite;
-	Sprite* explanSprite;
+	//スプライト
+	Sprite* reticleSprite;//照準
 	Sprite* titleSprite;
 	Sprite* endSprite;
 	Sprite* bossHpWakuSprite;
 	Sprite* bossHpBarSprite;
 	Sprite* playerHpSprite;
 	Sprite* gameOverSprite;
-	Sprite* tyutoRial;
-	Sprite* tyutoRialMove;
-	Sprite* backBlack;
 	Sprite* kSkipSprite;
 
 	DebugText* debugtext_minute = nullptr;

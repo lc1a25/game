@@ -11,7 +11,7 @@ class BossChild //ボスの周りをまわる敵
 
 	XMFLOAT3 bossPos;//ボスの座標
 
-	XMFLOAT3 shotRange;//
+	XMFLOAT3 shotRange;
 
 	int childNumber;
 

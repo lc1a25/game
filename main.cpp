@@ -84,7 +84,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 #pragma region 初期化
 
-	int gameflag = 0;
+	int gameSceneNum = 0;
 	
 #pragma endregion
 
@@ -104,46 +104,46 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//全キーの入力状態を取得する
 		input->Update();
 	
-		gameScene->SetGameFlag(gameflag);		
+		gameScene->SetGameFlag(gameSceneNum);
 		gameScene->SetHwnd(win->GetHwnd());
 		gameScene->SetViewPort(dxcommon->GetViewPort());
-		if (gameflag == 0)
+		if (gameSceneNum == 0)
 		{
 			gameScene->Update();
 			if (input->isMouseKey())
 			{
-				gameflag = 1;
+				gameSceneNum = 1;
 			}
 		}
-		else if (gameflag == 1)
+		else if (gameSceneNum == 1)
 		{
 			gameScene->Update();
 
 			if (gameScene->playerDieFlag == true)
 			{
-				gameflag = 3;
+				gameSceneNum = 3;
 			}
 			if (gameScene->pointsLast == true)
 			{
-				gameflag = 2;
+				gameSceneNum = 2;
 			}
 
 		}
 		//ゲームクリア
-		else if (gameflag == 2)
+		else if (gameSceneNum == 2)
 		{
 			if (input->isKeyTrigger(DIK_SPACE))
 			{
-				gameflag = 0;
+				gameScene = 0;
 				gameScene = Reset(gameScene, dxcommon, input, audio,win);
 			}
 		}
 		//ゲームオーバー
-		else if (gameflag == 3)
+		else if (gameSceneNum == 3)
 		{
 			if (input->isKeyTrigger(DIK_SPACE))
 			{
-				gameflag = 0;
+				gameScene = 0;
 				gameScene = Reset(gameScene, dxcommon, input, audio,win);
 			}
 		}

@@ -8,7 +8,6 @@ using namespace DirectX;
 using namespace Microsoft::WRL;
 
 
-
 static const DirectX::XMFLOAT3 operator+(const DirectX::XMFLOAT3& lhs, const DirectX::XMFLOAT3& rhs)
 {
 	XMFLOAT3 result;

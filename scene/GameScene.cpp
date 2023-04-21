@@ -32,7 +32,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	wallModel = Model::LoadFromOBJ("wallBig");
 	wallBossModel = Model::LoadFromOBJ("wallBoss");
 	wallFlatModel = Model::LoadFromOBJ("wallFlatGray");
-	pillarModel = Model::LoadFromOBJ("bill");
+	billModel = Model::LoadFromOBJ("bill");
 	enemyBulletModel = Model::LoadFromOBJ("box_aka");
 	roadModel = Model::LoadFromOBJ("road");
 	shotObjModel = Model::LoadFromOBJ("shotObj");
@@ -162,9 +162,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	spriteCommon->LoadTexture(0, L"Resource/target.png");
 	
 	reticleSprite = Sprite::Create(spriteCommon, 0);
-	//説明のテキスト
-	spriteCommon->LoadTexture(1, L"Resource/setu.png");
-	explanSprite = Sprite::Create(spriteCommon, 1);
 
 	//タイトル
 	spriteCommon->LoadTexture(2, L"Resource/title.png");
@@ -212,10 +209,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	reticleSprite->SetSize({ 100,100 });
 	reticleSprite->TransVertexBuffer();
 
-	explanSprite->SetPosition({ 640.0f,360.0f,0.0f });
-	explanSprite->SetSize({ 1280,720 });
-	explanSprite->TransVertexBuffer();
-
 	titleSprite->SetPosition({ 640.0f,360.0f,0.0f });
 	titleSprite->SetSize({ 1280,720 });
 	titleSprite->TransVertexBuffer();
@@ -249,134 +242,91 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 void GameScene::Update()
 {
 	
-
-	bossHpX = GetbossHpBar();
-	hp = GetHpBar();
-
-	bossHpBarSprite->SetSize({ bossHpX,32 });
+	//スプライト
+	//ボスのhp
+	bossHpBarSprite->SetSize({ bossHpBar,32 });
 	bossHpBarSprite->TransVertexBuffer();
 
-
+	//playerのhpト
 	playerHpSprite->SetPosition({ 1112.0f,640.0f,0.0f });
-	playerHpSprite->SetSize({ hp,96 });
-	playerHpSprite->SetTexsize({ hp,96 });
+	playerHpSprite->SetSize({ hpBar,96 });
+	playerHpSprite->SetTexsize({ hpBar,96 });
 	playerHpSprite->TransVertexBuffer();
 
-	
-	explanSprite->Update();
-	titleSprite->Update();
-	endSprite->Update();
-	gameOverSprite->Update();
-	bossHpBarSprite->Update();
-	bossHpWakuSprite->Update();
+	titleSprite->Update();//タイトル
+	endSprite->Update();//クリア
+	gameOverSprite->Update();//ゲームオーバー
+	bossHpBarSprite->Update();//ボスのhpバー
+	bossHpWakuSprite->Update();//ボスのhpバーの枠
 
 	//照準
 	reticleSprite->Update();
 	reticleSprite->SetPosition({ mouseX,mouseY,0 });
 
-	playerHpSprite->Update();
-	kSkipSprite->Update();
+	playerHpSprite->Update();//playerのhp
+	kSkipSprite->Update();//ムービースキップ
 	//デバッグテキスト
 	debugtext_minute->Print(moji, 0, 0, 1.0f);
 	debugtext_minute2->Print(moji2, 0, 100, 1.0f);
 
 	
+	//デバッグ用コマンド
+	////プレイヤーのｈｐへる
+	//if (input->isKeyTrigger(DIK_P))
+	//{
+	//	player->OnCollision();
+	//}
+	////当たり判定けす
+	//if (input->isKeyTrigger(DIK_C) && mutekiFlagDeb == true)
+	//{
+	//	mutekiFlagDeb = false;
+	//}
+	////当たり判定戻す
+	//else if (input->isKeyTrigger(DIK_C))
+	//{
+	//	mutekiFlagDeb = true;
+	//}
+	////ボスのhp けずる
+	//int bossHpAttack = 35;
+	//if (input->isKeyTrigger(DIK_Q))
+	//{
+	//	for (int i = 0; i < bossHpAttack; i++)
+	//	{
+	//		boss->GetEnemy()->OnBossCollision();
+	//	}		
+	//}
 
-	//デバッグ用　プレイヤーのｈｐへる
-	if (input->isKeyTrigger(DIK_P))
-	{
-		player->OnCollision();
-	}
-	//デバッグ用　当たり判定けす
-	if (input->isKeyTrigger(DIK_C) && mutekiFlagDeb == true)
-	{
-		mutekiFlagDeb = false;
-	}
-	//デバッグ用　当たり判定戻す
-	else if (input->isKeyTrigger(DIK_C))
-	{
-		mutekiFlagDeb = true;
-	}
-	//デバッグ用　ボスのhp けずる
-	int bossHpAttack = 35;
-	if (input->isKeyTrigger(DIK_Q))
-	{
-		for (int i = 0; i < bossHpAttack; i++)
-		{
-			boss->GetEnemy()->OnBossCollision();
-		}		
-	}
+	
 
-	//自機の弾のパーティクル
-	//自弾リスト
-	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player->GetBullets();
-	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
-	{
-		bullet1 = bullet->GetWorldPosition();
-
-		if (input->isMouseKey())
-		{
-			attackParticleFlag = true;
-
-		}
-		if (attackParticleFlag == true)
-		{
-			CreateParticle(30,8,bullet1,0.5,0.05,10.0f,0.0f,{1,1,1},{1,0,0});
-		}
-	}
-
-	//ボスのバリア
-	if (boss->GetBarrierFlag() == true)
-	{
-		barrier->SetPosition({ boss->GetPos().x,boss->GetPos().y - 10 , boss->GetPos().z - 5 });
-		if (barrier->scale.x <= 8)
-		{
-			barrier->scale.x++;
-			barrier->scale.y++;
-			barrier->scale.z++;
-		}
-		else
-		{
-			barrier->scale = { 9,9,9 };
-		}
-
-	}
-	else if (boss->GetBarrierFlag() == false)
-	{
-		barrier->scale = { 0,0,0 };
-	}
-
-	barrier->Update();
-
-
+	//ゲーム内
 	//タイトルからスタートムービー演出へ
-	if (cameraObj->GetStartMovieFlag() == false && gameStart == false)
+	if (cameraObj->GetStartMovieFlag() == false && gameStartFlag == false)
 	{
 		if (input->isMouseKey())
 		{
 			cameraObj->SetStartMovieSkip(true);
-			gameStart = true;
+			gameStartFlag = true;
 		}
 	}
 	//スタートムービー
-	if (gameStart == true && cameraObj->GetStartMovieFlag() == false)
+	if (gameStartFlag == true && cameraObj->GetStartMovieFlag() == false)
 	{
-		startPlayer->position.z += 4;
-		startPlayer->position.y += 0.3;
+		startPlayer->position.z += startPlayerAddZ;
+		startPlayer->position.y += startPlayerAddY;
 	}
 
 	//ムービースキップ
-	if (input->isKeyTrigger(DIK_K))
+	if (gameStartFlag == true && input->isKeyTrigger(DIK_K))
 	{
 		cameraObj->SetStartMovieSkip(false);
-		startPlayer->SetPosition({ 0,-200,610 });
+		startPlayer->SetPosition(startPlayerAfterPos);
 		movieSkipFlag = true;
 	}
 	
 	//スタートムービー後の自機(仮)の場所
-	if (startPlayer->GetPosition().z >= 600 && boss->GetBossDead() == false)
+	if (startPlayer->GetPosition().z >= startPlayerAfterPos.z && boss->GetBossDead() == false)
 	{
-		startPlayer->SetPosition({0,-200,610});
+		startPlayer->SetPosition(startPlayerAfterPos);
 		movieSkipFlag = true;
 	}
 
@@ -390,12 +340,12 @@ void GameScene::Update()
 	}
 
 	cameraObj->SetTutorialFlag(tutorialFlag);
-	//リストけす
+
+	//listけす
 	bills.remove_if([](std::unique_ptr<Bill>& bill)
 	{
 		return bill->billDead();
 	});
-
 	oneWays.remove_if([](std::unique_ptr<EnemyOneWay>& oneWay)
 	{
 		return oneWay->GetIsDead();
@@ -591,19 +541,58 @@ void GameScene::Update()
 	bossChildRDB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
 
 	//当たり判定
-	
-		CheckAllCollision(boss->GetEnemy());
-		CheckBossANDChildCollision(bossChildLUF->GetEnemy());
-		CheckBossANDChildCollision(bossChildLUB->GetEnemy());
-		CheckBossANDChildCollision(bossChildRUF->GetEnemy());
-		CheckBossANDChildCollision(bossChildRUB->GetEnemy());
-		CheckBossANDChildCollision(bossChildLDF->GetEnemy());
-		CheckBossANDChildCollision(bossChildLDB->GetEnemy());
-		CheckBossANDChildCollision(bossChildRDF->GetEnemy());
-		CheckBossANDChildCollision(bossChildRDB->GetEnemy());
-		CheckPillarCollision();
-	
+	CheckAllCollision(boss->GetEnemy());
+	CheckBossANDChildCollision(bossChildLUF->GetEnemy());
+	CheckBossANDChildCollision(bossChildLUB->GetEnemy());
+	CheckBossANDChildCollision(bossChildRUF->GetEnemy());
+	CheckBossANDChildCollision(bossChildRUB->GetEnemy());
+	CheckBossANDChildCollision(bossChildLDF->GetEnemy());
+	CheckBossANDChildCollision(bossChildLDB->GetEnemy());
+	CheckBossANDChildCollision(bossChildRDF->GetEnemy());
+	CheckBossANDChildCollision(bossChildRDB->GetEnemy());
+	CheckMojiCollision();
 
+	//自機の弾のパーティクル
+	//自弾リスト
+	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player->GetBullets();
+	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
+	{
+		bullet1 = bullet->GetWorldPosition();
+
+		if (input->isMouseKey())
+		{
+			attackParticleFlag = true;
+		}
+		if (attackParticleFlag == true)
+		{
+			CreateParticle(30, 8, bullet1, 0.5, 0.05, 10.0f, 0.0f, { 1,1,1 }, { 1,0,0 });
+		}
+	}
+
+	//ボスのバリア
+	if (boss->GetBarrierFlag() == true)
+	{
+		barrier->SetPosition({ boss->GetPos().x,boss->GetPos().y - 10 , boss->GetPos().z - 5 });
+		if (barrier->scale.x <= 8)
+		{
+			barrier->scale.x++;
+			barrier->scale.y++;
+			barrier->scale.z++;
+		}
+		else
+		{
+			barrier->scale = { 9,9,9 };
+		}
+
+	}
+	else if (boss->GetBarrierFlag() == false)
+	{
+		barrier->scale = { 0,0,0 };
+	}
+
+	barrier->Update();
+	
+	//ボスのバリアを割る
 	if (
 		bossChildLUF->GetMiniDead() == true&&
 		bossChildLUB->GetMiniDead() == true &&
@@ -700,17 +689,16 @@ void GameScene::Draw()
 	/// ここに3Dオブジェクトの描画処理
 	Object3d::PreDraw(dxcommon->GetCmdlist());
 
-	//スカイドーム
-	skydome->Draw();
-
-	wallFloor->Draw();
-	road->Draw();
+	skydome->Draw();//スカイドーム
+	wallFloor->Draw();//床
+	road->Draw();//道
 
 	for (std::unique_ptr<Bill>& bill : bills)
 	{
 		bill->Draw();
 	}
-	if (mojiHp >= 9)
+	//文字が一回でも攻撃されたらひびが入った文字に変更する
+	if (mojiHp >= mojiChangeHp)
 	{
 		shotObj->Draw();
 	}
@@ -728,8 +716,23 @@ void GameScene::Draw()
 
 	startPlayer->Draw();
 
-	player->Draw();
 	
+	if (mutekiFlag == true && player->GetHp0() == false)
+	{
+		tenmetuCount++;
+		if (tenmetuCount >= 10)
+		{
+			player->Draw();
+			if (tenmetuCount >= 20)
+			{
+				tenmetuCount = 0;
+			}
+		}
+	}
+	else
+	{
+		player->Draw();
+	}
 	
 	for (std::unique_ptr<EnemyOneWay>& oneWay : oneWays)
 	{
@@ -761,7 +764,7 @@ void GameScene::Draw()
 // 3Dオブクジェクトの描画おわり
 
 	spriteCommon->PreDraw();
-	if (gameflag == 0)
+	if (gameScene == 0)//タイトル
 	{
 
 		titleSprite->Draw();
@@ -770,7 +773,7 @@ void GameScene::Draw()
 		//debugtext_minute->DrawAll();
 		//debugtext_minute2->DrawAll();
 	}
-	else if (gameflag == 1)
+	else if (gameScene == 1)//ゲーム内
 	{
 		reticleSprite->Draw();
 		if (movieSkipFlag == false)
@@ -795,11 +798,11 @@ void GameScene::Draw()
 		//debugtext_minute2->DrawAll();
 
 	}
-	else if (gameflag == 2)
+	else if (gameScene == 2)//クリアシーン
 	{
 		endSprite->Draw();
 	}
-	else if (gameflag == 3)
+	else if (gameScene == 3)//ゲームオーバーシーン
 	{
 		gameOverSprite->Draw();
 	}
@@ -861,7 +864,7 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
 	{
 		pos2 = bullet->GetWorldPosition();
-		
+		//雑魚敵と弾の当たり判定
 		if (pos2.z <= pos1.z + pos1Add + pos1AddZ && pos2.z >= pos1.z - pos1Add - pos1AddZ &&
 			pos2.x <= pos1.x + pos1Add && pos2.x >= pos1.x - pos1Add &&
 			pos2.y <= pos1.y + pos1Add && pos2.y >= pos1.y - pos1Add)
@@ -876,6 +879,7 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 			}
 			
 		}
+		//ボスと弾の当たり判定
 		if (pos2.z <= pos1.z + pos1BossAdd && pos2.z >= pos1.z &&
 			pos2.x <= pos1.x + pos1BossAdd && pos2.x >= pos1.x - pos1BossAdd &&
 			pos2.y <= pos1.y + pos1BossAdd && pos2.y >= pos1.y - pos1Add)
@@ -883,10 +887,9 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 			if(cameraObj->GetRaleIndex() >= 6 )
 			{
 				enemy->OnBossCollision();
-				if (boss->GetBarrierFlag() == false)
+				if (boss->GetBarrierFlag() == false || boss->GetBossMovieFlag() == false)
 				{
 					BossCreateParticle(enemy->GetWorldPosition());
-				
 				}
 			
 				bullet->OnCollision();
@@ -949,6 +952,7 @@ void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 	//当たり判定の調整
 	float pos1Add = 4;
 
+	//ボスの周りをまわる敵の当たり判定
 	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
 	{
 		pos2 = bullet->GetWorldPosition();
@@ -976,7 +980,7 @@ void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 	
 }
 
-void GameScene::CheckPillarCollision()
+void GameScene::CheckMojiCollision()
 {
 	if (mutekiFlagDeb == true)
 	{
@@ -996,7 +1000,7 @@ void GameScene::CheckPillarCollision()
 	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
 	{
 		pos2 = bullet->GetWorldPosition();
-		
+		//チュートリアルの文字にダメージ
 		if (pos2.z >= pos1.z && //z
 			pos2.x <= pos1.x + pos1Addx && pos2.x >= pos1.x - pos1Addx && //x
 			pos2.y <= pos1.y + pos1Addy && pos2.y >= pos1.y - pos1Addy && //y
@@ -1009,6 +1013,7 @@ void GameScene::CheckPillarCollision()
 			CreateParticle(30,48, bullet->GetWorldPosition(), 2.8f,0.02f,
 				12.0f,0.0f, { 1,0,0 }, { 0.5,0.3,0.17 });
 		}
+		//チュートリアルの文字がこわれるとき用
 		else if (pos2.z >= pos1.z && //z
 			pos2.x <= pos1.x + pos1Addx && pos2.x >= pos1.x - pos1Addx && //x
 			pos2.y <= pos1.y + pos1Addy && pos2.y >= pos1.y - pos1Addy && //y
@@ -1018,6 +1023,30 @@ void GameScene::CheckPillarCollision()
 			mojiHp=-1;
 			MojiBreakParticle({ shotObj->GetPosition().x ,  shotObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z });
 		}
+	}
+}
+
+void GameScene::CheckBillCollision(Bill* bill)
+{
+	XMFLOAT3 pos1, pos2;
+
+	//自弾リスト
+	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player->GetBullets();
+
+	pos1 = bill->GetPos();
+
+	int pos1Add = 20;
+	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
+	{
+		pos2 = bullet->GetWorldPosition();
+
+		if (pos2.z <= pos1.z + pos1Add && pos2.z >= pos1.z &&
+			pos2.x <= pos1.x + pos1Add && pos2.x >= pos1.x - pos1Add &&
+			pos2.y <= pos1.y + pos1Add && pos2.y >= pos1.y - pos1Add)
+		{
+			bullet->OnCollision();
+		}
+
 	}
 }
 
@@ -1133,8 +1162,6 @@ void GameScene::UpdateEnemyPop()
 			//登録
 			circles.push_back(std::move(newCircle));//move はユニークから譲渡するため
 
-		/*	enemyCircle = new EnemyCircle();
-			enemyCircle->Init(enemyRotateModel, pos, LorR, attackFlag);*/
 		}
 		else if (word.find("OUTWAY") == 0)
 		{
@@ -1412,7 +1439,6 @@ void GameScene::MojiBreakParticle(XMFLOAT3 position)
 		const float rnd_acc = 0.081f;
 		acc.y = -(float)rand() / RAND_MAX * rnd_acc;
 
-		//Add(5, pos, vel, acc);
 		Particle->Add(64, pos, vel, acc, 10.0f, 0.0f, { 0,1,0 }, { 0.5,0.3,0.17 });
 	}
 }
@@ -1507,7 +1533,7 @@ srand((1));
 		BillScaleY(randBill);
 			//bill生成
 			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-			newBill->Init(pillarModel, { 40,-32,startZ + i }, { 4,billScaleY,4 }, billRotation);
+			newBill->Init(billModel, { 40,-32,startZ + i }, { 4,billScaleY,4 }, billRotation);
 
 			//bill登録
 			bills.push_back(std::move(newBill));//move はユニークから譲渡するため
@@ -1520,7 +1546,7 @@ srand((1));
 		BillScaleY(randBill);
 			//bill生成
 			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-			newBill->Init(pillarModel, { -40,-32,startZ + i }, { 4,billScaleY,4 });
+			newBill->Init(billModel, { -40,-32,startZ + i }, { 4,billScaleY,4 });
 
 			//bill登録
 			bills.push_back(std::move(newBill));//move はユニークから譲渡するため
@@ -1534,7 +1560,7 @@ srand((1));
 		BillScaleY(randBill);
 			//bill生成
 			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-			newBill->Init(pillarModel, { 80,-32,startZ + i }, { 4,billScaleY,4 });
+			newBill->Init(billModel, { 80,-32,startZ + i }, { 4,billScaleY,4 });
 
 			//bill登録
 			bills.push_back(std::move(newBill));//move はユニークから譲渡するため
@@ -1547,7 +1573,7 @@ srand((1));
 		BillScaleY(randBill);
 			//bill生成
 			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-			newBill->Init(pillarModel, { -80,-32,startZ + i }, { 4,billScaleY,4 });
+			newBill->Init(billModel, { -80,-32,startZ + i }, { 4,billScaleY,4 });
 
 			//bill登録
 			bills.push_back(std::move(newBill));//move はユニークから譲渡するため
@@ -1560,7 +1586,7 @@ srand((1));
 		BillScaleY(randBill);
 			//bill生成
 			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-			newBill->Init(pillarModel, { 120,-32,startZ + i }, { 4,billScaleY,4 });
+			newBill->Init(billModel, { 120,-32,startZ + i }, { 4,billScaleY,4 });
 
 			//bill登録
 			bills.push_back(std::move(newBill));//move はユニークから譲渡するため
@@ -1573,7 +1599,7 @@ srand((1));
 		BillScaleY(randBill);
 			//bill生成
 			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-			newBill->Init(pillarModel, { -120,-32,startZ + i }, { 4,billScaleY,4 });
+			newBill->Init(billModel, { -120,-32,startZ + i }, { 4,billScaleY,4 });
 
 			//bill登録
 			bills.push_back(std::move(newBill));//move はユニークから譲渡するため
@@ -1585,7 +1611,7 @@ srand((1));
 
 		//bill生成
 		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(pillarModel, { 200,-32,0 - i }, { 4,13,4 });
+		newBill->Init(billModel, { 200,-32,0 - i }, { 4,13,4 });
 
 		//bill登録
 		bills.push_back(std::move(newBill));//move はユニークから譲渡するため
@@ -1595,7 +1621,7 @@ srand((1));
 	{
 		//bill生成
 		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(pillarModel, { -200,-32,0 - i }, { 4,13,4 });
+		newBill->Init(billModel, { -200,-32,0 - i }, { 4,13,4 });
 
 		//bill登録
 		bills.push_back(std::move(newBill));//move はユニークから譲渡するため
@@ -1605,7 +1631,7 @@ srand((1));
 	{
 		//bill生成
 		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(pillarModel, { 80,-32,0 - i }, { 4,13,4 });
+		newBill->Init(billModel, { 80,-32,0 - i }, { 4,13,4 });
 
 		//bill登録
 		bills.push_back(std::move(newBill));//move はユニークから譲渡するため
@@ -1615,7 +1641,7 @@ srand((1));
 	{
 		//bill生成
 		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(pillarModel, { -80,-32,0 - i }, { 4,13,4 });
+		newBill->Init(billModel, { -80,-32,0 - i }, { 4,13,4 });
 
 		//bill登録
 		bills.push_back(std::move(newBill));//move はユニークから譲渡するため
@@ -1630,27 +1656,27 @@ srand((1));
 		billRotation = BillRot(randBillRot);
 		//bill生成
 		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(pillarModel, { -200 + i,-32,990 }, { 4,billScaleY,4 },billRotation);
+		newBill->Init(billModel, { -200 + i,-32,990 }, { 4,billScaleY,4 },billRotation);
 		
 		//bill生成
 		std::unique_ptr<Bill> newBill2 = std::make_unique<Bill>();
-		newBill2->Init(pillarModel, { 200 - i,-32,990 }, { 4,billScaleY,4 }, billRotation);
+		newBill2->Init(billModel, { 200 - i,-32,990 }, { 4,billScaleY,4 }, billRotation);
 
 		//bill生成
 		std::unique_ptr<Bill> newBill3 = std::make_unique<Bill>();
-		newBill3->Init(pillarModel, { 200 + i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
+		newBill3->Init(billModel, { 200 + i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
 
 		//bill生成
 		std::unique_ptr<Bill> newBill4 = std::make_unique<Bill>();
-		newBill4->Init(pillarModel, { 200 - i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
+		newBill4->Init(billModel, { 200 - i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
 
 		//bill生成
 		std::unique_ptr<Bill> newBill5 = std::make_unique<Bill>();
-		newBill5->Init(pillarModel, { 200 + i,-32,1230 }, { 4,billScaleY,4 }, billRotation);
+		newBill5->Init(billModel, { 200 + i,-32,1230 }, { 4,billScaleY,4 }, billRotation);
 
 		//bill生成
 		std::unique_ptr<Bill> newBill6 = std::make_unique<Bill>();
-		newBill6->Init(pillarModel, { 200 - i,-32,1230 }, { 4,billScaleY,4 }, billRotation);
+		newBill6->Init(billModel, { 200 - i,-32,1230 }, { 4,billScaleY,4 }, billRotation);
 
 
 		//bill登録
@@ -1678,11 +1704,11 @@ srand((1));
 	//	billRotation = BillRot(randBillRot);
 	//	//bill生成
 	//	std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-	//	newBill->Init(pillarModel, { 160 + i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
+	//	newBill->Init(billModel, { 160 + i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
 
 	//	//bill生成
 	//	std::unique_ptr<Bill> newBill2 = std::make_unique<Bill>();
-	//	newBill2->Init(pillarModel, { 160 - i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
+	//	newBill2->Init(billModel, { 160 - i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
 
 
 	//	//bill登録
