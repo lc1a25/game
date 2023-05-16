@@ -22,6 +22,8 @@ enum class Phase
 	CircleInfinity,//∞上にまわる
 	OneWayR,//右から左に行く
 	OneWayL,//左から右に行く
+	OneWayMovieR,
+	OneWayMovieL,
 	BossApproach,
 	BossVertical,//bossのミニが縦方向に動く
 	BossVerticalL,
@@ -54,6 +56,8 @@ private:
 	//OneWayの敵のスピード
 	float OWRSpeed = 0.5f;
 	float OWLSpeed = 0.5f;
+	float OWMaxRange = 80;
+	float OWMinRange = 20;
 	XMVECTOR OneWayPos;
 	XMVECTOR MiniPosLUF;
 
@@ -83,7 +87,6 @@ private:
 	XMVECTOR playerPos;
 
 	XMFLOAT3 bossPos;
-	XMFLOAT3 childShotRange;
 
 	//発射タイマー
 	int32_t shotTimer = 0;
@@ -149,6 +152,8 @@ private:
 	void PCircleL();
 
 	void PShot();
+
+	void PMovieShot();
 
 	void PShotMinor();
 
@@ -224,6 +229,8 @@ public:
 	void CircleInfinity();//∞上にまわる
 	void OneWayR();//右から左に行く
 	void OneWayL();//左から右に行く
+	void OneWayMovieR();
+	void OneWayMovieL();
 	void BossApproach();
 	void BossVertical();//bossのミニが縦方向に動く
 	void BossVerticalL();
@@ -254,6 +261,11 @@ public:
 	/// 前に向かって弾を打つ
 	/// </summary>
 	void FrontShot();
+
+	/// <summary>
+	/// 下に向かって弾を打つ
+	/// </summary>
+	void LowerShot();
 
 	/// <summary>
 	/// Phase の　初期化
@@ -298,12 +310,6 @@ public:
 	/// </summary>
 	/// <param name="bossPos">ボスの座標</param>
 	void SetBossPos(XMFLOAT3 bossPos) { this->bossPos = bossPos; }
-
-	/// <summary>
-	/// 弾の発射間隔
-	/// </summary>
-	/// <param name="shotRange"></param>
-	void SetChildShotRange(XMFLOAT3 childShotRange) { this->childShotRange = childShotRange; }
 
 	//スプライトhpバー用
 	void SetBossHpBar(float bossHpBar,float bossHpBarMax) {

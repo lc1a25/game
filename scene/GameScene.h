@@ -74,8 +74,8 @@ public: // メンバ関数
 	void EnemyPopLoadData();
 
 	void UpdateEnemyPop();
-	
-	XMFLOAT3 CommandPositionSet(std::istream &line_stream, std::string &word);
+
+	XMFLOAT3 CommandPositionSet(std::istream& line_stream, std::string& word);
 
 	void SetGameFlag(int gameFlag) { this->gameScene = gameFlag; }
 
@@ -93,6 +93,7 @@ public: // メンバ関数
 	bool pointsLast = false;
 	bool bossFlag = false;
 
+	bool playerDieFlag = false;
 	//コマンド用
 	bool waitCommand = false;
 	int waitTimer = 0;
@@ -100,18 +101,6 @@ public: // メンバ関数
 	//コマンド用
 	bool waitRailIndexCommand = false;
 	int waitRail = 0;
-
-	//ボス系
-	float bossHpBar = 733;
-	float bossHpBarMax = 733;
-
-	//プレイヤーhp
-	float hpBar = 288;
-	float hpBarMax = 288;
-	bool playerDieFlag = false;
-
-	int dieTimer = 120;
-	int  coll = 0;
 
 	bool tutorialFlag = true;
 
@@ -144,15 +133,11 @@ private: // メンバ変数
 	//道
 	Object3d* road = road->Create();
 
-	//ビル
-	Object3d* pillar = pillar->Create();
-	Object3d* pillar2 = pillar2->Create();
-	Object3d* pillar3 = pillar3->Create();
-	Object3d* pillar4 = pillar4->Create();
-	Object3d* pillar5 = pillar5->Create();
+	Object3d* titleObj = titleObj->Create();
 
 	std::list<std::unique_ptr<Bill>> bills;
 	std::list<std::unique_ptr<EnemyOneWay>> oneWays;
+	std::list<std::unique_ptr<EnemyOneWay>> oneWayMovies;
 	std::list<std::unique_ptr<EnemyCircle>> circles;
 
 	Object3d* shotObj = shotObj->Create();
@@ -165,15 +150,11 @@ private: // メンバ変数
 	Object3d* kanbanShot3Obj = kanbanShot3Obj->Create();
 	Object3d* kanbanShot4Obj = kanbanShot4Obj->Create();
 
-	//ボスのバリア
-	Object3d* barrier = barrier->Create();
 	//プレイヤー
 	Player* player = nullptr;
 	Object3d* startPlayer = startPlayer->Create();
 
 	//敵
-	Enemy* enemy = nullptr;
-	Enemy* enemyL = nullptr;
 	EnemyCircle* enemyCircle = nullptr;
 	EnemyCircle* enemyCircle2 = nullptr;
 	EnemyOneWay* enemyOneWay = nullptr;
@@ -215,6 +196,8 @@ private: // メンバ変数
 	Model* kanbanShot4Model = nullptr;
 	Model* barrierModel = nullptr;
 
+	
+
 	//パーティクル
 	ParticleManager* Particle = nullptr;
 
@@ -222,16 +205,19 @@ private: // メンバ変数
 	float length = 0.0f;
 	float size = 25.0f;
 	float wallColliLength = 0.0f;
-
 	float startPlayerAddZ = 4.0f;
 	float startPlayerAddY = 0.3f;
+
 	XMFLOAT3 startPlayerAfterPos = { 0,-200,610 };
+	float endPlayerPos = 1400.0f;
 
 	//床のy
 	float floorY = -55.0f;
 
-	//skydome z
+	//skydome 
+	XMFLOAT3 skydomePos = { 0,-220,0 };
 	float skydomeZ = 0;
+	float skydomeVec = 0.8;
 
 	//看板のアニメーション
 	int kanbanTime = 0;
@@ -239,12 +225,16 @@ private: // メンバ変数
 	XMFLOAT3 kanbanShotPos = { 90,-30,115 };
 	XMFLOAT3 kanbanShotPosDown = { 90,-90,115 };
 
+    //無敵時間
 	bool mutekiFlagDeb = false;
-	//無敵時間
+	
 	bool mutekiFlag = false;
-	int mutekiCoolTimeMax = 120;
+	int mutekiCoolTimeMax = 420;
+	int mutekiCoolTimeMin = 0;
 	int mutekiCoolTime = mutekiCoolTimeMax;
-	int tenmetuCount;//無敵時間中に点滅させるため
+
+	int tenmetuCountReset = 0;//無敵時間中に点滅させるため
+	int tenmetuCount = tenmetuCountReset;//無敵時間中に点滅させるため
 	int tenmetuAliveCount = 10;//無敵時間中にキャラを出す時間
 	int tenmetuDeadCount = 20;//無敵時間中にキャラを出さない時間
 
@@ -252,15 +242,34 @@ private: // メンバ変数
 	bool setObjectFlag = false;//ムービー後にオブジェクトをセットする用
 
 	//チュートリアル文字のｈｐ
-	int mojiHp = 10;
+	int mojiHp = 8;
 	int mojiChangeHp = mojiHp - 1;
 
 	int gameScene = 0;//スプライトのゲームシーン
+	int gameSceneTitle = 0;//スプライトのタイトルシーン
+	int gameSceneInGame = 1;//スプライトのインゲームシーン
+	int gameSceneClear = 2;//スプライトのクリアシーン
+	int gameSceneGameOver = 3;//スプライトのゲームオーバーシーン
 
+	//ボス系
+	float bossHpBar = 733;
+	float bossHpBarMax = 733;
+
+	//プレイヤーhp
+	float hpBar = 288;
+	float hpBarMax = 288;
+
+
+	int dieTimerMax = 120;
+	int dieTimer = dieTimerMax;
+	int  coll = 0;
 	
 	float shotObjAddy = 10;//shotObjの当たり判定調整用
 	XMFLOAT3 bullet1;//プレイヤーの弾の座標をいれる用
 
+	int movieParticleTime = 0;
+	float movieParticleXL = 80;
+	float movieParticleXR = 40;
 	bool attackParticleFlag = false;//プレイヤーの弾のパーティクルがでるときに使うflag
 	bool gameStartFlag = false;//タイトルからゲームシーンに入ったことがわかるflag
 
@@ -284,14 +293,7 @@ private: // メンバ変数
 
 	SpriteCommon* spriteCommon = nullptr;
 
-	//パーティクル
-	void PlayerCreateParticle(XMFLOAT3 position);
-	void EnemyCreateParticle(XMFLOAT3 position);
-	void BossCreateParticle(XMFLOAT3 position);
-	void MojiCreateParticle(XMFLOAT3 position);
-	void MojiBreakParticle(XMFLOAT3 position);
-	void CreateParticle(int particleCount ,int lifeTime, XMFLOAT3 position, float vec, float accel, float start_scale, float end_scale, XMFLOAT3 start_color, XMFLOAT3 end_color);
-
+	
 	FLOAT BillScaleY(int randam);
 	XMFLOAT3 BillRot(int randam);
 };

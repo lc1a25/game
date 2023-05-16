@@ -39,12 +39,6 @@ public:
 	void Draw();
 
 	/// <summary>
-	/// 弾の発射間隔
-	/// </summary>
-	/// <param name="shotRange"></param>
-	void SetChildShotRange(XMFLOAT3 shotRange) { this->shotRange = shotRange; }
-
-	/// <summary>
 	/// ボスの座標をセット
 	/// </summary>
 	/// <param name="bossPos">ボスの座標</param>
@@ -55,12 +49,6 @@ public:
 	/// </summary>
 	/// <param name="bossVec">ボスの移動量</param>
 	void SetBossVec(XMFLOAT3 bossVec) { this->bossVec = bossVec; }
-
-	/// <summary>
-	/// ボスの生死をセット
-	/// </summary>
-	/// <param name="bossDead">ボスの生死</param>
-	void SetBossDead(bool bossDead) { this->bossDead = bossDead; }
 
 	/// <summary>
 	/// ボスがバリアを張ったかセット

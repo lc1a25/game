@@ -15,6 +15,8 @@ void(Enemy::*Enemy::spFuncTable[])() = {
 	&Enemy::CircleInfinity,//‡ã‚É‚Ü‚í‚é
 	&Enemy::OneWayR,//‰E‚©‚ç¶‚És‚­
 	&Enemy::OneWayL,
+	&Enemy::OneWayMovieR,
+	&Enemy::OneWayMovieL,
 	&Enemy::BossApproach,
 	&Enemy::BossVertical,//boss‚ªc•ûŒü‚É“®‚­
 	&Enemy::BossVerticalL,
@@ -130,6 +132,18 @@ void Enemy::PShot()
 	{
 		shotEndFlag = true;
 		FrontShot();
+		shotTimer = shotInterval;
+	}
+}
+
+void Enemy::PMovieShot()
+{
+	//’e‚ğŒ‚‚Â
+	shotTimer--;
+	if (shotTimer <= 0)
+	{
+		shotEndFlag = true;
+		LowerShot();
 		shotTimer = shotInterval;
 	}
 }
@@ -399,11 +413,35 @@ void Enemy::OneWayR()
 
 	enemy->position.z += cameraZ;
 
-	if (enemy->position.x <= -80)
+	if (enemy->position.x <= -OWMaxRange)
 	{
 		OWRSpeed *= -1;
 	}
-	if (enemy->position.x >= 20)
+	if (enemy->position.x >= OWMinRange)
+	{
+		OWRSpeed *= -1;
+	}
+
+	PHoming();
+
+	if (attackFlag == true)
+	{
+		//leaveTime‚ª‚OˆÈ‰º‚É‚È‚Á‚½‚ç—£’EƒtƒFƒCƒY‚É‚¢‚­
+		PLeaveF();
+	}
+}
+
+void Enemy::OneWayL()
+{
+	enemy->position.x -= OWRSpeed;
+
+	enemy->position.z += cameraZ;
+
+	if (enemy->position.x <= -OWMinRange)
+	{
+		OWRSpeed *= -1;
+	}
+	if (enemy->position.x >= OWMaxRange)
 	{
 		OWRSpeed *= -1;
 	}
@@ -416,27 +454,44 @@ void Enemy::OneWayR()
 	}
 }
 
-void Enemy::OneWayL()
+void Enemy::OneWayMovieR()
+{
+	enemy->position.x += OWRSpeed;
+
+	//enemy->position.z += cameraZ;
+
+	if (enemy->position.x <= -OWMaxRange)
+	{
+		OWRSpeed *= -1;
+	}
+	if (enemy->position.x >= OWMaxRange)
+	{
+		OWRSpeed *= -1;
+	}
+
+	//PMovieShot();
+
+	
+}
+
+void Enemy::OneWayMovieL()
 {
 	enemy->position.x -= OWRSpeed;
 
-	enemy->position.z += cameraZ;
+	//enemy->position.z += cameraZ;
 
-	if (enemy->position.x <= -20)
+	if (enemy->position.x <= -OWMaxRange)
 	{
 		OWRSpeed *= -1;
 	}
-	if (enemy->position.x >= 80)
+	if (enemy->position.x >= OWMaxRange)
 	{
 		OWRSpeed *= -1;
 	}
 
-	PHoming();
+	//PMovieShot();
 
-	if (attackFlag == true)
-	{
-		PLeaveF();
-	}
+	
 }
 
 void Enemy::BossApproach()
@@ -544,6 +599,7 @@ void Enemy::BossMiniStop()
 	PCircleBoss();//ƒ{ƒX‚Ìü‚è‚ğ‚Ü‚í‚é
 	enemy->rotation.y++;
 
+	//ÅIŒ`‘Ô‚Ö
 	if (barrierPhaseFlag == true)
 	{
 		barrierTime++;
@@ -593,8 +649,7 @@ void Enemy::BossPhaseChange()
 			changeTime = 0;
 		}
 	}
-
-	if (bossHp <= 25)
+	else if (bossHp <= 25)
 	{
 		barrierFlag = true;
 		enemy->rotation.y+=3;
@@ -641,10 +696,19 @@ void Enemy::Homing()
 
 void Enemy::FrontShot()
 {
-	
 	//’e¶¬
 	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
 	newBullet->Init(bulletModel_, enemy->position,{0,0,-2});
+
+	//’e“o˜^
+	bullets_.push_back(std::move(newBullet));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
+}
+
+void Enemy::LowerShot()
+{
+	//’e¶¬
+	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
+	newBullet->Init(bulletModel_, enemy->position, { 0,-4,-2 });
 
 	//’e“o˜^
 	bullets_.push_back(std::move(newBullet));//move ‚Íƒ†ƒj[ƒN‚©‚ç÷“n‚·‚é‚½‚ß
@@ -702,7 +766,7 @@ void Enemy::OnCollision()
 
 void Enemy::OnBossCollision()
 {
-	if (barrierFlag == false || bossMovieFlag == false)
+	if (barrierFlag == false && bossMovieFlag == false)
 	{
 		bossHp--;
 		hpBar -= hpBarMax / 50;

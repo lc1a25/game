@@ -6,12 +6,22 @@
 class Bill
 {
 	Model* model_ = nullptr;
+	DirectX::XMFLOAT3 pos_;
+	DirectX::XMFLOAT3 scale_;
 	DirectX::XMVECTOR velocity_ = { 0,0,0 };
+
 	Object3d* bill = bill->Create();
 
 	float cameraZ;
 	bool billDeadFlag = false;
 	DirectX::XMFLOAT3 billRotation;
+
+	std::list<std::unique_ptr<Bill>> bills;
+
+	int randBill = 0;//ビルをランダム配置するときにrandの数値をいれる(scale用)
+	float billScaleY = 13;//ビルの縦方向のスケール
+	int randBillRot = 0;//ビルをランダム配置するときにrandの数値をいれる(rotation用)
+	//DirectX::XMFLOAT3 billRotation;//ビルのローテーション
 public:
 	/// <summary>
 	/// 初期化
@@ -41,4 +51,8 @@ public:
 	{
 		return billDeadFlag;
 	}
+
+	FLOAT BillScaleY(int randam);
+	DirectX::XMFLOAT3 BillRot(int randam);
+	void BillCreate(Model* model);
 };

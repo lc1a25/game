@@ -42,9 +42,10 @@ void CameraObj::UpdateCamera()
 	float elapsedTime = static_cast<float> (elapsedCount) / 1000.0f;
 
 	timeRate = elapsedTime / maxTime;
-
+	
 	if (startMovie == true)
 	{
+		titleFlag = false;
 		//前方ベクトル
 		XMVECTOR forward({ 0, 0, 1 });
 		//回転(前方ベクトル)
@@ -83,8 +84,20 @@ void CameraObj::UpdateCamera()
 		target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
 		target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
 		target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
+	}	
+	else if(titleFlag = true)
+	{
+		eye = { 0,20,-600 };
+		//前方ベクトル
+		XMVECTOR forward({ 0, 0, 1 });
+		//回転(前方ベクトル)
+		forward = Matrix4::transform(forward, cameraObj->matWorld);
+		targetEnd = eye + forward;
+		target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
+		target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
+		target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
 	}
-	else
+	else if(startMovie == false)
 	{
 		//前方ベクトル
 		XMVECTOR forward({ 0, 0, 1 });
@@ -95,6 +108,7 @@ void CameraObj::UpdateCamera()
 		target.m128_f32[1] = startPlayerObj.y + forward.m128_f32[1];
 		target.m128_f32[2] = startPlayerObj.z + forward.m128_f32[2];
 	}
+
 	
 
 	if (pointsStart == false)

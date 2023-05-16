@@ -155,7 +155,7 @@ private:
 	bool pointsStart = true;
 	bool startMovie = false;
 	bool startGame = false;
-
+	bool titleFlag = true;
 	std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,end,end,end,end };
 
 	std::vector<XMVECTOR>tyutoPoints{ startT,startT,p2T,p3T,p3T };

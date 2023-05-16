@@ -39,7 +39,6 @@ void BossChild::Update()
 		bossChild->phase = Phase::BossMiniDead;
 	}
 	
-	bossChild->SetChildShotRange(shotRange);
 	bossChild->SetBossPos(bossPos);
 	bossChild->SetBossVec(bossVec);
 	bossChild->SetChildNumber(childNumber);

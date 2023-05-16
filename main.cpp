@@ -46,11 +46,7 @@ GameScene* Reset(GameScene* gameScene, DirectXCommon* dxcommon, Input* input, Au
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-
-
 // WindowsAPI初期化処理
-	
-	
 	Win* win = nullptr;
 	Input* input = nullptr;
 	DirectXCommon* dxcommon = nullptr;
@@ -76,15 +72,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	
 	// DirectX初期化処理　ここまで
 
-	////描画初期化処理　ここから
-	
-	//描画初期化処理　ここまで
 
 
 
 #pragma region 初期化
 
 	int gameSceneNum = 0;
+	int gameSceneTitleNum = 0;//タイトルシーン
+	int gameSceneInGameNum = 1;//インゲームシーン
+	int gameSceneClearNum = 2;//クリアシーン
+	int gameSceneGameOverNum = 3;//ゲームオーバーシーン
 	
 #pragma endregion
 
@@ -107,43 +104,44 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		gameScene->SetGameFlag(gameSceneNum);
 		gameScene->SetHwnd(win->GetHwnd());
 		gameScene->SetViewPort(dxcommon->GetViewPort());
-		if (gameSceneNum == 0)
+
+		if (gameSceneNum == gameSceneTitleNum)//タイトル
 		{
 			gameScene->Update();
 			if (input->isMouseKey())
 			{
-				gameSceneNum = 1;
+				gameSceneNum = gameSceneInGameNum;//インゲームへ
 			}
 		}
-		else if (gameSceneNum == 1)
+		else if (gameSceneNum == gameSceneInGameNum)//インゲーム
 		{
 			gameScene->Update();
 
-			if (gameScene->playerDieFlag == true)
+			if (gameScene->playerDieFlag == true)//プレイヤーが死んだら
 			{
-				gameSceneNum = 3;
+				gameSceneNum = gameSceneGameOverNum;//ゲームオーバー
 			}
 			if (gameScene->pointsLast == true)
 			{
-				gameSceneNum = 2;
+				gameSceneNum = gameSceneClearNum;//ゲームクリア
 			}
 
 		}
 		//ゲームクリア
-		else if (gameSceneNum == 2)
+		else if (gameSceneNum == gameSceneClearNum)
 		{
 			if (input->isKeyTrigger(DIK_SPACE))
 			{
-				gameScene = 0;
+				gameSceneNum = gameSceneTitleNum;//タイトルに戻る
 				gameScene = Reset(gameScene, dxcommon, input, audio,win);
 			}
 		}
 		//ゲームオーバー
-		else if (gameSceneNum == 3)
+		else if (gameSceneNum == gameSceneGameOverNum)
 		{
 			if (input->isKeyTrigger(DIK_SPACE))
 			{
-				gameScene = 0;
+				gameSceneNum = gameSceneTitleNum;//タイトルに戻る
 				gameScene = Reset(gameScene, dxcommon, input, audio,win);
 			}
 		}

@@ -7,14 +7,17 @@ class Boss
 	//モデル
 	Model* enemyModel_ = nullptr;
 	Model* enemyModelMini_ = nullptr;
+	Model* barrierModel_ = nullptr;
 
 	//座標
 	XMFLOAT3 position = { 0,0,0 };
+	Object3d* barrier = barrier->Create();
 
 	//ボス
 	Enemy* boss= nullptr;
 	//ボスの周りにいるやつ
 	Enemy* bossMiniLUF = nullptr;//LUF left up front 左上の手前
+	
 	
 	//プレイヤーの座標(ホーミング用)
 	XMFLOAT3 playerWorldPos;
@@ -33,7 +36,7 @@ public:
 	/// <param name="enemyModel">ボスのモデル</param>
 	/// <param name="enemyModelMini">ボスの周りにいるやつのモデル</param>
 	/// <param name="position">座標</param>
-	void Init(Model* enemyModel,Model* enemyModelMini, XMFLOAT3 position);
+	void Init(Model* enemyModel,Model* enemyModelMini, Model* barrierModel,XMFLOAT3 position);
 
 	/// <summary>
 	/// 更新処理

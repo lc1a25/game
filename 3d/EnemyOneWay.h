@@ -11,13 +11,16 @@ private:
 
 	XMFLOAT3 playerWorldPos;
 
+	bool rightMoveTrue;
+
 public:
 
-	void Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue,bool attackFlag = true);
+	void Init(Model* enemyModel, XMFLOAT3 position, bool rightMoveTrue,bool attackFlag = true, bool movieFlag = false);
 
 	void Update();
 
 	void Draw();
+	void MoviePhase(bool movieFlag);
 	//âEÇ©ÇÁÇ≠ÇÈÇ©ç∂Ç©ÇÁÇ≠ÇÈÇ©
 	void PhaseInit(bool rightMoveTrue);
 
