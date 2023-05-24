@@ -44,6 +44,8 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	kanbanShot3Model = Model::LoadFromOBJ("kanbanShot3");
 	kanbanShot4Model = Model::LoadFromOBJ("kanbanShot4");
 	barrierModel = Model::LoadFromOBJ("barrier",0.7);
+	targetModel = Model::LoadFromOBJ("target");
+	clickModel = Model::LoadFromOBJ("click");
 
 	bossHpBar = 733;
 	bossHpBarMax = 733;
@@ -72,6 +74,15 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	shotHibiObj->scale = { 3,3,3 };
 	shotHibiObj->SetPosition({ 0,0,90 });
 
+	targetObj->SetModel(targetModel);
+	targetObj->scale = { 3,3,3 };
+	targetObj->SetPosition({ 0,-200,90 });
+	targetObj->rotation.y = 180;
+
+	clickObj->SetModel(clickModel);
+	clickObj->scale = { 3,3,3 };
+	clickObj->SetPosition({ 0,0,90 });
+
 	kanbanObj->SetModel(kanbanModel);
 	kanbanObj->scale = { 1.5,1.5,1.5 };
 	kanbanObj->SetPosition({ -90,-50,120 });
@@ -95,6 +106,10 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	titleObj->SetModel(shotObjModel);
 	titleObj->scale = { 1.5,1.5,1.5 };
 	titleObj->SetPosition({ 0,25,-560 });
+
+	clickObj->SetModel(clickModel);
+	clickObj->scale = { 1.5,1.5,1.5 };
+	clickObj->SetPosition({ 0,15,-560 });
 
 	player = new Player();
 	player->Init(playerModel, bulletModel);
@@ -152,7 +167,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	//ビル生成
 	BillCreate();
 
-	//描画初期化処理　ここから
 	//スプライト初期化
 	spriteCommon = new SpriteCommon;
 	spriteCommon->Init(dxcommon->GetDev(), dxcommon->GetCmdlist(), win->window_width, win->window_height);
@@ -321,9 +335,12 @@ void GameScene::Update()
 	wallFloor->Update();
 	road->Update();
 	shotHibiObj->Update();
+	//shotHibiObj->rotation.y = 180;
 	kanbanObj->Update();
 	kanbanPlaneObj->Update();
 	shotObj->Update();
+	targetObj->Update();
+	//shotObj->rotation.y = 180;
 
 	//タイトルからスタートムービー演出へ
 	if (cameraObj->GetStartMovieFlag() == false && gameStartFlag == false)
@@ -337,7 +354,7 @@ void GameScene::Update()
 	//スタートムービー
 	if (gameStartFlag == true && cameraObj->GetStartMovieFlag() == false)
 	{
-		
+		//playerを上ななめ前にとばす
 		startPlayer->position.z += startPlayerAddZ;
 		startPlayer->position.y += startPlayerAddY;
 	}
@@ -347,14 +364,14 @@ void GameScene::Update()
 	{
 		cameraObj->SetStartMovieSkip(false);
 		startPlayer->SetPosition(startPlayerAfterPos);
-		movieSkipFlag = true;
+		movieSkipFlag = true;//ムービースキップのスプライト
 	}
 	
 	//スタートムービー後の自機(仮)の場所
 	if (startPlayer->GetPosition().z >= startPlayerAfterPos.z && boss->GetBossDead() == false)
 	{
 		startPlayer->SetPosition(startPlayerAfterPos);
-		movieSkipFlag = true;
+		movieSkipFlag = true;//ムービースキップのスプライト
 	}
 	else
 	{
@@ -408,11 +425,11 @@ void GameScene::Update()
 	//ムービーが終わった後のチュートリアル用のobj　と　playerの位置設定
 	if (cameraObj->GetStartGameFlag() == true && setObjectFlag == false)
 	{
-		shotObj->SetPosition({ 0,0,90 });
+		//shotObj->SetPosition({ 0,0,90 });
+		targetObj->SetPosition({ 0,0,90 });
 		player->SetPlayerPos({ 0,0,0 });
 		setObjectFlag = true;
 	}
-
 	//弾の発射説明obj　　(画面右の看板)(アニメーションする)
 	if (cameraObj->GetStartGameFlag() == true)
 	{
@@ -585,6 +602,7 @@ void GameScene::Update()
 	{
 		bullet1 = bullet->GetWorldPosition();
 
+		//攻撃時パーティクルがでる
 		if (input->isMouseKey())
 		{
 			attackParticleFlag = true;
@@ -650,7 +668,6 @@ void GameScene::Update()
 			Particle->CreateParticle(30, 48, boss->GetPos(), { 0.5,0.5,0.5 }, { 0.05,0.05,0.05 }, 10.0f, 2.0f,
 				{ 1,1,1 }, { 1,0.5,0 });
 		}
-		
 	}
 
 	
@@ -688,6 +705,9 @@ void GameScene::Update()
 	startPlayer->Update();
 	Particle->Update();
 	titleObj->Update();
+	clickCount++;
+	
+	clickObj->Update();
 }
 
 void GameScene::Draw()
@@ -706,13 +726,13 @@ void GameScene::Draw()
 	//文字が一回でも攻撃されたらひびが入った文字に変更する
 	if (mojiHp >= mojiChangeHp)
 	{
-		shotObj->Draw();
+		targetObj->Draw();
 	}
 	else if (mojiHp >= 0)
 	{
-		shotHibiObj->Draw();
+		targetObj->Draw();
 	}
-
+	
 	kanbanObj->Draw();
 	kanbanPlaneObj->Draw();
 	kanbanShotObj->Draw();
@@ -722,6 +742,14 @@ void GameScene::Draw()
 	if (cameraObj->GetStartMovieFlag() == false && gameStartFlag == false)
 	{
 		titleObj->Draw();
+		if (clickCount >= clickAliveCount)
+		{
+			clickObj->Draw();
+			if (clickCount >= clickDeadCount)
+			{
+				clickCount = clickCountReset;
+			}
+		}
 	}
 		
 	
@@ -1021,11 +1049,11 @@ void GameScene::CheckMojiCollision()
 	//自弾リスト
 	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player->GetBullets();
 
-	pos1 = shotObj->GetPosition();
+	pos1 = targetObj->GetPosition();
 	pos1.y = pos1.y + 10;
 
-	float pos1Addx = 32;
-	float pos1Addy = 16;
+	float pos1Addx = 8;
+	float pos1Addy = 6;
 
 	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
 	{
@@ -1051,7 +1079,7 @@ void GameScene::CheckMojiCollision()
 			)
 		{
 			mojiHp=-1;
-			Particle->CreateParticle(30, 32, { shotObj->GetPosition().x ,  shotObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z }
+			Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z }
 				, { 2.8f, 2.8f, 2.8f }, { 0,-0.08,0 }, 12.0f, 2.0f,
 				{ 0,1,0 }, { 0.5,0.3,0.17 });
 		}
@@ -1623,9 +1651,6 @@ srand((1));
 		//bill登録
 		bills.push_back(std::move(newBill6));//move はユニークから譲渡するため
 	}
-
-
-
 }
 
 

@@ -142,6 +142,10 @@ private: // メンバ変数
 
 	Object3d* shotObj = shotObj->Create();
 	Object3d* shotHibiObj = shotHibiObj->Create();
+	Object3d* targetObj = targetObj->Create();
+	Object3d* targetObj2 = targetObj2->Create();
+	Object3d* targetObj3 = targetObj3->Create();
+	Object3d* clickObj = clickObj->Create();
 
 	Object3d* kanbanObj = kanbanObj->Create();
 	Object3d* kanbanPlaneObj = kanbanPlaneObj->Create();
@@ -195,6 +199,8 @@ private: // メンバ変数
 	Model* kanbanShot3Model = nullptr;
 	Model* kanbanShot4Model = nullptr;
 	Model* barrierModel = nullptr;
+	Model* targetModel = nullptr;
+	Model* clickModel = nullptr;
 
 	
 
@@ -237,6 +243,11 @@ private: // メンバ変数
 	int tenmetuCount = tenmetuCountReset;//無敵時間中に点滅させるため
 	int tenmetuAliveCount = 10;//無敵時間中にキャラを出す時間
 	int tenmetuDeadCount = 20;//無敵時間中にキャラを出さない時間
+
+	int clickCountReset = 0;//点滅させるため
+	int clickCount = clickCountReset;//点滅させるため
+	int clickAliveCount = 15;//キャラを出す時間
+	int clickDeadCount = 30;//キャラを出さない時間
 
 	bool movieSkipFlag = false;//ムービースキップ用
 	bool setObjectFlag = false;//ムービー後にオブジェクトをセットする用

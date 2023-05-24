@@ -27,9 +27,6 @@ void CameraObj::Init(XMVECTOR worldPos, XMFLOAT3 rotation)
 	eyeVecTemp = { 0.0f,0.0f,0.0f };
 	eyeVec = { 0.0f,0.0f,0.0f };
 
-	targetVecTemp = { 0.0f,0.0f,0.0f };
-	targetVec = { 0.0f,0.0f,0.0f };
-
 	eye = { startT };
 }
 
@@ -85,9 +82,9 @@ void CameraObj::UpdateCamera()
 		target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
 		target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
 	}	
-	else if(titleFlag = true)
+	else if(titleFlag == true)//タイトル
 	{
-		eye = { 0,20,-600 };
+		eye = { titlePos };
 		//前方ベクトル
 		XMVECTOR forward({ 0, 0, 1 });
 		//回転(前方ベクトル)
@@ -97,7 +94,7 @@ void CameraObj::UpdateCamera()
 		target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
 		target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
 	}
-	else if(startMovie == false)
+	else//スタートムービー後　カメラの移動を止めてプレイヤーを見続ける
 	{
 		//前方ベクトル
 		XMVECTOR forward({ 0, 0, 1 });
@@ -121,7 +118,6 @@ void CameraObj::UpdateCamera()
 			//回転(前方ベクトル)
 			forward = Matrix4::transform(forward, cameraObj->matWorld);
 			targetEnd = eye + forward;
-
 
 			if (timeRate >= 1.0f)
 			{

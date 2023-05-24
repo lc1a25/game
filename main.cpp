@@ -77,7 +77,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 #pragma region 初期化
 
-	int gameSceneNum = 0;
+	int gameSceneNum = 0;//今いるシーン
 	int gameSceneTitleNum = 0;//タイトルシーン
 	int gameSceneInGameNum = 1;//インゲームシーン
 	int gameSceneClearNum = 2;//クリアシーン
@@ -101,9 +101,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//全キーの入力状態を取得する
 		input->Update();
 	
-		gameScene->SetGameFlag(gameSceneNum);
-		gameScene->SetHwnd(win->GetHwnd());
-		gameScene->SetViewPort(dxcommon->GetViewPort());
+		gameScene->SetGameFlag(gameSceneNum);//シーンがどこにいるか
+		gameScene->SetHwnd(win->GetHwnd());//hwndおくる レティクル用
+		gameScene->SetViewPort(dxcommon->GetViewPort());//ビューポートおくる　レティクル用
 
 		if (gameSceneNum == gameSceneTitleNum)//タイトル
 		{

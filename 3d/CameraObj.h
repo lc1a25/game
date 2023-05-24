@@ -38,7 +38,6 @@ public:
 	const XMFLOAT3& GetUp() { return up; }
 
 	const XMFLOAT3& GetEyeVec() { return eyeVec; }
-	const XMFLOAT3& GetTargetVec() { return targetVec; }
 
 	const float& GetpositionX() { return cameraObj->position.z; }
 
@@ -127,6 +126,7 @@ private:
 	long long nowCount = 0;
 	long long elapsedCount = 0;
 
+	//ゲーム内
 	XMVECTOR start{ 0.0f, 0.0f, 0.0f };
 	XMVECTOR p2{ 0.0f, 0.0f, 100.0f };
 	XMVECTOR p3{ 0.0f, 0.0f, +200.0f };
@@ -137,9 +137,12 @@ private:
 
 	XMVECTOR end{ 0.0f, 0.0f, 800.0f };
 
+	//スタートムービー
 	XMVECTOR startT{ -10.0f, 10.0f, -500.0f };
 	XMVECTOR p2T{ -30.0f, 0.0f, -550.0f };
 	XMVECTOR p3T{ 0.0f, 0.0f, -600.0f };
+
+	XMVECTOR titlePos{ 0,20,-600 };//タイトル
 
 	XMVECTOR targetEnd{};
 	float maxTime = 10.0f;
@@ -148,14 +151,12 @@ private:
 	XMFLOAT3 eyeVecTemp = { 0.0f,0.0f,0.0f };
 	XMFLOAT3 eyeVec = { 0.0f,0.0f,0.0f };
 
-	XMFLOAT3 targetVecTemp = { 0.0f,0.0f,0.0f };
-	XMFLOAT3 targetVec = { 0.0f,0.0f,0.0f };
-
 	bool pointsLast = false;
 	bool pointsStart = true;
 	bool startMovie = false;
 	bool startGame = false;
 	bool titleFlag = true;
+
 	std::vector<XMVECTOR>points{ start,start,p2,p3,p4,p5,end,end,end,end };
 
 	std::vector<XMVECTOR>tyutoPoints{ startT,startT,p2T,p3T,p3T };
