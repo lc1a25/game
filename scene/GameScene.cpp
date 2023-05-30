@@ -76,7 +76,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 
 	targetObj->SetModel(targetModel);
 	targetObj->scale = { 3,3,3 };
-	targetObj->SetPosition({ 0,-200,90 });
+	targetObj->SetPosition({ 0,-200,100 });
 	targetObj->rotation.y = 180;
 
 	clickObj->SetModel(clickModel);
@@ -380,26 +380,31 @@ void GameScene::Update()
 		 //60frame から　120frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
 		if (movieParticleTime >= 60 && movieParticleTime <= 120)
 		{
-			movieParticleXL = 40;
-			movieParticleXR = 80;
-			Particle->CreateParticle(30, 64, { -movieParticleXL, 0,-320 }, { 0.5,0.5,0.5 }, { 0.02,0.02,0.02 }, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-			Particle->CreateParticle(30, 64, { movieParticleXR, 20,-320 }, { 0.5,0.5,0.5 }, { 0.02,0.02,0.02 }, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+			movieParticleXL = particleMinPosXTitle;
+			movieParticleXR = particleMaxPosXTitle;
+			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, 0,-320 }, particleVelocityTitle,
+				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
+				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
 			//80frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
 			if(movieParticleTime >= 80)
 			{ 
-				Particle->CreateParticle(30, 64, { movieParticleXR, 20,-320 }, { 0.5,0.5,0.5 }, { 0.02,0.02,0.02 }, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+				Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
+					particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
 			}
 		}
 		 //120frame から　180frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
 		else if(movieParticleTime >= 120 && movieParticleTime <= 180)
 		{
-			movieParticleXL = 80;
-			movieParticleXR = 40;
-			Particle->CreateParticle(30, 64, { -movieParticleXL, 0,-320 }, { 0.5,0.5,0.5 }, { 0.02,0.02,0.02 }, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+			movieParticleXL = particleMaxPosXTitle;
+			movieParticleXR = particleMinPosXTitle;
+			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, 0,-320 }, particleVelocityTitle,
+				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
 			//160frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
 			if (movieParticleTime >= 160)
 			{
-				Particle->CreateParticle(30, 64, { movieParticleXR, 20,-320 }, { 0.5,0.5,0.5 }, { 0.02,0.02,0.02 }, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+				Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
+					particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
 			}
 		}
 		else if (movieParticleTime >= 180)
@@ -412,21 +417,14 @@ void GameScene::Update()
 	//csvのenemy発生
 	UpdateEnemyPop();
 
-	//チュートリアル
-	if (mojiHp <= -1)
-	{
-		tutorialFlag = false;	
-	}
-
-	//チュートリアルがおわったことをカメラに教える
+	//チュートリアルがおわっているかをカメラに教える
 	cameraObj->SetTutorialFlag(tutorialFlag);
 
 	
 	//ムービーが終わった後のチュートリアル用のobj　と　playerの位置設定
 	if (cameraObj->GetStartGameFlag() == true && setObjectFlag == false)
 	{
-		//shotObj->SetPosition({ 0,0,90 });
-		targetObj->SetPosition({ 0,0,90 });
+		targetObj->SetPosition({ 0,0,100 });
 		player->SetPlayerPos({ 0,0,0 });
 		setObjectFlag = true;
 	}
@@ -593,7 +591,7 @@ void GameScene::Update()
 	CheckBossANDChildCollision(bossChildLDB->GetEnemy());
 	CheckBossANDChildCollision(bossChildRDF->GetEnemy());
 	CheckBossANDChildCollision(bossChildRDB->GetEnemy());
-	CheckMojiCollision();
+	CheckTargetCollision();
 
 	//自機の弾のパーティクル
 	//自弾リスト
@@ -724,11 +722,11 @@ void GameScene::Draw()
 		bill->Draw();
 	}
 	//文字が一回でも攻撃されたらひびが入った文字に変更する
-	if (mojiHp >= mojiChangeHp)
+	/*if (mojiHp >= mojiChangeHp)
 	{
 		targetObj->Draw();
-	}
-	else if (mojiHp >= 0)
+	}*/
+	if (targetHp >= 1)
 	{
 		targetObj->Draw();
 	}
@@ -1038,7 +1036,7 @@ void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 	
 }
 
-void GameScene::CheckMojiCollision()
+void GameScene::CheckTargetCollision()
 {
 	if (mutekiFlagDeb == true)
 	{
@@ -1052,37 +1050,80 @@ void GameScene::CheckMojiCollision()
 	pos1 = targetObj->GetPosition();
 	pos1.y = pos1.y + 10;
 
-	float pos1Addx = 8;
+	float pos1Addx = 6;
 	float pos1Addy = 6;
+	float pos1Addz = 8;
 
 	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
 	{
+		if (count == 1)
+		{
+		
+		}
 		pos2 = bullet->GetWorldPosition();
-		//チュートリアルの文字にダメージ
-		if (pos2.z >= pos1.z && //z
+		//チュートリアルの的にダメージ
+		if (pos2.z <= pos1.z + pos1Addz && pos2.z >= pos1.z &&//z
 			pos2.x <= pos1.x + pos1Addx && pos2.x >= pos1.x - pos1Addx && //x
 			pos2.y <= pos1.y + pos1Addy && pos2.y >= pos1.y - pos1Addy && //y
-			mojiHp >= 1 //alive
+			targetHp >= 1 //alive
 			)
 		{
 			bullet->OnCollision();
-			mojiHp--;
-			//パーティクル生成
-			Particle->CreateParticle(30, 32, bullet->GetWorldPosition(), { 2.8f, 2.8f, 2.8f }, { 0.02,0.02,0.02 }, 12.0f, 2.0f,
-				{ 1,0,0 }, { 0.5,0.3,0.17 });
+			targetHp--;
+			if (targetHp >= 1)
+			{
+				//パーティクル生成
+				Particle->CreateParticle(30, 32, bullet->GetWorldPosition(), { 2.8f, 2.8f, 2.8f }, { 0.02,0.02,0.02 }, 12.0f, 2.0f,
+					{ 1,0,0 }, { 0.5,0.3,0.17 });
+			}
+			else if(count == 0)
+			{
+				count++;
+				Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z }
+					, { 2.8f, 2.8f, 2.8f }, { 0,-0.08,0 }, 12.0f, 2.0f,
+					{ 0,1,0 }, { 0.5,0.3,0.17 });
+				targetHp = targetHpMax;
+				targetObj->position.x = 50;
+			
+				//targetObj->rotation.y = 190;
+			}
+			else if (count == 1)
+			{
+				count++;
+				Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z }
+					, { 2.8f, 2.8f, 2.8f }, { 0,-0.08,0 }, 12.0f, 2.0f,
+					{ 0,1,0 }, { 0.5,0.3,0.17 });
+				targetHp = targetHpMax;
+				targetObj->position.x = -50;
+				targetObj->rotation.y = 165;
+			}
+			else if (count == 2)
+			{
+				count++;
+				Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z }
+					, { 2.8f, 2.8f, 2.8f }, { 0,-0.08,0 }, 12.0f, 2.0f,
+					{ 0,1,0 }, { 0.5,0.3,0.17 });
+				targetHp = targetHpMax;
+				tutorialFlag = false;
+				targetObj->position.y = -250;
+				targetObj->rotation.y = 165;
+			}
+
 		}
-		//チュートリアルの文字がこわれるとき用
-		else if (pos2.z >= pos1.z && //z
-			pos2.x <= pos1.x + pos1Addx && pos2.x >= pos1.x - pos1Addx && //x
-			pos2.y <= pos1.y + pos1Addy && pos2.y >= pos1.y - pos1Addy && //y
-			mojiHp >= 0 //alive
-			)
-		{
-			mojiHp=-1;
-			Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z }
-				, { 2.8f, 2.8f, 2.8f }, { 0,-0.08,0 }, 12.0f, 2.0f,
-				{ 0,1,0 }, { 0.5,0.3,0.17 });
-		}
+		////チュートリアルの文字がこわれるとき用
+		//else if (pos2.z >= pos1.z && //z
+		//	pos2.x <= pos1.x + pos1Addx && pos2.x >= pos1.x - pos1Addx && //x
+		//	pos2.y <= pos1.y + pos1Addy && pos2.y >= pos1.y - pos1Addy && //y
+		//	mojiHp <= 0 //alive
+		//	)
+		//{
+		//	count++;
+		//	Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z }
+		//		, { 2.8f, 2.8f, 2.8f }, { 0,-0.08,0 }, 12.0f, 2.0f,
+		//		{ 0,1,0 }, { 0.5,0.3,0.17 });
+		//	mojiHp = 10;
+		//	targetObj->position.x = 50;
+		//}
 	}
 }
 

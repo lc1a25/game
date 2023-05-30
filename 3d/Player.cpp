@@ -86,7 +86,7 @@ void Player::Update()
 	//near から mouseDirection(near->far) に　distanceObject 分進んだ距離
 	reticle->matWorld.r[3].m128_f32[0] = posNear.m128_f32[0] + mouseDirection.m128_f32[0] * 100;
 	reticle->matWorld.r[3].m128_f32[1] = posNear.m128_f32[1] + mouseDirection.m128_f32[1] * 100;
-	reticle->matWorld.r[3].m128_f32[2] = posNear.m128_f32[2] + mouseDirection.m128_f32[2] * 120;
+	reticle->matWorld.r[3].m128_f32[2] = posNear.m128_f32[2] + mouseDirection.m128_f32[2] * 100;
 	
 	//ワールド座標に
 	reticle->position.x = reticle->matWorld.r[3].m128_f32[0];

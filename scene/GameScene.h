@@ -62,7 +62,7 @@ public: // メンバ関数
 	//当たり判定
 	void CheckAllCollision(Enemy* enemy);
 	void CheckBossANDChildCollision(Enemy* bossChild);
-	void CheckMojiCollision();
+	void CheckTargetCollision();
 	void CheckBillCollision(Bill* bill);
 	//hwndの取得
 	void SetHwnd(HWND winHwnd) { hwnd = winHwnd; }
@@ -207,6 +207,14 @@ private: // メンバ変数
 	//パーティクル
 	ParticleManager* Particle = nullptr;
 
+	float particleCountTitle = 30;
+	float particleLifeTitle = 64;
+	XMFLOAT3 particleLeftPosTitle = { -movieParticleXL, 0,-320 };
+	XMFLOAT3 particleVelocityTitle = { 0.5,0.5,0.5 };
+	XMFLOAT3 particleAccelTitle = { 0.02,0.02,0.02 };
+	float particleMaxPosXTitle = 80;
+	float particleMinPosXTitle = 40;
+
 	//当たり判定用変数
 	float length = 0.0f;
 	float size = 25.0f;
@@ -253,8 +261,10 @@ private: // メンバ変数
 	bool setObjectFlag = false;//ムービー後にオブジェクトをセットする用
 
 	//チュートリアル文字のｈｐ
-	int mojiHp = 8;
-	int mojiChangeHp = mojiHp - 1;
+	int targetHpMax = 3;
+	int targetHp = targetHpMax;
+	int targetChangeHp = targetHp - 1;
+	int count = 0;
 
 	int gameScene = 0;//スプライトのゲームシーン
 	int gameSceneTitle = 0;//スプライトのタイトルシーン
