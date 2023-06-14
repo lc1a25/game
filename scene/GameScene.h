@@ -17,8 +17,22 @@
 #include "BossChild.h"
 #include "ParticleManager.h"
 #include <sstream>
+#include "BillManager.h"
 #include "Bill.h"
-
+enum class Scene
+{
+	Title,
+	Game,
+	Clear,
+	GameOver,
+};
+enum class SceneDraw
+{
+	TitleDraw,
+	GameDraw,
+	ClearDraw,
+	GameOverDraw,
+};
 
 class GameScene
 {
@@ -63,7 +77,7 @@ public: // メンバ関数
 	void CheckAllCollision(Enemy* enemy);
 	void CheckBossANDChildCollision(Enemy* bossChild);
 	void CheckTargetCollision();
-	void CheckBillCollision(Bill* bill);
+	void CheckBillCollision(BillManager* bill);
 	//hwndの取得
 	void SetHwnd(HWND winHwnd) { hwnd = winHwnd; }
 
@@ -79,8 +93,14 @@ public: // メンバ関数
 
 	void SetGameFlag(int gameFlag) { this->gameScene = gameFlag; }
 
-	//ビル生成
-	void BillCreate();
+	void Title();
+	void Game();
+	void Clear();
+	void GameOver();
+	void TitleDraw();
+	void GameDraw();
+	void ClearDraw();
+	void GameOverDraw();
 
 	//マウス座標
 	float mouseX;
@@ -110,7 +130,12 @@ public: // メンバ関数
 	std::stringstream enemyPopCommands;
 
 private: // メンバ変数
-
+	int phaseNumber = static_cast<int>(scene_);
+	static void (GameScene::* spFuncTable[])();
+	int phaseDrawNumber = static_cast<int>(sceneDraw_);
+	static void (GameScene::* spFuncTableDraw[])();
+	Scene scene_ = Scene::Title;
+	SceneDraw sceneDraw_ = SceneDraw::TitleDraw;
 	HWND hwnd;
 	//ビューポート
 	XMMATRIX viewPort;
@@ -135,7 +160,8 @@ private: // メンバ変数
 
 	Object3d* titleObj = titleObj->Create();
 
-	std::list<std::unique_ptr<Bill>> bills;
+	BillManager* billM = nullptr;
+
 	std::list<std::unique_ptr<EnemyOneWay>> oneWays;
 	std::list<std::unique_ptr<EnemyOneWay>> oneWayMovies;
 	std::list<std::unique_ptr<EnemyCircle>> circles;

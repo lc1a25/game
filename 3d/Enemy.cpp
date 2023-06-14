@@ -61,13 +61,9 @@ void Enemy::Update()
 	phaseNumber = static_cast<int>(phase);
 	(this->*spFuncTable[phaseNumber])();
 
-
-	
-
 	//’e‚ÌXV
 	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
 	{
-		//bullet->SetLockOnPosition(GetWorldPosition(), playerWorldPos);
 		bullet->Update();
 	}
 
@@ -250,41 +246,7 @@ void Enemy::PChild()
 
 }
 
-void Enemy::PWait()
-{
-	waitTimer--;
-	if (waitTimer <= 0)
-	{
-		//phaseMini = BossPhase::MiniVerticalLUF;
-	}
-}
 
-void Enemy::PWaitLB()
-{
-	waitTimer--;
-	if (waitTimer <= 0)
-	{
-		//phaseMini = BossPhase::MiniVerticalLUB;
-	}
-}
-
-void Enemy::PWaitR()
-{
-	waitTimer--;
-	if (waitTimer <= 0)
-	{
-		//phaseMini = BossPhase::MiniVerticalRUF;
-	}
-}
-
-void Enemy::PWaitRB()
-{
-	waitTimer--;
-	if (waitTimer <= 0)
-	{
-		//phaseMini = BossPhase::MiniVerticalRUB;
-	}
-}
 
 void Enemy::PChildHoming()
 {
@@ -458,8 +420,6 @@ void Enemy::OneWayMovieR()
 {
 	enemy->position.x += OWRSpeed;
 
-	//enemy->position.z += cameraZ;
-
 	if (enemy->position.x <= -OWMaxRange)
 	{
 		OWRSpeed *= -1;
@@ -468,18 +428,12 @@ void Enemy::OneWayMovieR()
 	{
 		OWRSpeed *= -1;
 	}
-
-	//PMovieShot();
-
-	
 }
 
 void Enemy::OneWayMovieL()
 {
 	enemy->position.x -= OWRSpeed;
 
-	//enemy->position.z += cameraZ;
-
 	if (enemy->position.x <= -OWMaxRange)
 	{
 		OWRSpeed *= -1;
@@ -489,9 +443,6 @@ void Enemy::OneWayMovieL()
 		OWRSpeed *= -1;
 	}
 
-	//PMovieShot();
-
-	
 }
 
 void Enemy::BossApproach()

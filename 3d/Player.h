@@ -83,6 +83,7 @@ private:
 	bool playerSet = true;
 	bool keyInput = false;
 	bool gameEndMovieFlag = false;
+
 public:
 
 	//プレイヤーの弾　当たり判定でつかう

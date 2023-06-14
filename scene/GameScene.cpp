@@ -1,6 +1,19 @@
 #include "GameScene.h"
 #include "time.h"
 
+void(GameScene::* GameScene::spFuncTable[])() = {
+	&GameScene::Title,
+	&GameScene::Game,
+	&GameScene::Clear,
+	&GameScene::GameOver,
+};
+void(GameScene::* GameScene::spFuncTableDraw[])() = {
+	&GameScene::TitleDraw,
+	&GameScene::GameDraw,
+	&GameScene::ClearDraw,
+	&GameScene::GameOverDraw,
+};
+
 GameScene::GameScene()
 {
 }
@@ -68,7 +81,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 
 	shotObj->SetModel(shotObjModel);
 	shotObj->scale = { 3,3,3 };
-	shotObj->SetPosition({ 0,-200,90 });
+	shotObj->SetPosition({ 0,-200,0 });
 
 	shotHibiObj->SetModel(shotHibiObjModel);
 	shotHibiObj->scale = { 3,3,3 };
@@ -122,7 +135,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	boss->Init(bossModel, enemyBulletModel, barrierModel,{ 0,0,-200.0f });
 
 	bossChildLUF = new BossChild();
-	bossChildLUF->Init(bossModel, { 0, 0, 1000.0f }, 1);
+	bossChildLUF->Init(bossModel, { 0, 0, 1000.0f }, 1);//csvで読み込みする
 	bossChildLUB = new BossChild();
 	bossChildLUB->Init(bossModel, { 0, 0, 1000.0f }, 2);
 	bossChildRUF = new BossChild();
@@ -164,8 +177,9 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	// 3Dオブジェクト生成
 	Particle = ParticleManager::Create(dxcommon->GetDev(), camera);
 
+	billM = new BillManager();
+	billM->BillSet(billModel);
 	//ビル生成
-	BillCreate();
 
 	//スプライト初期化
 	spriteCommon = new SpriteCommon;
@@ -243,24 +257,13 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 
 void GameScene::Update()
 {
+
+	phaseNumber = static_cast<int>(scene_);
+	(this->*spFuncTable[phaseNumber])();
+	phaseDrawNumber = static_cast<int>(sceneDraw_);
 	
-//スプライト
-	//ボスのhp
-	bossHpBarSprite->SetSize({ bossHpBar,32 });
-	bossHpBarSprite->TransVertexBuffer();
-
-	//playerのhp
-	playerHpSprite->SetPosition({ 1112.0f,640.0f,0.0f });
-	playerHpSprite->SetSize({ hpBar,96 });
-	playerHpSprite->SetTexsize({ hpBar,96 });
-	playerHpSprite->TransVertexBuffer();
-
-	titleSprite->Update();//タイトル
-	endSprite->Update();//クリア
-	gameOverSprite->Update();//ゲームオーバー
-	bossHpBarSprite->Update();//ボスのhpバー
-	bossHpWakuSprite->Update();//ボスのhpバーの枠
-
+	
+//共通処理
 	//照準
 	reticleSprite->Update();
 	reticleSprite->SetPosition({ mouseX,mouseY,0 });
@@ -297,37 +300,16 @@ void GameScene::Update()
 			boss->GetEnemy()->OnBossCollision();
 		}		
 	}
-
-//ゲーム内
-	//条件を満たしたlistけす
-	bills.remove_if([](std::unique_ptr<Bill>& bill)
-		{
-			return bill->billDead();
-		});
-	oneWays.remove_if([](std::unique_ptr<EnemyOneWay>& oneWay)
-		{
-			return oneWay->GetIsDead();
-		});
-	oneWayMovies.remove_if([](std::unique_ptr<EnemyOneWay>& oneWayMovie)
-		{
-			return oneWayMovie->GetIsDead();
-		});
-
-	circles.remove_if([](std::unique_ptr<EnemyCircle>& circle)
-		{
-			return circle->GetIsDead();
-		});
-
-	//ビル更新処理
-	for (std::unique_ptr<Bill>& bill : bills)
+	if (input->isKeyTrigger(DIK_N))
 	{
-		bill->SetCameraZ(cameraObj->GetEye().z);
-		bill->Update();
+		scene_ = Scene::Clear;
+		sceneDraw_ = SceneDraw::ClearDraw;
 	}
 
+	//ビル更新処理
+	billM->Update();
+
 	//スカイドーム
-	 //カメラの移動量より少し遅く動く
-	skydomeZ += cameraObj->GetEyeVec().z * skydomeVec;
 	skydome->SetPosition({ 0,-220,skydomeZ });
 	skydome->Update();
 
@@ -335,138 +317,10 @@ void GameScene::Update()
 	wallFloor->Update();
 	road->Update();
 	shotHibiObj->Update();
-	//shotHibiObj->rotation.y = 180;
 	kanbanObj->Update();
 	kanbanPlaneObj->Update();
 	shotObj->Update();
 	targetObj->Update();
-	//shotObj->rotation.y = 180;
-
-	//タイトルからスタートムービー演出へ
-	if (cameraObj->GetStartMovieFlag() == false && gameStartFlag == false)
-	{
-		if (input->isMouseKey())
-		{
-			cameraObj->SetStartMovieSkip(true);
-			gameStartFlag = true;
-		}
-	}
-	//スタートムービー
-	if (gameStartFlag == true && cameraObj->GetStartMovieFlag() == false)
-	{
-		//playerを上ななめ前にとばす
-		startPlayer->position.z += startPlayerAddZ;
-		startPlayer->position.y += startPlayerAddY;
-	}
-
-	//ムービースキップ
-	if (gameStartFlag == true && input->isKeyTrigger(DIK_K))
-	{
-		cameraObj->SetStartMovieSkip(false);
-		startPlayer->SetPosition(startPlayerAfterPos);
-		movieSkipFlag = true;//ムービースキップのスプライト
-	}
-	
-	//スタートムービー後の自機(仮)の場所
-	if (startPlayer->GetPosition().z >= startPlayerAfterPos.z && boss->GetBossDead() == false)
-	{
-		startPlayer->SetPosition(startPlayerAfterPos);
-		movieSkipFlag = true;//ムービースキップのスプライト
-	}
-	else
-	{
-		//ムービー中のパーティクル
-		movieParticleTime++;
-		 //60frame から　120frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
-		if (movieParticleTime >= 60 && movieParticleTime <= 120)
-		{
-			movieParticleXL = particleMinPosXTitle;
-			movieParticleXR = particleMaxPosXTitle;
-			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, 0,-320 }, particleVelocityTitle,
-				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
-				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-			//80frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
-			if(movieParticleTime >= 80)
-			{ 
-				Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
-					particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-			}
-		}
-		 //120frame から　180frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
-		else if(movieParticleTime >= 120 && movieParticleTime <= 180)
-		{
-			movieParticleXL = particleMaxPosXTitle;
-			movieParticleXR = particleMinPosXTitle;
-			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, 0,-320 }, particleVelocityTitle,
-				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-			//160frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
-			if (movieParticleTime >= 160)
-			{
-				Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
-					particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-			}
-		}
-		else if (movieParticleTime >= 180)
-		{
-			//180frameを0に
-			movieParticleTime = 0;
-		}
-	}
-
-	//csvのenemy発生
-	UpdateEnemyPop();
-
-	//チュートリアルがおわっているかをカメラに教える
-	cameraObj->SetTutorialFlag(tutorialFlag);
-
-	
-	//ムービーが終わった後のチュートリアル用のobj　と　playerの位置設定
-	if (cameraObj->GetStartGameFlag() == true && setObjectFlag == false)
-	{
-		targetObj->SetPosition({ 0,0,100 });
-		player->SetPlayerPos({ 0,0,0 });
-		setObjectFlag = true;
-	}
-	//弾の発射説明obj　　(画面右の看板)(アニメーションする)
-	if (cameraObj->GetStartGameFlag() == true)
-	{
-		kanbanTime++;
-	}
-	if (kanbanTime >= kanbanTimeMax)
-	{
-		kanbanShotObj->SetPosition({ kanbanShotPosDown });
-		kanbanShot2Obj->SetPosition({ kanbanShotPos });
-		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
-		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
-	}
-	if (kanbanTime >= kanbanTimeMax * 2)
-	{
-		kanbanShotObj->SetPosition({ kanbanShotPosDown });
-		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
-		kanbanShot3Obj->SetPosition({ kanbanShotPos });
-		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
-	}
-	if (kanbanTime >= kanbanTimeMax * 3)
-	{
-		kanbanShotObj->SetPosition({ kanbanShotPosDown });
-		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
-		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
-		kanbanShot4Obj->SetPosition({ kanbanShotPos });
-	}
-	if (kanbanTime >= kanbanTimeMax * 4)
-	{
-		kanbanShotObj->SetPosition({ kanbanShotPos });
-		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
-		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
-		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
-		kanbanTime = 0;
-	}
-	//弾の発射説明obj　の更新処理
-	kanbanShotObj->Update();
-	kanbanShot2Obj->Update();
-	kanbanShot3Obj->Update();
-	kanbanShot4Obj->Update();
 	
 	//2dレティクルスプライトの座標
 	mouseX = player->GetMouseX();
@@ -493,219 +347,10 @@ void GameScene::Update()
 	player->SetHwnd(hwnd);
 	player->SetViewPort(viewPort);
 	player->SetCameraMatViewProjection(cameraObj->GetMatViewProjection());
-
-	//自機
-	player->SetStartFlag(cameraObj->GetStartGameFlag());
-	player->SetCameraObj(cameraObj->GetWorldTransform());
-	player->SetCameraPos(cameraObj->GetEye());
-	player->SetCameraEyeVec(cameraObj->GetEyeVec());
-	player->SetPlayerHpBar(hpBar);
 	player->Update();
-
-	// 敵
-	//oneway更新処理
-	for (std::unique_ptr<EnemyOneWay>& oneWay : oneWays)
-	{
-		CheckAllCollision(oneWay->GetEnemy());
-		oneWay->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
-		oneWay->SetPlayerPosition(player->GetWorldPosition());
-		oneWay->Update();
-	}
-
-	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
-	{
-		CheckAllCollision(oneWay2->GetEnemy());
-		oneWay2->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
-		oneWay2->Update();
-	}
-	
-	//circle更新処理
-	for (std::unique_ptr<EnemyCircle>& circle : circles)
-	{
-		CheckAllCollision(circle->GetEnemy());
-		circle->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
-		circle->SetPlayerPosition(player->GetWorldPosition());
-		circle->Update();
-	}
-
-	//ボス
-	boss->SetPlayerWorldPos(player->GetWorldPosition());
-	boss->GetEnemy()->SetBossHpBar(bossHpBar,bossHpBarMax);
-	boss->Update();
-
-	//ボスの周りをまわる敵
-	
-	 //ボスの周りをまわる攻撃のため
-	 //ボスに追従するため
-
-	bossChildLUF->SetBossPos(boss->GetPos());
-	bossChildLUF->SetBossVec(boss->GetBossVec());
-	bossChildLUF->Update();
-
-	bossChildLUB->SetBossPos(boss->GetPos());
-	bossChildLUB->SetBossVec(boss->GetBossVec());
-	bossChildLUB->Update();
-
-	bossChildRUF->SetBossPos(boss->GetPos());
-	bossChildRUF->SetBossVec(boss->GetBossVec());
-	bossChildRUF->Update();
-
-	bossChildRUB->SetBossPos(boss->GetPos());
-	bossChildRUB->SetBossVec(boss->GetBossVec());
-	bossChildRUB->Update();
-
-	bossChildLDF->SetBossPos(boss->GetPos());
-	bossChildLDF->SetBossVec(boss->GetBossVec());
-	bossChildLDF->Update();
-
-	bossChildLDB->SetBossPos(boss->GetPos());
-	bossChildLDB->SetBossVec(boss->GetBossVec());
-	bossChildLDB->Update();
-
-	bossChildRDF->SetBossPos(boss->GetPos());
-	bossChildRDF->SetBossVec(boss->GetBossVec());
-	bossChildRDF->Update();
-
-	bossChildRDB->SetBossPos(boss->GetPos());
-	bossChildRDB->SetBossVec(boss->GetBossVec());
-	bossChildRDB->Update();
-
-
-	//ボスがバリアを張ったか
-	bossChildLUF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildLUB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildRUF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildRUB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildLDF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildLDB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildRDF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildRDB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-
-	//ボス系当たり判定
-	CheckAllCollision(boss->GetEnemy());
-	CheckBossANDChildCollision(bossChildLUF->GetEnemy());
-	CheckBossANDChildCollision(bossChildLUB->GetEnemy());
-	CheckBossANDChildCollision(bossChildRUF->GetEnemy());
-	CheckBossANDChildCollision(bossChildRUB->GetEnemy());
-	CheckBossANDChildCollision(bossChildLDF->GetEnemy());
-	CheckBossANDChildCollision(bossChildLDB->GetEnemy());
-	CheckBossANDChildCollision(bossChildRDF->GetEnemy());
-	CheckBossANDChildCollision(bossChildRDB->GetEnemy());
-	CheckTargetCollision();
-
-	//自機の弾のパーティクル
-	//自弾リスト
-	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player->GetBullets();
-	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
-	{
-		bullet1 = bullet->GetWorldPosition();
-
-		//攻撃時パーティクルがでる
-		if (input->isMouseKey())
-		{
-			attackParticleFlag = true;
-		}
-		if (attackParticleFlag == true)
-		{
-			Particle->CreateParticle(30, 8, bullet1, { 0.5,0.5,0.5 }, { 0.03,0.03,0.03 }, 5.0f, 1.0f, { 1,1,1 }, { 1,0,0 });
-		}
-	}
-	
-	//ボスのバリアを割る
-	if (
-		bossChildLUF->GetMiniDead() == true&&
-		bossChildLUB->GetMiniDead() == true &&
-		bossChildRUF->GetMiniDead() == true &&
-		bossChildRUB->GetMiniDead() == true &&
-		bossChildLDF->GetMiniDead() == true &&
-		bossChildLDB->GetMiniDead() == true &&
-		bossChildRDF->GetMiniDead() == true &&
-		bossChildRDB->GetMiniDead() == true
-		)
-	{
-		boss->SetBarrierFlag(false);
-	}
-
-	//hp
-	bossHpBar = boss->GetEnemy()->GetHpBarX();
-	hpBar = player->GetHpBar();
-
-    //ボス戦はじまる (カメラが止まる)
-	if (cameraObj->GetEndFlag() == true)
-	{
-		bossFlag = true;
-	}
-
-	//ボスが倒されたら
-	if (boss->GetEnemy()->IsDead() == true)
-	{
-		player->SetEndFlag(true);
-		player->SetkeyInput(false);
-		
-		//ボスの演出がおわったら
-		if (boss->GetEnemy()->GetWorldPosition().y <= floorY)
-		{
-			//シーンチェンジまち用
-			dieTimer--;
-			if (dieTimer <= 0)
-			{
-				player->SetEndMovieFlag(true);
-				//シーンチェンジ
-				if (player->GetWorldPosition().z >= endPlayerPos)
-				{
-						pointsLast = true;
-				}
-			}
-			else
-			{
-				cameraObj->SetEndMovieFlag(true);
-			}
-		}
-		else
-		{
-			Particle->CreateParticle(30, 48, boss->GetPos(), { 0.5,0.5,0.5 }, { 0.05,0.05,0.05 }, 10.0f, 2.0f,
-				{ 1,1,1 }, { 1,0.5,0 });
-		}
-	}
-
-	
-
-	//プレイヤーのhpが０になったら
-	if (player->GetHp0() == true)
-	{
-		player->SetEndFlag(true);
-		player->SetkeyInput(false);
-		//パーティクル生成
-		Particle->CreateParticle(5, 32, player->GetWorldPosition(), { 0.8,0.8,0.8 }, { 0,-0.05,0 }, 10.0f, 2.0f,
-			{ 1,1,1 }, { 1,0,0 });
-		
-		//bossのやられた演出まち用
-		dieTimer--;
-
-		if (dieTimer <= 0)
-		{
-			//シーンチェンジ
-			playerDieFlag = true;
-
-			dieTimer = dieTimerMax;
-		}
-		
-	}
-	//ゲームが終わったらビルを消す
-	if (pointsLast == true || playerDieFlag == true)
-	{
-		for (std::unique_ptr<Bill>& bill : bills)
-		{
-			bill->SetBillDeadFlag(true);
-		}
-	}
 
 	startPlayer->Update();
 	Particle->Update();
-	titleObj->Update();
-	clickCount++;
-	
-	clickObj->Update();
 }
 
 void GameScene::Draw()
@@ -717,134 +362,20 @@ void GameScene::Draw()
 	wallFloor->Draw();//床
 	road->Draw();//道
 
-	for (std::unique_ptr<Bill>& bill : bills)
-	{
-		bill->Draw();
-	}
-	//文字が一回でも攻撃されたらひびが入った文字に変更する
-	/*if (mojiHp >= mojiChangeHp)
-	{
-		targetObj->Draw();
-	}*/
-	if (targetHp >= 1)
-	{
-		targetObj->Draw();
-	}
-	
-	kanbanObj->Draw();
-	kanbanPlaneObj->Draw();
-	kanbanShotObj->Draw();
-	kanbanShot2Obj->Draw();
-	kanbanShot3Obj->Draw();
-	kanbanShot4Obj->Draw();
-	if (cameraObj->GetStartMovieFlag() == false && gameStartFlag == false)
-	{
-		titleObj->Draw();
-		if (clickCount >= clickAliveCount)
-		{
-			clickObj->Draw();
-			if (clickCount >= clickDeadCount)
-			{
-				clickCount = clickCountReset;
-			}
-		}
-	}
-		
-	
-	
-	startPlayer->Draw();
+	billM->Draw();
 
-	if (mutekiFlag == true && player->GetHp0() == false)
-	{
-		tenmetuCount++;
-		if (tenmetuCount >= tenmetuAliveCount)
-		{
-			player->Draw();
-			if (tenmetuCount >= tenmetuDeadCount)
-			{
-				tenmetuCount = tenmetuCountReset;
-			}
-		}
-	}
-	else
-	{
-		player->Draw();
-	}
-	
-	for (std::unique_ptr<EnemyOneWay>& oneWay : oneWays)
-	{
-		oneWay->Draw();
-	}
-	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
-	{
-		oneWay2->Draw();
-	}
-	for (std::unique_ptr<EnemyCircle>& circle : circles)
-	{
-		circle->Draw();
-	}
-	
-	if(cameraObj->GetEndFlag() == true)
-	{ 
-		boss->Draw();
-		bossChildLUF->Draw();
-		bossChildLUB->Draw();
-		bossChildRUF->Draw();
-		bossChildRUB->Draw();
-		bossChildLDF->Draw();
-		bossChildLDB->Draw();
-		bossChildRDF->Draw();
-		bossChildRDB->Draw();
-	}
+	startPlayer->Draw();
+	Object3d::PostDraw();
+	// 3Dオブクジェクトの描画おわり
+	(this->*spFuncTableDraw[phaseDrawNumber])();
+	/// ここに3Dオブジェクトの描画処理
+	Object3d::PreDraw(dxcommon->GetCmdlist());
 	
 	Particle->Draw(dxcommon->GetCmdlist());
 	
 	Object3d::PostDraw();
 // 3Dオブクジェクトの描画おわり
 
-	spriteCommon->PreDraw();
-	if (gameScene == gameSceneTitle)//タイトル
-	{
-
-		//titleSprite->Draw();
-		reticleSprite->Draw();
-	
-		//debugtext_minute->DrawAll();
-		//debugtext_minute2->DrawAll();
-	}
-	else if (gameScene == gameSceneInGame)//ゲーム内
-	{
-		reticleSprite->Draw();
-		if (movieSkipFlag == false)
-		{
-			kSkipSprite->Draw();
-		}
-		if (tutorialFlag == true)
-		{
-		}
-		else
-		{
-			playerHpSprite->Draw();
-		}
-		if (bossFlag == true)
-		{
-			bossHpBarSprite->Draw();
-			bossHpWakuSprite->Draw();
-		}
-
-		//デバッグテキスト
-		//debugtext_minute->DrawAll();
-		//debugtext_minute2->DrawAll();
-
-	}
-	else if (gameScene == gameSceneClear)//クリアシーン
-	{
-		endSprite->Draw();
-	}
-	else if (gameScene == gameSceneGameOver)//ゲームオーバーシーン
-	{
-		gameOverSprite->Draw();
-	}
 
 	
 }
@@ -1110,24 +641,10 @@ void GameScene::CheckTargetCollision()
 			}
 
 		}
-		////チュートリアルの文字がこわれるとき用
-		//else if (pos2.z >= pos1.z && //z
-		//	pos2.x <= pos1.x + pos1Addx && pos2.x >= pos1.x - pos1Addx && //x
-		//	pos2.y <= pos1.y + pos1Addy && pos2.y >= pos1.y - pos1Addy && //y
-		//	mojiHp <= 0 //alive
-		//	)
-		//{
-		//	count++;
-		//	Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z }
-		//		, { 2.8f, 2.8f, 2.8f }, { 0,-0.08,0 }, 12.0f, 2.0f,
-		//		{ 0,1,0 }, { 0.5,0.3,0.17 });
-		//	mojiHp = 10;
-		//	targetObj->position.x = 50;
-		//}
 	}
 }
 
-void GameScene::CheckBillCollision(Bill* bill)
+void GameScene::CheckBillCollision(BillManager* bill)
 {
 	XMFLOAT3 pos1, pos2;
 
@@ -1419,279 +936,515 @@ XMFLOAT3 GameScene::CommandPositionSet(std::istream  &line_stream, std::string &
 	return position;
 }
 
-
-
-FLOAT GameScene::BillScaleY(int randam)
+void GameScene::Title()
 {
-	if (randam == 1)
+	if (input->isMouseKey())
 	{
-		billScaleY = 13;
+		cameraObj->SetStartMovieSkip(true);
+		scene_ = Scene::Game;
+		sceneDraw_ = SceneDraw::GameDraw;
 	}
-	else if (randam == 2)
-	{
-		billScaleY = 7;
-	}
-	else if (randam == 0)
-	{
-		billScaleY = 10;
-	}
-	return billScaleY;
+	titleObj->Update();
+	clickCount++;
+
+	clickObj->Update();
+
 }
 
-XMFLOAT3 GameScene::BillRot(int randam)
+void GameScene::Game()
 {
-	if (randam == 1)
-	{
-		billRotation.x = 90;
-		billRotation.y = 45;
-		billRotation.z = 20;
-	}
-	else if (randam == 2)
-	{
-		billRotation.x = -20;
-		billRotation.y = -45;
-		billRotation.z = -90;
-	}
-	else if (randam == 0)
-	{
-		billRotation.x = 90;
-		billRotation.y = 0;
-		billRotation.z = 45;
-	}
-	return billRotation;
-	
-}
+	//sprite
+		//ボスのhp
+	bossHpBarSprite->SetSize({ bossHpBar,32 });
+	bossHpBarSprite->TransVertexBuffer();
 
-void GameScene::BillCreate()
-{
-	const float iMax = 600;
-	const float iAdd = 40;
-	const float startZ = 130;
-	const float iMaxS = 1000;
-	const float iMaxE = 400;
-srand((1));
-	for (float i = 0; i < iMax; i += iAdd)
-	{
-		
+	bossHpBarSprite->Update();//ボスのhpバー
+	bossHpWakuSprite->Update();//ボスのhpバーの枠
 
-		randBill = rand() % 3;
-	/*	randBillRot = rand() % 15;
-		if (randBillRot <= 0)
+	//playerのhp
+	playerHpSprite->SetPosition({ 1112.0f,640.0f,0.0f });
+	playerHpSprite->SetSize({ hpBar,96 });
+	playerHpSprite->SetTexsize({ hpBar,96 });
+	playerHpSprite->TransVertexBuffer();
+
+	//3d設置物
+		//スカイドーム
+		//カメラの移動量より少し遅く動く
+	skydomeZ += cameraObj->GetEyeVec().z * skydomeVec;
+
+	//スタートムービー
+	if (cameraObj->GetStartMovieFlag() == false)
+	{
+		//playerを上ななめ前にとばす
+		startPlayer->position.z += startPlayerAddZ;
+		startPlayer->position.y += startPlayerAddY;
+	}
+
+	//ムービースキップ
+	if (input->isKeyTrigger(DIK_K))
+	{
+		cameraObj->SetStartMovieSkip(false);
+		startPlayer->SetPosition(startPlayerAfterPos);
+		movieSkipFlag = true;//ムービースキップのスプライト
+	}
+
+	//スタートムービー後の自機(仮)の場所
+	if (startPlayer->GetPosition().z >= startPlayerAfterPos.z && boss->GetBossDead() == false)
+	{
+		startPlayer->SetPosition(startPlayerAfterPos);
+		movieSkipFlag = true;//ムービースキップのスプライト
+	}
+	else
+	{
+		//ムービー中のパーティクル
+		movieParticleTime++;
+		//60frame から　120frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
+		if (movieParticleTime >= 60 && movieParticleTime <= 120)
 		{
-			billRotation.z = 90;
-		}*/
-		BillScaleY(randBill);
-			//bill生成
-			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-			newBill->Init(billModel, { 40,-32,startZ + i }, { 4,billScaleY,4 }, billRotation);
-
-			//bill登録
-			bills.push_back(std::move(newBill));//move はユニークから譲渡するため
-		
-	}
-	for (float i = 0; i < iMax; i += iAdd)
-	{
-		randBill = rand() % 3;
-
-		BillScaleY(randBill);
-			//bill生成
-			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-			newBill->Init(billModel, { -40,-32,startZ + i }, { 4,billScaleY,4 });
-
-			//bill登録
-			bills.push_back(std::move(newBill));//move はユニークから譲渡するため
-		
-	}
-
-	for (float i = 0; i < iMax; i += iAdd)
-	{
-		randBill = rand() % 3;
-
-		BillScaleY(randBill);
-			//bill生成
-			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-			newBill->Init(billModel, { 80,-32,startZ + i }, { 4,billScaleY,4 });
-
-			//bill登録
-			bills.push_back(std::move(newBill));//move はユニークから譲渡するため
-		
-	}
-	for (float i = 0; i < iMax; i += iAdd)
-	{
-		randBill = rand() % 3;
-
-		BillScaleY(randBill);
-			//bill生成
-			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-			newBill->Init(billModel, { -80,-32,startZ + i }, { 4,billScaleY,4 });
-
-			//bill登録
-			bills.push_back(std::move(newBill));//move はユニークから譲渡するため
-		
-	}
-	for (float i = 0; i < iMax; i += iAdd)
-	{
-		randBill = rand() % 3;
-
-		BillScaleY(randBill);
-			//bill生成
-			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-			newBill->Init(billModel, { 120,-32,startZ + i }, { 4,billScaleY,4 });
-
-			//bill登録
-			bills.push_back(std::move(newBill));//move はユニークから譲渡するため
-		
-	}
-	for (float i = 0; i < iMax; i += iAdd)
-	{
-		randBill = rand() % 3;
-
-		BillScaleY(randBill);
-			//bill生成
-			std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-			newBill->Init(billModel, { -120,-32,startZ + i }, { 4,billScaleY,4 });
-
-			//bill登録
-			bills.push_back(std::move(newBill));//move はユニークから譲渡するため
-		
-	}
-
-
-	for (float i = 0; i < iMaxS; i += iAdd)
-	{
-
-
-		randBill = rand() % 3;
-		/*	randBillRot = rand() % 15;
-			if (randBillRot <= 0)
+			movieParticleXL = particleMinPosXTitle;
+			movieParticleXR = particleMaxPosXTitle;
+			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, 0,-320 }, particleVelocityTitle,
+				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
+				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+			//80frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
+			if (movieParticleTime >= 80)
 			{
-				billRotation.z = 90;
-			}*/
-		BillScaleY(randBill);
-		//bill生成
-		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(billModel, { 40,-32,0 - i }, { 4,billScaleY,4 }, billRotation);
-
-		//bill登録
-		bills.push_back(std::move(newBill));//move はユニークから譲渡するため
-
+				Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
+					particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+			}
+		}
+		//120frame から　180frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
+		else if (movieParticleTime >= 120 && movieParticleTime <= 180)
+		{
+			movieParticleXL = particleMaxPosXTitle;
+			movieParticleXR = particleMinPosXTitle;
+			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, 0,-320 }, particleVelocityTitle,
+				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+			//160frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
+			if (movieParticleTime >= 160)
+			{
+				Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
+					particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+			}
+		}
+		else if (movieParticleTime >= 180)
+		{
+			//180frameを0に
+			movieParticleTime = 0;
+		}
 	}
-	for (float i = 0; i < iMaxS; i += iAdd)
+
+	//csvのenemy発生
+	UpdateEnemyPop();
+
+	//チュートリアルがおわっているかをカメラに教える
+	cameraObj->SetTutorialFlag(tutorialFlag);
+
+	//ムービーが終わった後のチュートリアル用のobj　と　playerの位置設定
+	if (cameraObj->GetStartGameFlag() == true && setObjectFlag == false)
 	{
-		randBill = rand() % 3;
-
-		BillScaleY(randBill);
-		//bill生成
-		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(billModel, { -40,-32,0 - i }, { 4,billScaleY,4 });
-
-		//bill登録
-		bills.push_back(std::move(newBill));//move はユニークから譲渡するため
-
+		targetObj->SetPosition({ 0,0,100 });
+		player->SetPlayerPos({ 0,0,0 });
+		setObjectFlag = true;
 	}
-
-	for (float i = 0; i < iMaxS; i += iAdd)
+	//弾の発射説明obj　　(画面右の看板)(アニメーションする)
+	if (cameraObj->GetStartGameFlag() == true)
 	{
-		randBill = rand() % 3;
-
-		BillScaleY(randBill);
-		//bill生成
-		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(billModel, { 80,-32,0 - i }, { 4,billScaleY,4 });
-
-		//bill登録
-		bills.push_back(std::move(newBill));//move はユニークから譲渡するため
-
+		kanbanTime++;
 	}
-	for (float i = 0; i < iMaxS; i += iAdd)
+	if (kanbanTime >= kanbanTimeMax)
 	{
-		randBill = rand() % 3;
-
-		BillScaleY(randBill);
-		//bill生成
-		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(billModel, { -80,-32,0 - i }, { 4,billScaleY,4 });
-
-		//bill登録
-		bills.push_back(std::move(newBill));//move はユニークから譲渡するため
-
+		kanbanShotObj->SetPosition({ kanbanShotPosDown });
+		kanbanShot2Obj->SetPosition({ kanbanShotPos });
+		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
 	}
-	for (float i = 0; i < iMaxS; i += iAdd)
+	if (kanbanTime >= kanbanTimeMax * 2)
 	{
-		randBill = rand() % 3;
-
-		BillScaleY(randBill);
-		//bill生成
-		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(billModel, { 120,-32,0 - i }, { 4,billScaleY,4 });
-
-		//bill登録
-		bills.push_back(std::move(newBill));//move はユニークから譲渡するため
-
+		kanbanShotObj->SetPosition({ kanbanShotPosDown });
+		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot3Obj->SetPosition({ kanbanShotPos });
+		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
 	}
-	for (float i = 0; i < iMaxS; i += iAdd)
+	if (kanbanTime >= kanbanTimeMax * 3)
 	{
-		randBill = rand() % 3;
-
-		BillScaleY(randBill);
-		//bill生成
-		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(billModel, { -120,-32,0 - i }, { 4,billScaleY,4 });
-
-		//bill登録
-		bills.push_back(std::move(newBill));//move はユニークから譲渡するため
-
+		kanbanShotObj->SetPosition({ kanbanShotPosDown });
+		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot4Obj->SetPosition({ kanbanShotPos });
 	}
-	
-
-	//ボス戦のビル　ランダムに倒して回転して配置
-	for (float i = 0; i < iMaxE; i += iAdd)
+	if (kanbanTime >= kanbanTimeMax * 4)
 	{
-
-		randBill = rand() % 3;
-		randBillRot = rand() % 3;
-
-		BillScaleY(randBill);
-		billRotation = BillRot(randBillRot);
-		//bill生成
-		std::unique_ptr<Bill> newBill = std::make_unique<Bill>();
-		newBill->Init(billModel, { -200 + i,-32,990 }, { 4,billScaleY,4 },billRotation);
-		
-		//bill生成
-		std::unique_ptr<Bill> newBill2 = std::make_unique<Bill>();
-		newBill2->Init(billModel, { 200 - i,-32,990 }, { 4,billScaleY,4 }, billRotation);
-
-		//bill生成
-		std::unique_ptr<Bill> newBill3 = std::make_unique<Bill>();
-		newBill3->Init(billModel, { 200 + i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
-
-		//bill生成
-		std::unique_ptr<Bill> newBill4 = std::make_unique<Bill>();
-		newBill4->Init(billModel, { 200 - i,-32,1110 }, { 4,billScaleY,4 }, billRotation);
-
-		//bill生成
-		std::unique_ptr<Bill> newBill5 = std::make_unique<Bill>();
-		newBill5->Init(billModel, { 200 + i,-32,1230 }, { 4,billScaleY,4 }, billRotation);
-
-		//bill生成
-		std::unique_ptr<Bill> newBill6 = std::make_unique<Bill>();
-		newBill6->Init(billModel, { 200 - i,-32,1230 }, { 4,billScaleY,4 }, billRotation);
-
-
-		//bill登録
-		bills.push_back(std::move(newBill));//move はユニークから譲渡するため
-		//bill登録
-		bills.push_back(std::move(newBill2));//move はユニークから譲渡するため
-
-		//bill登録
-		bills.push_back(std::move(newBill3));//move はユニークから譲渡するため
-		//bill登録
-		bills.push_back(std::move(newBill4));//move はユニークから譲渡するため
-		//bill登録
-		bills.push_back(std::move(newBill5));//move はユニークから譲渡するため
-		//bill登録
-		bills.push_back(std::move(newBill6));//move はユニークから譲渡するため
+		kanbanShotObj->SetPosition({ kanbanShotPos });
+		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
+		kanbanTime = 0;
 	}
+	//弾の発射説明obj　の更新処理
+	kanbanShotObj->Update();
+	kanbanShot2Obj->Update();
+	kanbanShot3Obj->Update();
+	kanbanShot4Obj->Update();
+
+
+	//自機
+	player->SetStartFlag(cameraObj->GetStartGameFlag());
+	player->SetCameraObj(cameraObj->GetWorldTransform());
+	player->SetCameraPos(cameraObj->GetEye());
+	player->SetCameraEyeVec(cameraObj->GetEyeVec());
+	player->SetPlayerHpBar(hpBar);
+
+	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player->GetBullets();
+	//自機の弾のパーティクル
+	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
+	{
+		bullet1 = bullet->GetWorldPosition();
+
+		//攻撃時パーティクルがでる
+		if (input->isMouseKey())
+		{
+			attackParticleFlag = true;
+		}
+		if (attackParticleFlag == true)
+		{
+			Particle->CreateParticle(30, 8, bullet1, { 0.5,0.5,0.5 }, { 0.03,0.03,0.03 }, 5.0f, 1.0f, { 1,1,1 }, { 1,0,0 });
+		}
+	}
+
+	// 敵
+	//oneway更新処理
+	for (std::unique_ptr<EnemyOneWay>& oneWay : oneWays)
+	{
+		CheckAllCollision(oneWay->GetEnemy());
+		oneWay->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
+		oneWay->SetPlayerPosition(player->GetWorldPosition());
+		oneWay->Update();
+	}
+
+	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
+	{
+		CheckAllCollision(oneWay2->GetEnemy());
+		oneWay2->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
+		oneWay2->Update();
+	}
+
+	//circle更新処理
+	for (std::unique_ptr<EnemyCircle>& circle : circles)
+	{
+		CheckAllCollision(circle->GetEnemy());
+		circle->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
+		circle->SetPlayerPosition(player->GetWorldPosition());
+		circle->Update();
+	}
+
+	//ボス
+	boss->SetPlayerWorldPos(player->GetWorldPosition());
+	boss->GetEnemy()->SetBossHpBar(bossHpBar, bossHpBarMax);
+	boss->Update();
+
+	//ボスの周りをまわる敵
+
+	 //ボスの周りをまわる攻撃のため
+	 //ボスに追従するため
+	bossChildLUF->SetBossPos(boss->GetPos());
+	bossChildLUF->SetBossVec(boss->GetBossVec());
+	bossChildLUF->Update();
+
+	bossChildLUB->SetBossPos(boss->GetPos());
+	bossChildLUB->SetBossVec(boss->GetBossVec());
+	bossChildLUB->Update();
+
+	bossChildRUF->SetBossPos(boss->GetPos());
+	bossChildRUF->SetBossVec(boss->GetBossVec());
+	bossChildRUF->Update();
+
+	bossChildRUB->SetBossPos(boss->GetPos());
+	bossChildRUB->SetBossVec(boss->GetBossVec());
+	bossChildRUB->Update();
+
+	bossChildLDF->SetBossPos(boss->GetPos());
+	bossChildLDF->SetBossVec(boss->GetBossVec());
+	bossChildLDF->Update();
+
+	bossChildLDB->SetBossPos(boss->GetPos());
+	bossChildLDB->SetBossVec(boss->GetBossVec());
+	bossChildLDB->Update();
+
+	bossChildRDF->SetBossPos(boss->GetPos());
+	bossChildRDF->SetBossVec(boss->GetBossVec());
+	bossChildRDF->Update();
+
+	bossChildRDB->SetBossPos(boss->GetPos());
+	bossChildRDB->SetBossVec(boss->GetBossVec());
+	bossChildRDB->Update();
+
+
+	//ボスがバリアを張ったか
+	bossChildLUF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildLUB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildRUF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildRUB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildLDF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildLDB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildRDF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildRDB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+
+	//ボス系当たり判定
+	CheckAllCollision(boss->GetEnemy());
+	CheckBossANDChildCollision(bossChildLUF->GetEnemy());
+	CheckBossANDChildCollision(bossChildLUB->GetEnemy());
+	CheckBossANDChildCollision(bossChildRUF->GetEnemy());
+	CheckBossANDChildCollision(bossChildRUB->GetEnemy());
+	CheckBossANDChildCollision(bossChildLDF->GetEnemy());
+	CheckBossANDChildCollision(bossChildLDB->GetEnemy());
+	CheckBossANDChildCollision(bossChildRDF->GetEnemy());
+	CheckBossANDChildCollision(bossChildRDB->GetEnemy());
+	CheckTargetCollision();
+
+	//ボスのバリアを割る
+	if (
+		bossChildLUF->GetMiniDead() == true &&
+		bossChildLUB->GetMiniDead() == true &&
+		bossChildRUF->GetMiniDead() == true &&
+		bossChildRUB->GetMiniDead() == true &&
+		bossChildLDF->GetMiniDead() == true &&
+		bossChildLDB->GetMiniDead() == true &&
+		bossChildRDF->GetMiniDead() == true &&
+		bossChildRDB->GetMiniDead() == true
+		)
+	{
+		boss->SetBarrierFlag(false);
+	}
+
+	//hp
+	bossHpBar = boss->GetEnemy()->GetHpBarX();
+	hpBar = player->GetHpBar();
+
+	//ボス戦はじまる (カメラが止まる)
+	if (cameraObj->GetEndFlag() == true)
+	{
+		bossFlag = true;
+	}
+
+	//ボスが倒されたら
+	if (boss->GetEnemy()->IsDead() == true)
+	{
+		player->SetEndFlag(true);
+		player->SetkeyInput(false);
+
+		//ボスの演出がおわったら
+		if (boss->GetEnemy()->GetWorldPosition().y <= floorY)
+		{
+			//シーンチェンジまち用
+			dieTimer--;
+			if (dieTimer <= 0)
+			{
+				player->SetEndMovieFlag(true);
+				//シーンチェンジ
+				if (player->GetWorldPosition().z >= endPlayerPos)
+				{
+					pointsLast = true;
+					scene_ = Scene::Clear;
+					/*shotObj->SetPosition({ 0,-200,cameraObj->GetEye().z });*/
+				}
+			}
+			else
+			{
+				cameraObj->SetEndMovieFlag(true);
+			}
+		}
+		else
+		{
+			Particle->CreateParticle(30, 48, boss->GetPos(), { 0.5,0.5,0.5 }, { 0.05,0.05,0.05 }, 10.0f, 2.0f,
+				{ 1,1,1 }, { 1,0.5,0 });
+		}
+	}
+
+
+
+	//プレイヤーのhpが０になったら
+	if (player->GetHp0() == true)
+	{
+		player->SetEndFlag(true);
+		player->SetkeyInput(false);
+		//パーティクル生成
+		Particle->CreateParticle(5, 32, player->GetWorldPosition(), { 0.8,0.8,0.8 }, { 0,-0.05,0 }, 10.0f, 2.0f,
+			{ 1,1,1 }, { 1,0,0 });
+
+		//bossのやられた演出まち用
+		dieTimer--;
+
+		if (dieTimer <= 0)
+		{
+			//シーンチェンジ
+			playerDieFlag = true;
+			scene_ = Scene::GameOver;
+			dieTimer = dieTimerMax;
+		}
+
+	}
+	//ゲームが終わったらビルを消す
+	if (pointsLast == true || playerDieFlag == true)
+	{
+		billM->SetBillDeadFlag(true);
+	}
+
+	//条件を満たしたlistけす
+
+	oneWays.remove_if([](std::unique_ptr<EnemyOneWay>& oneWay)
+		{
+			return oneWay->GetIsDead();
+		});
+	oneWayMovies.remove_if([](std::unique_ptr<EnemyOneWay>& oneWayMovie)
+		{
+			return oneWayMovie->GetIsDead();
+		});
+
+	circles.remove_if([](std::unique_ptr<EnemyCircle>& circle)
+		{
+			return circle->GetIsDead();
+		});
+
 }
+
+void GameScene::Clear()
+{
+	shotObj->rotation.y++;
+	shotObj->SetPosition({ 0,0,cameraObj->GetEye().z +200 });
+	endSprite->Update();//クリア
+}
+
+void GameScene::GameOver()
+{
+	gameOverSprite->Update();//ゲームオーバー
+}
+
+void GameScene::TitleDraw()
+{
+	/// ここに3Dオブジェクトの描画処理
+	Object3d::PreDraw(dxcommon->GetCmdlist());
+	titleObj->Draw();
+	if (clickCount >= clickAliveCount)
+	{
+		clickObj->Draw();
+		if (clickCount >= clickDeadCount)
+		{
+			clickCount = clickCountReset;
+		}
+	}
+	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
+	{
+		oneWay2->Draw();
+	}
+	Object3d::PostDraw();
+	// 3Dオブクジェクトの描画おわり
+	spriteCommon->PreDraw();
+	reticleSprite->Draw();
+}
+
+void GameScene::GameDraw()
+{
+	/// ここに3Dオブジェクトの描画処理
+	Object3d::PreDraw(dxcommon->GetCmdlist());
+	kanbanObj->Draw();
+	kanbanPlaneObj->Draw();
+	kanbanShotObj->Draw();
+	kanbanShot2Obj->Draw();
+	kanbanShot3Obj->Draw();
+	kanbanShot4Obj->Draw();
+	
+	if (targetHp >= 1)
+	{
+		targetObj->Draw();
+	}
+
+	if (mutekiFlag == true && player->GetHp0() == false)
+	{
+		tenmetuCount++;
+		if (tenmetuCount >= tenmetuAliveCount)
+		{
+			player->Draw();
+			if (tenmetuCount >= tenmetuDeadCount)
+			{
+				tenmetuCount = tenmetuCountReset;
+			}
+		}
+	}
+	else
+	{
+		player->Draw();
+	}
+
+	for (std::unique_ptr<EnemyOneWay>& oneWay : oneWays)
+	{
+		oneWay->Draw();
+	}
+	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
+	{
+		oneWay2->Draw();
+	}
+	for (std::unique_ptr<EnemyCircle>& circle : circles)
+	{
+		circle->Draw();
+	}
+
+	if (cameraObj->GetEndFlag() == true)
+	{
+		boss->Draw();
+		bossChildLUF->Draw();
+		bossChildLUB->Draw();
+		bossChildRUF->Draw();
+		bossChildRUB->Draw();
+		bossChildLDF->Draw();
+		bossChildLDB->Draw();
+		bossChildRDF->Draw();
+		bossChildRDB->Draw();
+	}
+	Object3d::PostDraw();
+	// 3Dオブクジェクトの描画おわり
+
+	spriteCommon->PreDraw();
+	reticleSprite->Draw();
+	if (movieSkipFlag == false)
+	{
+		kSkipSprite->Draw();
+	}
+	if (tutorialFlag == true)
+	{
+	}
+	else
+	{
+		playerHpSprite->Draw();
+	}
+	if (bossFlag == true)
+	{
+		bossHpBarSprite->Draw();
+		bossHpWakuSprite->Draw();
+	}
+
+	//デバッグテキスト
+	//debugtext_minute->DrawAll();
+	//debugtext_minute2->DrawAll();
+}
+
+void GameScene::ClearDraw()
+{
+	/// ここに3Dオブジェクトの描画処理
+	Object3d::PreDraw(dxcommon->GetCmdlist());
+	shotObj->Draw();
+	Object3d::PostDraw();
+	// 3Dオブクジェクトの描画おわり
+	spriteCommon->PreDraw();
+	//endSprite->Draw();
+}
+
+void GameScene::GameOverDraw()
+{
+	spriteCommon->PreDraw();
+	gameOverSprite->Draw();
+}
+
 
 

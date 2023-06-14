@@ -171,14 +171,6 @@ private:
 
 	void PChild();
 
-	void PWait();
-
-	void PWaitLB();
-
-	void PWaitR();
-
-	void PWaitRB();
-
 	void PChildHoming();
 
 	void PChangeBossDead();
@@ -272,8 +264,6 @@ public:
 	/// </summary>
 	/// <param name="rightMoveTrue">敵が画面の右からでてくるか左から出てくるか</param>
 	void PhaseInit(bool rightMoveTrue);
-
-	//void SetPlayer(Player* player) { player_ = player; }
 
 	/// <summary>
 	/// プレイヤーの座標

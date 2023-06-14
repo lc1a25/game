@@ -12,6 +12,7 @@ void Bill::Init(Model* model, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 scal
 
 void Bill::Update()
 {
+
 	bill->Update();
 }
 
