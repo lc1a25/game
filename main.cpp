@@ -130,7 +130,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//ゲームクリア
 		else if (gameSceneNum == gameSceneClearNum)
 		{
-			if (input->isKeyTrigger(DIK_SPACE))
+			gameScene->Update();
+			if (input->isMouseKey())
 			{
 				gameSceneNum = gameSceneTitleNum;//タイトルに戻る
 				gameScene = Reset(gameScene, dxcommon, input, audio,win);
@@ -139,7 +140,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//ゲームオーバー
 		else if (gameSceneNum == gameSceneGameOverNum)
 		{
-			if (input->isKeyTrigger(DIK_SPACE))
+			gameScene->Update();
+			if (input->isMouseKey())
 			{
 				gameSceneNum = gameSceneTitleNum;//タイトルに戻る
 				gameScene = Reset(gameScene, dxcommon, input, audio,win);

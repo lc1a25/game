@@ -59,6 +59,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	barrierModel = Model::LoadFromOBJ("barrier",0.7);
 	targetModel = Model::LoadFromOBJ("target");
 	clickModel = Model::LoadFromOBJ("click");
+	clearModel = Model::LoadFromOBJ("clear");
 
 	bossHpBar = 733;
 	bossHpBarMax = 733;
@@ -123,6 +124,10 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	clickObj->SetModel(clickModel);
 	clickObj->scale = { 1.5,1.5,1.5 };
 	clickObj->SetPosition({ 0,15,-560 });
+
+	clearObj->SetModel(clearModel);
+	clearObj->scale = { 3,3,3 };
+	clearObj->SetPosition({ 0,15,0 });
 
 	player = new Player();
 	player->Init(playerModel, bulletModel);
@@ -192,19 +197,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	reticleSprite->SetSize({ 100,100 });
 	reticleSprite->TransVertexBuffer();
 
-	//タイトル
-	spriteCommon->LoadTexture(2, L"Resource/title.png");
-	titleSprite = Sprite::Create(spriteCommon, 2);
-	titleSprite->SetPosition({ 640.0f,360.0f,0.0f });
-	titleSprite->SetSize({ 1280,720 });
-	titleSprite->TransVertexBuffer();
-
-	//エンド
-	spriteCommon->LoadTexture(3, L"Resource/end.png");
-	endSprite = Sprite::Create(spriteCommon, 3);
-	endSprite->SetPosition({ 640.0f,360.0f,0.0f });
-	endSprite->SetSize({ 1280,720 });
-	endSprite->TransVertexBuffer();
 
 	//ボスのhpバーの枠
 	spriteCommon->LoadTexture(4, L"Resource/hpWaku.png");
@@ -225,13 +217,6 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	playerHpSprite->SetSize({ 288,96 });
 	playerHpSprite->SetTexsize({ 288,96 });
 	playerHpSprite->TransVertexBuffer();
-
-	//ゲームオーバー
-	spriteCommon->LoadTexture(7, L"Resource/gameover.png");
-	gameOverSprite = Sprite::Create(spriteCommon, 7);
-	gameOverSprite->SetPosition({ 640.0f,360.0f,0.0f });
-	gameOverSprite->SetSize({ 1280,720 });
-	gameOverSprite->TransVertexBuffer();
 
 	//movie　skip用
 	spriteCommon->LoadTexture(11, L"Resource/kSkip.png");
@@ -302,8 +287,15 @@ void GameScene::Update()
 	}
 	if (input->isKeyTrigger(DIK_N))
 	{
+		pointsLast = true;
 		scene_ = Scene::Clear;
 		sceneDraw_ = SceneDraw::ClearDraw;
+	}
+	if (input->isKeyTrigger(DIK_M))
+	{
+		playerDieFlag = true;
+		scene_ = Scene::GameOver;
+		sceneDraw_ = SceneDraw::GameOverDraw;
 	}
 
 	//ビル更新処理
@@ -946,9 +938,12 @@ void GameScene::Title()
 	}
 	titleObj->Update();
 	clickCount++;
-
 	clickObj->Update();
 
+	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
+	{
+		oneWay2->Update();
+	}
 }
 
 void GameScene::Game()
@@ -1247,7 +1242,7 @@ void GameScene::Game()
 				{
 					pointsLast = true;
 					scene_ = Scene::Clear;
-					/*shotObj->SetPosition({ 0,-200,cameraObj->GetEye().z });*/
+					sceneDraw_ = SceneDraw::ClearDraw;
 				}
 			}
 			else
@@ -1281,6 +1276,7 @@ void GameScene::Game()
 			//シーンチェンジ
 			playerDieFlag = true;
 			scene_ = Scene::GameOver;
+			sceneDraw_ = SceneDraw::GameOverDraw;
 			dieTimer = dieTimerMax;
 		}
 
@@ -1311,14 +1307,63 @@ void GameScene::Game()
 
 void GameScene::Clear()
 {
-	shotObj->rotation.y++;
-	shotObj->SetPosition({ 0,0,cameraObj->GetEye().z +200 });
-	endSprite->Update();//クリア
+	int addParticle = 110;
+	float particleY = -30;
+	//ムービー中のパーティクル
+	movieParticleTime++;
+	//60frame から　120frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
+	if (movieParticleTime >= 60 && movieParticleTime <= 120)
+	{
+		movieParticleXL = particleMinPosXTitle;
+		movieParticleXR = particleMaxPosXTitle;
+		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { -movieParticleXL, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
+			particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
+			particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		//80frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
+		if (movieParticleTime >= 80)
+		{
+			Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
+				particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		}
+	}
+	//120frame から　180frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
+	else if (movieParticleTime >= 120 && movieParticleTime <= 180)
+	{
+		movieParticleXL = particleMaxPosXTitle;
+		movieParticleXR = particleMinPosXTitle;
+		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { -movieParticleXL, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
+			particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		//160frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
+		if (movieParticleTime >= 160)
+		{
+			Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
+				particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		}
+	}
+	else if (movieParticleTime >= 180)
+	{
+		//180frameを0に
+		movieParticleTime = 0;
+	}
+	clearObj->rotation.y++;
+	clearObj->SetPosition({ 0,0,cameraObj->GetEye().z +50 });
+	clickCount++;
+	clickObj->SetPosition({ 0,-15,cameraObj->GetEye().z + 50 });
+	clearObj->Update();
+	clickObj->Update();
+
 }
 
 void GameScene::GameOver()
 {
-	gameOverSprite->Update();//ゲームオーバー
+	shotObj->rotation.y++;
+	shotObj->SetPosition({ 0,0,cameraObj->GetEye().z + 50 });
+
+	shotObj->Update();
+	clickCount++;
+	clickObj->SetPosition({ 0,-15,cameraObj->GetEye().z + 50 });
+	clickObj->Update();
 }
 
 void GameScene::TitleDraw()
@@ -1433,7 +1478,15 @@ void GameScene::ClearDraw()
 {
 	/// ここに3Dオブジェクトの描画処理
 	Object3d::PreDraw(dxcommon->GetCmdlist());
-	shotObj->Draw();
+	if (clickCount >= clickAliveCount)
+	{
+		clickObj->Draw();
+		if (clickCount >= clickDeadCount)
+		{
+			clickCount = clickCountReset;
+		}
+	}
+	clearObj->Draw();
 	Object3d::PostDraw();
 	// 3Dオブクジェクトの描画おわり
 	spriteCommon->PreDraw();
@@ -1442,8 +1495,19 @@ void GameScene::ClearDraw()
 
 void GameScene::GameOverDraw()
 {
-	spriteCommon->PreDraw();
-	gameOverSprite->Draw();
+	/// ここに3Dオブジェクトの描画処理
+	Object3d::PreDraw(dxcommon->GetCmdlist());
+	if (clickCount >= clickAliveCount)
+	{
+		clickObj->Draw();
+		if (clickCount >= clickDeadCount)
+		{
+			clickCount = clickCountReset;
+		}
+	}
+	shotObj->Draw();
+	Object3d::PostDraw();
+	// 3Dオブクジェクトの描画おわり
 }
 
 

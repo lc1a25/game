@@ -172,6 +172,7 @@ private: // メンバ変数
 	Object3d* targetObj2 = targetObj2->Create();
 	Object3d* targetObj3 = targetObj3->Create();
 	Object3d* clickObj = clickObj->Create();
+	Object3d* clearObj = clearObj->Create();
 
 	Object3d* kanbanObj = kanbanObj->Create();
 	Object3d* kanbanPlaneObj = kanbanPlaneObj->Create();
@@ -227,6 +228,7 @@ private: // メンバ変数
 	Model* barrierModel = nullptr;
 	Model* targetModel = nullptr;
 	Model* clickModel = nullptr;
+	Model* clearModel = nullptr;
 
 	
 
@@ -237,7 +239,9 @@ private: // メンバ変数
 	float particleLifeTitle = 64;
 	XMFLOAT3 particleLeftPosTitle = { -movieParticleXL, 0,-320 };
 	XMFLOAT3 particleVelocityTitle = { 0.5,0.5,0.5 };
+	XMFLOAT3 particleVelocityClear = { 3.5,4.0,0.8 };
 	XMFLOAT3 particleAccelTitle = { 0.02,0.02,0.02 };
+	XMFLOAT3 particleAccelClear = { 0.1,0.05,0.1 };
 	float particleMaxPosXTitle = 80;
 	float particleMinPosXTitle = 40;
 
@@ -327,12 +331,9 @@ private: // メンバ変数
 
 	//スプライト
 	Sprite* reticleSprite;//照準
-	Sprite* titleSprite;
-	Sprite* endSprite;
 	Sprite* bossHpWakuSprite;
 	Sprite* bossHpBarSprite;
 	Sprite* playerHpSprite;
-	Sprite* gameOverSprite;
 	Sprite* kSkipSprite;
 
 	DebugText* debugtext_minute = nullptr;
@@ -340,8 +341,5 @@ private: // メンバ変数
 
 	SpriteCommon* spriteCommon = nullptr;
 
-	
-	FLOAT BillScaleY(int randam);
-	XMFLOAT3 BillRot(int randam);
 };
 

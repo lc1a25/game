@@ -521,6 +521,33 @@ void ParticleManager::CreateParticle(int particleCount, int life, XMFLOAT3 posit
 	}
 }
 
+void ParticleManager::CreateParticleClear(int particleCount, int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale, XMFLOAT3 start_color, XMFLOAT3 end_color)
+{
+	//パーティクル
+	for (int i = 0; i < particleCount; i++)
+	{
+		XMFLOAT3 pos{};
+
+
+		pos.x = position.x;
+		pos.y = position.y;
+		pos.z = position.z;
+
+		const XMFLOAT3 rnd_vel = velocity;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * rnd_vel.x - rnd_vel.x / 2.0f;
+		vel.y = +(float)rand() / RAND_MAX * rnd_vel.y;
+		vel.z = (float)rand() / RAND_MAX * rnd_vel.z - rnd_vel.z / 2.0f;
+
+		XMFLOAT3 acc{};
+		const XMFLOAT3 rnd_acc = accel;
+		//acc.x = (float)rand() / RAND_MAX * rnd_acc.x - rnd_acc.x / 2.0f;
+		//acc.y = (float)rand() / RAND_MAX * rnd_acc.y - rnd_acc.y / 2.0f;
+		acc.y = -(float)rand() / RAND_MAX * rnd_acc.y;
+
+		Add(life, pos, vel, acc, start_scale, end_scale, start_color, end_color);
+	}
+}
 ParticleManager::ParticleManager(ComPtr<ID3D12Device> device, Camera* camera)
 {
 	this->device = device;
