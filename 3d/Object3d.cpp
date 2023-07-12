@@ -40,6 +40,7 @@ std::vector<Object3d::VertexPosNormalUv>Object3d::vertices;
 std::vector<unsigned short>Object3d::indices;
 
 Object3d::Material Object3d::material;
+Light* Object3d::light = nullptr;
 Camera* Object3d::camera = nullptr;
 
 
@@ -348,6 +349,7 @@ void Object3d::Draw()
 	// 定数バッファビューをセット
 	cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0->GetGPUVirtualAddress());
 
+	light->Draw(cmdList, 3);
 	model->Draw(cmdList, 1);
 }
 

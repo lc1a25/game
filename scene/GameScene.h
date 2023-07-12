@@ -19,6 +19,7 @@
 #include <sstream>
 #include "BillManager.h"
 #include "Bill.h"
+#include "Light.h"
 enum class Scene
 {
 	Title,
@@ -129,6 +130,8 @@ public: // メンバ関数
 	//csv　コマンド読み込み
 	std::stringstream enemyPopCommands;
 
+	Light* light = nullptr;
+
 private: // メンバ変数
 	int phaseNumber = static_cast<int>(scene_);
 	static void (GameScene::* spFuncTable[])();
@@ -229,7 +232,7 @@ private: // メンバ変数
 	Model* targetModel = nullptr;
 	Model* clickModel = nullptr;
 	Model* clearModel = nullptr;
-
+	Model* deadModel = nullptr;
 	
 
 	//パーティクル
@@ -341,5 +344,7 @@ private: // メンバ変数
 
 	SpriteCommon* spriteCommon = nullptr;
 
+	void ParticleClear();
+	void ParticleTitle();
 };
 

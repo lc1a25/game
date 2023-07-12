@@ -60,6 +60,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	targetModel = Model::LoadFromOBJ("target");
 	clickModel = Model::LoadFromOBJ("click");
 	clearModel = Model::LoadFromOBJ("clear");
+	deadModel = Model::LoadFromOBJ("dead");
 
 	bossHpBar = 733;
 	bossHpBarMax = 733;
@@ -80,13 +81,9 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	skydome->scale = { 11,11,15 };
 	skydome->SetPosition({ 0,-220,skydomeZ });
 
-	shotObj->SetModel(shotObjModel);
+	shotObj->SetModel(deadModel);
 	shotObj->scale = { 3,3,3 };
 	shotObj->SetPosition({ 0,-200,0 });
-
-	shotHibiObj->SetModel(shotHibiObjModel);
-	shotHibiObj->scale = { 3,3,3 };
-	shotHibiObj->SetPosition({ 0,0,90 });
 
 	targetObj->SetModel(targetModel);
 	targetObj->scale = { 3,3,3 };
@@ -155,6 +152,12 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	bossChildRDF->Init(bossModel, { 0, 0, 1000.0f }, 7);
 	bossChildRDB = new BossChild();
 	bossChildRDB->Init(bossModel, { 0, 0, 1000.0f }, 8);
+
+	light = Light::Create();
+	light->SetLightColor({ 1,1,1 });
+	static XMVECTOR lightDir = { 1,-1.5,1,0 };
+	light->SetLightDir(lightDir);
+	Object3d::SetLight(light);
 
 	camera = new Camera();
 	camera->Init();
@@ -308,7 +311,6 @@ void GameScene::Update()
 	//設置物の更新
 	wallFloor->Update();
 	road->Update();
-	shotHibiObj->Update();
 	kanbanObj->Update();
 	kanbanPlaneObj->Update();
 	shotObj->Update();
@@ -339,10 +341,14 @@ void GameScene::Update()
 	player->SetHwnd(hwnd);
 	player->SetViewPort(viewPort);
 	player->SetCameraMatViewProjection(cameraObj->GetMatViewProjection());
+	Particle->CreateParticle(20, 4, { player->GetWorldPosition().x,player->GetWorldPosition().y + 4,player->GetWorldPosition().z -4 },
+		{ 0.5,0.5,0.5 }, { 0.2,0.2,0.2 }, 1.0f, 0.0f, { 1,0,0 }, { 1,0.5,0 });
+
 	player->Update();
 
 	startPlayer->Update();
 	Particle->Update();
+	light->Update();
 }
 
 void GameScene::Draw()
@@ -602,18 +608,17 @@ void GameScene::CheckTargetCollision()
 			else if(count == 0)
 			{
 				count++;
-				Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z }
+				Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , targetObj->GetPosition().z }
 					, { 2.8f, 2.8f, 2.8f }, { 0,-0.08,0 }, 12.0f, 2.0f,
 					{ 0,1,0 }, { 0.5,0.3,0.17 });
 				targetHp = targetHpMax;
 				targetObj->position.x = 50;
-			
-				//targetObj->rotation.y = 190;
+
 			}
 			else if (count == 1)
 			{
 				count++;
-				Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z }
+				Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , targetObj->GetPosition().z }
 					, { 2.8f, 2.8f, 2.8f }, { 0,-0.08,0 }, 12.0f, 2.0f,
 					{ 0,1,0 }, { 0.5,0.3,0.17 });
 				targetHp = targetHpMax;
@@ -623,7 +628,7 @@ void GameScene::CheckTargetCollision()
 			else if (count == 2)
 			{
 				count++;
-				Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , shotObj->GetPosition().z }
+				Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , targetObj->GetPosition().z }
 					, { 2.8f, 2.8f, 2.8f }, { 0,-0.08,0 }, 12.0f, 2.0f,
 					{ 0,1,0 }, { 0.5,0.3,0.17 });
 				targetHp = targetHpMax;
@@ -942,8 +947,14 @@ void GameScene::Title()
 
 	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
 	{
+		oneWay2->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
 		oneWay2->Update();
 	}
+	//csvのenemy発生
+	UpdateEnemyPop();
+
+	ParticleTitle();
+
 }
 
 void GameScene::Game()
@@ -991,43 +1002,7 @@ void GameScene::Game()
 	}
 	else
 	{
-		//ムービー中のパーティクル
-		movieParticleTime++;
-		//60frame から　120frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
-		if (movieParticleTime >= 60 && movieParticleTime <= 120)
-		{
-			movieParticleXL = particleMinPosXTitle;
-			movieParticleXR = particleMaxPosXTitle;
-			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, 0,-320 }, particleVelocityTitle,
-				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
-				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-			//80frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
-			if (movieParticleTime >= 80)
-			{
-				Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
-					particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-			}
-		}
-		//120frame から　180frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
-		else if (movieParticleTime >= 120 && movieParticleTime <= 180)
-		{
-			movieParticleXL = particleMaxPosXTitle;
-			movieParticleXR = particleMinPosXTitle;
-			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, 0,-320 }, particleVelocityTitle,
-				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-			//160frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
-			if (movieParticleTime >= 160)
-			{
-				Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
-					particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-			}
-		}
-		else if (movieParticleTime >= 180)
-		{
-			//180frameを0に
-			movieParticleTime = 0;
-		}
+		ParticleTitle();
 	}
 
 	//csvのenemy発生
@@ -1268,7 +1243,7 @@ void GameScene::Game()
 		Particle->CreateParticle(5, 32, player->GetWorldPosition(), { 0.8,0.8,0.8 }, { 0,-0.05,0 }, 10.0f, 2.0f,
 			{ 1,1,1 }, { 1,0,0 });
 
-		//bossのやられた演出まち用
+		//やられた演出まち用
 		dieTimer--;
 
 		if (dieTimer <= 0)
@@ -1307,49 +1282,11 @@ void GameScene::Game()
 
 void GameScene::Clear()
 {
-	int addParticle = 110;
-	float particleY = -30;
-	//ムービー中のパーティクル
-	movieParticleTime++;
-	//60frame から　120frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
-	if (movieParticleTime >= 60 && movieParticleTime <= 120)
-	{
-		movieParticleXL = particleMinPosXTitle;
-		movieParticleXR = particleMaxPosXTitle;
-		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { -movieParticleXL, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
-			particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
-			particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-		//80frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
-		if (movieParticleTime >= 80)
-		{
-			Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
-				particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-		}
-	}
-	//120frame から　180frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
-	else if (movieParticleTime >= 120 && movieParticleTime <= 180)
-	{
-		movieParticleXL = particleMaxPosXTitle;
-		movieParticleXR = particleMinPosXTitle;
-		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { -movieParticleXL, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
-			particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-		//160frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
-		if (movieParticleTime >= 160)
-		{
-			Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
-				particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-		}
-	}
-	else if (movieParticleTime >= 180)
-	{
-		//180frameを0に
-		movieParticleTime = 0;
-	}
+	ParticleClear();
 	clearObj->rotation.y++;
-	clearObj->SetPosition({ 0,0,cameraObj->GetEye().z +50 });
+	clearObj->SetPosition({ 0,10,cameraObj->GetEye().z +50 });
 	clickCount++;
-	clickObj->SetPosition({ 0,-15,cameraObj->GetEye().z + 50 });
+	clickObj->SetPosition({ 0,-5,cameraObj->GetEye().z + 50 });
 	clearObj->Update();
 	clickObj->Update();
 
@@ -1357,8 +1294,9 @@ void GameScene::Clear()
 
 void GameScene::GameOver()
 {
+	cameraObj->SetStopFlag(true);
 	shotObj->rotation.y++;
-	shotObj->SetPosition({ 0,0,cameraObj->GetEye().z + 50 });
+	shotObj->SetPosition({ 0,0,cameraObj->GetEye().z + 80 });
 
 	shotObj->Update();
 	clickCount++;
@@ -1488,9 +1426,6 @@ void GameScene::ClearDraw()
 	}
 	clearObj->Draw();
 	Object3d::PostDraw();
-	// 3Dオブクジェクトの描画おわり
-	spriteCommon->PreDraw();
-	//endSprite->Draw();
 }
 
 void GameScene::GameOverDraw()
@@ -1508,6 +1443,90 @@ void GameScene::GameOverDraw()
 	shotObj->Draw();
 	Object3d::PostDraw();
 	// 3Dオブクジェクトの描画おわり
+}
+
+void GameScene::ParticleClear()
+{
+	int addParticle = 110;
+	float particleY = -30;
+	//ムービー中のパーティクル
+	movieParticleTime++;
+	//60frame から　120frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
+	if (movieParticleTime >= 60 && movieParticleTime <= 120)
+	{
+		movieParticleXL = particleMinPosXTitle;
+		movieParticleXR = particleMaxPosXTitle;
+		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { -movieParticleXL, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
+			particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
+			particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		//80frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
+		if (movieParticleTime >= 80)
+		{
+			Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
+				particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		}
+	}
+	//120frame から　180frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
+	else if (movieParticleTime >= 120 && movieParticleTime <= 180)
+	{
+		movieParticleXL = particleMaxPosXTitle;
+		movieParticleXR = particleMinPosXTitle;
+		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { -movieParticleXL, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
+			particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		//160frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
+		if (movieParticleTime >= 160)
+		{
+			Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
+				particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		}
+	}
+	else if (movieParticleTime >= 180)
+	{
+		//180frameを0に
+		movieParticleTime = 0;
+	}
+}
+
+void GameScene::ParticleTitle()
+{
+	//ムービー中のパーティクル
+	movieParticleTime++;
+	//60frame から　120frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
+	if (movieParticleTime >= 60 && movieParticleTime <= 120)
+	{
+		movieParticleXL = particleMinPosXTitle;
+		movieParticleXR = particleMaxPosXTitle;
+		Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, 0,-320 }, particleVelocityTitle,
+			particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
+			particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		//80frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
+		if (movieParticleTime >= 80)
+		{
+			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
+				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		}
+	}
+	//120frame から　180frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
+	else if (movieParticleTime >= 120 && movieParticleTime <= 180)
+	{
+		movieParticleXL = particleMaxPosXTitle;
+		movieParticleXR = particleMinPosXTitle;
+		Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, 0,-320 }, particleVelocityTitle,
+			particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		//160frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
+		if (movieParticleTime >= 160)
+		{
+			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
+				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		}
+	}
+	else if (movieParticleTime >= 180)
+	{
+		//180frameを0に
+		movieParticleTime = 0;
+	}
 }
 
 

@@ -110,7 +110,19 @@ void CameraObj::UpdateCamera()
 
 	if (pointsStart == false)
 	{
-		if (pointsLast == false)//道中　雑魚戦
+		if (stopFlag == true)
+		{
+			eyeVec = { 0,0,0 };
+			//前方ベクトル
+			XMVECTOR forward({ 0, 0, 1 });
+			//回転(前方ベクトル)
+			forward = Matrix4::transform(forward, cameraObj->matWorld);
+			target.m128_f32[0] = eye.m128_f32[0] + forward.m128_f32[0];
+			target.m128_f32[1] = eye.m128_f32[1] + forward.m128_f32[1];
+			target.m128_f32[2] = eye.m128_f32[2] + forward.m128_f32[2];
+			targetEnd = eye + forward;
+		}
+		else if (pointsLast == false)//道中　雑魚戦
 		{
 			startGame = true;
 			//前方ベクトル

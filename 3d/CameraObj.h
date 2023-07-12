@@ -79,6 +79,8 @@ public:
 	/// <param name="startMovie">falseならスキップ</param>
 	void SetStartMovieSkip(bool startMovie) { this->startMovie = startMovie; }
 
+	void SetStopFlag(bool stopFlag) { this->stopFlag = stopFlag; }
+
 private:
 	XMFLOAT3 playerPos;
 	XMFLOAT3 startPlayerObj;
@@ -87,6 +89,7 @@ private:
 	bool playerDieFlag = false;
 	bool bossDieFlag = false;
 	bool endMovieFlag = false;
+	bool stopFlag = false;
 
 	float distance = 20.0f;
 	// ビュー行列

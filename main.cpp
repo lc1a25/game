@@ -13,6 +13,7 @@
 #include<fstream>
 
 #include "Object3d.h"
+#include "Light.h"
 
 #include "Win.h"
 #include "Input.h"
@@ -60,6 +61,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	dxcommon->Init(win);
 
 	Object3d::StaticInitialize(dxcommon->GetDev(), win->window_width, win->window_height);
+	Light::StaticInitialize(dxcommon->GetDev());
 
 	audio = new Audio();
 	audio->Init();
