@@ -140,12 +140,14 @@ public: // メンバ関数
 	void CreateParticle(int particleCount,int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel,
 		float start_scale, float end_scale, XMFLOAT3 start_color, XMFLOAT3 end_color);
 
+	void CreateParticlePlayer(int particleCount, int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel,
+		float start_scale, float end_scale, XMFLOAT3 start_color, XMFLOAT3 end_color);
+
 	void CreateParticleClear(int particleCount, int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, 
 		float start_scale, float end_scale, XMFLOAT3 start_color, XMFLOAT3 end_color);
 
 
 private: // メンバ変数
-
 	// デバイス
 	ComPtr<ID3D12Device> device = nullptr;
 	// デスクリプタサイズ

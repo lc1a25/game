@@ -59,8 +59,6 @@ public://静的メンバ変数
 	/// <summary>
 	void Update();
 
-
-
 	///<summary>
 	///インスタンス生成
 	/// <summary>
@@ -91,12 +89,5 @@ private://メンバ変数
 	///定数バッファ転送
 	/// <summary>
 	void TransferConstBuffer();
-
-
-
-
-
-
-
 
 };

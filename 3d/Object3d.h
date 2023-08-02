@@ -9,6 +9,7 @@
 #include "Model.h"
 #include "Camera.h"
 #include "Light.h"
+#include "LightGroup.h"
 
 /// <summary>
 /// 3Dオブジェクト
@@ -76,6 +77,8 @@ public: // サブクラス
 	static Material material;
 
 	static Light* light;//ライト
+	// ライト
+	static LightGroup* lightGroup;
 
 	// 射影行列
 	//static XMMATRIX matProjection;
@@ -121,6 +124,15 @@ public: // 静的メンバ関数
 	static void SetLight(Light* light)
 	{
 		Object3d::light = light;
+	}
+
+	/// <summary>
+	/// ライトのセット
+	/// </summary>
+	/// <param name="light">ライト</param>
+	static void SetLight(LightGroup* light)
+	{
+		Object3d::lightGroup = light;
 	}
 	
 private: // 静的メンバ変数

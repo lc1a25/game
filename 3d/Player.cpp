@@ -158,6 +158,11 @@ void Player::Update()
 		player->position.y -= playerVelocity;
 		player->rotation.x += playerVelocity;
 	}
+	else if (input->isKey(DIK_I) && keyInput == true)
+	{
+		player->position.z += playerVelocity;
+		//player->rotation.z += playerVelocity;
+	}
 	else
 	{
 	

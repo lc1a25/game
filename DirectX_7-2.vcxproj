@@ -105,6 +105,7 @@
     <ClCompile Include="3d\EnemyCircle.cpp" />
     <ClCompile Include="3d\EnemyOneWay.cpp" />
     <ClCompile Include="3d\Light.cpp" />
+    <ClCompile Include="3d\LightGroup.cpp" />
     <ClCompile Include="3d\Model.cpp" />
     <ClCompile Include="3d\Object3d.cpp" />
     <ClCompile Include="3d\ParticleManager.cpp" />
@@ -136,11 +137,14 @@
     <ClInclude Include="3d\EnemyCircle.h" />
     <ClInclude Include="3d\EnemyOneWay.h" />
     <ClInclude Include="3d\Light.h" />
+    <ClInclude Include="3d\LightGroup.h" />
     <ClInclude Include="3d\Model.h" />
     <ClInclude Include="3d\Object3d.h" />
+    <ClInclude Include="3d\ParallelLight.h" />
     <ClInclude Include="3d\ParticleManager.h" />
     <ClInclude Include="3d\Player.h" />
     <ClInclude Include="3d\PlayerBullet.h" />
+    <ClInclude Include="3d\ShadowCircle.h" />
     <ClInclude Include="audio\Audio.h" />
     <ClInclude Include="base\DirectXCommon.h" />
     <ClInclude Include="base\PipelineSet.h" />

@@ -1,6 +1,7 @@
 ﻿#include "ParticleManager.h"
 #include <d3dcompiler.h>
 #include <DirectXTex.h>
+#include <random>
 
 #pragma comment(lib, "d3dcompiler.lib")
 
@@ -496,6 +497,7 @@ void ParticleManager::CreateModel()
 
 void ParticleManager::CreateParticle(int particleCount, int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale, XMFLOAT3 start_color, XMFLOAT3 end_color)
 {
+
 	//パーティクル
 	for (int i = 0; i < particleCount; i++)
 	{
@@ -512,11 +514,50 @@ void ParticleManager::CreateParticle(int particleCount, int life, XMFLOAT3 posit
 		vel.y = (float)rand() / RAND_MAX * rnd_vel.y - rnd_vel.y / 2.0f;
 		vel.z = (float)rand() / RAND_MAX * rnd_vel.z - rnd_vel.z / 2.0f;
 
+
 		XMFLOAT3 acc{};
 		const XMFLOAT3 rnd_acc = accel;
 		acc.x = (float)rand() / RAND_MAX * rnd_acc.x - rnd_acc.x / 2.0f;
 		acc.y = (float)rand() / RAND_MAX * rnd_acc.y - rnd_acc.y / 2.0f;
+
 												  			  
+		Add(life, pos, vel, acc, start_scale, end_scale, start_color, end_color);
+	}
+}
+
+void ParticleManager::CreateParticlePlayer(int particleCount, int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale, XMFLOAT3 start_color, XMFLOAT3 end_color)
+{
+	//randam 周期が短い
+	std::random_device seed_gen;
+	std::default_random_engine engine(seed_gen());
+
+
+	//パーティクル
+	for (int i = 0; i < particleCount; i++)
+	{
+		XMFLOAT3 pos{};
+
+
+		pos.x = position.x;
+		pos.y = position.y;
+		pos.z = position.z;
+
+		const XMFLOAT3 rnd_vel = velocity;
+		XMFLOAT3 vel{};
+		std::uniform_real_distribution<float> velX(-rnd_vel.x, rnd_vel.x);
+		vel.x = velX(engine);
+		std::uniform_real_distribution<float> velY(-rnd_vel.y, rnd_vel.y);
+		vel.y = velY(engine);
+		std::uniform_real_distribution<float> velZ(-rnd_vel.z, rnd_vel.z);
+		vel.z = velZ(engine);
+
+		XMFLOAT3 acc{};
+		const XMFLOAT3 rnd_acc = accel;
+		std::uniform_real_distribution<float> accX(-rnd_acc.x, rnd_acc.x);
+		acc.x = accX(engine);
+		/*std::uniform_real_distribution<float> accY(-rnd_acc.y, rnd_acc.y);
+		acc.y = accY(engine);*/
+
 		Add(life, pos, vel, acc, start_scale, end_scale, start_color, end_color);
 	}
 }

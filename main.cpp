@@ -61,8 +61,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	dxcommon->Init(win);
 
 	Object3d::StaticInitialize(dxcommon->GetDev(), win->window_width, win->window_height);
-	Light::StaticInitialize(dxcommon->GetDev());
-
+	//Light::StaticInitialize(dxcommon->GetDev());
+	// ƒ‰ƒCƒgÃ“I‰Šú‰»
+	LightGroup::StaticInitialize(dxcommon->GetDev());
 	audio = new Audio();
 	audio->Init();
 

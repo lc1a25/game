@@ -1,6 +1,7 @@
 ﻿#include "Object3d.h"
 #include <d3dcompiler.h>
 #include <DirectXTex.h>
+//#include <D3d9>
 
 //1-3
 #include <fstream>
@@ -11,6 +12,7 @@
 #include "Model.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
+//#pragma comment(lib, "D3dx9.lib")
 
 //1-3
 using namespace std;
@@ -41,6 +43,8 @@ std::vector<unsigned short>Object3d::indices;
 
 Object3d::Material Object3d::material;
 Light* Object3d::light = nullptr;
+LightGroup* Object3d::lightGroup = nullptr;
+
 Camera* Object3d::camera = nullptr;
 
 
@@ -179,7 +183,7 @@ bool Object3d::InitializeGraphicsPipeline()
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
 	};
-
+	
 	// グラフィックスパイプラインの流れを設定
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline{};
 	gpipeline.VS = CD3DX12_SHADER_BYTECODE(vsBlob.Get());
@@ -225,6 +229,7 @@ bool Object3d::InitializeGraphicsPipeline()
 	CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
 	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
 
+	
 	// ルートパラメータ
 	//CD3DX12_ROOT_PARAMETER rootparams[2];
 	//rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
@@ -349,7 +354,7 @@ void Object3d::Draw()
 	// 定数バッファビューをセット
 	cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0->GetGPUVirtualAddress());
 
-	light->Draw(cmdList, 3);
+	lightGroup->Draw(cmdList, 3);
 	model->Draw(cmdList, 1);
 }
 

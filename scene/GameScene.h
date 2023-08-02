@@ -20,6 +20,8 @@
 #include "BillManager.h"
 #include "Bill.h"
 #include "Light.h"
+#include "LightGroup.h"
+
 enum class Scene
 {
 	Title,
@@ -131,6 +133,7 @@ public: // ƒƒ“ƒoŠÖ”
 	std::stringstream enemyPopCommands;
 
 	Light* light = nullptr;
+	LightGroup* lightGroup = nullptr;
 
 private: // ƒƒ“ƒo•Ï”
 	int phaseNumber = static_cast<int>(scene_);

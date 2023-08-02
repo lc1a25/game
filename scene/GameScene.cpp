@@ -153,11 +153,15 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	bossChildRDB = new BossChild();
 	bossChildRDB->Init(bossModel, { 0, 0, 1000.0f }, 8);
 
-	light = Light::Create();
+	/*light = Light::Create();
 	light->SetLightColor({ 1,1,1 });
 	static XMVECTOR lightDir = { 1,-1.5,1,0 };
 	light->SetLightDir(lightDir);
-	Object3d::SetLight(light);
+	Object3d::SetLight(light);*/
+	// ライト生成
+	lightGroup = LightGroup::Create();
+	// 3Dオブエクトにライトをセット
+	Object3d::SetLight(lightGroup);
 
 	camera = new Camera();
 	camera->Init();
@@ -341,14 +345,25 @@ void GameScene::Update()
 	player->SetHwnd(hwnd);
 	player->SetViewPort(viewPort);
 	player->SetCameraMatViewProjection(cameraObj->GetMatViewProjection());
-	Particle->CreateParticle(20, 4, { player->GetWorldPosition().x,player->GetWorldPosition().y + 4,player->GetWorldPosition().z -4 },
+	Particle->CreateParticlePlayer(20, 4, { player->GetWorldPosition().x,player->GetWorldPosition().y + 4,player->GetWorldPosition().z -4 },
 		{ 0.5,0.5,0.5 }, { 0.2,0.2,0.2 }, 1.0f, 0.0f, { 1,0,0 }, { 1,0.5,0 });
 
 	player->Update();
 
 	startPlayer->Update();
 	Particle->Update();
-	light->Update();
+	lightGroup->Update();
+	lightGroup->SetAmbientColor({ 1,1,1 });
+	lightGroup->SetDirLightDir(0, XMVECTOR{1,-1.7,1,0 });//0, XMVECTOR{ 1,-1.4,1,0 }
+	lightGroup->SetDirLightActive(0, true);
+	lightGroup->SetDirLightActive(1, true);
+	lightGroup->SetDirLightActive(2, true);
+	lightGroup->SetCircleShadowActive(0, true);
+	lightGroup->SetCircleShadowDir(0, XMVECTOR({ 0,-5,0,0 }));
+	lightGroup->SetCircleShadowCasterPos(0, XMFLOAT3(player->GetWorldPosition()));
+	lightGroup->SetCircleShadowAtten(0, XMFLOAT3({ 0.2f,0.3f,0.0f }));
+	lightGroup->SetCircleShadowFactorAngle(0, XMFLOAT2({ 0.0f,3.0f }));
+
 }
 
 void GameScene::Draw()
@@ -1090,6 +1105,8 @@ void GameScene::Game()
 		CheckAllCollision(oneWay->GetEnemy());
 		oneWay->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
 		oneWay->SetPlayerPosition(player->GetWorldPosition());
+		lightGroup->SetCircleShadowCasterPos(0, XMFLOAT3(oneWay->GetEnemy()->GetWorldPosition()));
+
 		oneWay->Update();
 	}
 
@@ -1106,6 +1123,8 @@ void GameScene::Game()
 		CheckAllCollision(circle->GetEnemy());
 		circle->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
 		circle->SetPlayerPosition(player->GetWorldPosition());
+		lightGroup->SetCircleShadowCasterPos(0, XMFLOAT3(circle->GetEnemy()->GetWorldPosition()));
+
 		circle->Update();
 	}
 
