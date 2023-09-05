@@ -63,8 +63,7 @@ void ParticleManager::Initialize()
 	// パイプライン初期化
 	InitializeGraphicsPipeline();
 
-	// テクスチャ読み込み
-	LoadTexture();
+	
 
 	// モデル生成
 	CreateModel();
@@ -404,7 +403,7 @@ void ParticleManager::InitializeGraphicsPipeline()
 	}
 }
 
-void ParticleManager::LoadTexture()
+void ParticleManager::LoadTexture(const wchar_t* filename)
 {
 	HRESULT result = S_FALSE;
 
@@ -413,7 +412,7 @@ void ParticleManager::LoadTexture()
 	ScratchImage scratchImg{};
 
 	result = LoadFromWICFile(
-		L"Resource/effect1.png", WIC_FLAGS_NONE,
+		filename, WIC_FLAGS_NONE,
 		&metadata, scratchImg);
 	if (FAILED(result)) {
 		assert(0);

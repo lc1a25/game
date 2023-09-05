@@ -62,7 +62,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	clearModel = Model::LoadFromOBJ("clear");
 	deadModel = Model::LoadFromOBJ("dead");
 
-	bossHpBar = 733;
+	bossHpBar.x = 733;
 	bossHpBarMax = 733;
 	dieTimer = 120;
 
@@ -70,7 +70,7 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 
 	bossFlag = false;
 
-	hpBar = 288;
+	hpBar.x = 288;
 	hpBarMax = 288;
 
 	//プレイヤーが倒された用
@@ -78,86 +78,77 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 
 	//オブジェクトの初期化
 	skydome->SetModel(skydome_model);
-	skydome->scale = { 11,11,15 };
-	skydome->SetPosition({ 0,-220,skydomeZ });
+	skydome->scale = { skydomeScale };
+	skydome->SetPosition({ skydomePos });
 
-	shotObj->SetModel(deadModel);
-	shotObj->scale = { 3,3,3 };
-	shotObj->SetPosition({ 0,-200,0 });
+	deadObj->SetModel(deadModel);
+	deadObj->scale = { deadObjScale };
+	deadObj->SetPosition({ deadObjPos });
 
 	targetObj->SetModel(targetModel);
-	targetObj->scale = { 3,3,3 };
-	targetObj->SetPosition({ 0,-200,100 });
-	targetObj->rotation.y = 180;
+	targetObj->scale = { targetObjScale };
+	targetObj->SetPosition({ targetObjPosition });
+	targetObj->rotation.y = targetObjRotY;
 
 	clickObj->SetModel(clickModel);
-	clickObj->scale = { 3,3,3 };
-	clickObj->SetPosition({ 0,0,90 });
+	clickObj->scale = { clickObjScale };
+	clickObj->SetPosition({ clickObjPos });
 
 	kanbanObj->SetModel(kanbanModel);
-	kanbanObj->scale = { 1.5,1.5,1.5 };
-	kanbanObj->SetPosition({ -90,-50,120 });
+	kanbanObj->scale = { kanbanObjScale };
+	kanbanObj->SetPosition({ kanbanObjPos });
 	
 	kanbanPlaneObj->SetModel(kanbanPlaneModel);
-	kanbanPlaneObj->scale = { 1.5,1.5,1.5 };
-	kanbanPlaneObj->SetPosition({ 90,-50,120 });
+	kanbanPlaneObj->scale = { kanbanPlaneObjScale };
+	kanbanPlaneObj->SetPosition({ kanbanPlaneObjPos });
 	kanbanShotObj->SetModel(kanbanShotModel);
-	kanbanShotObj->scale = { 1.5,1.5,1.5 };
+	kanbanShotObj->scale = { kanbanPlaneObjScale };
 	kanbanShotObj->SetPosition({ kanbanShotPos });
 	kanbanShot2Obj->SetModel(kanbanShot2Model);
-	kanbanShot2Obj->scale = { 1.5,1.5,1.5 };
+	kanbanShot2Obj->scale = { kanbanPlaneObjScale };
 	kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
 	kanbanShot3Obj->SetModel(kanbanShot3Model);
-	kanbanShot3Obj->scale = { 1.5,1.5,1.5 };
+	kanbanShot3Obj->scale = { kanbanPlaneObjScale };
 	kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
 	kanbanShot4Obj->SetModel(kanbanShot4Model);
-	kanbanShot4Obj->scale = { 1.5,1.5,1.5 };
+	kanbanShot4Obj->scale = { kanbanPlaneObjScale };
 	kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
 
 	titleObj->SetModel(shotObjModel);
-	titleObj->scale = { 1.5,1.5,1.5 };
-	titleObj->SetPosition({ 0,25,-560 });
-
-	clickObj->SetModel(clickModel);
-	clickObj->scale = { 1.5,1.5,1.5 };
-	clickObj->SetPosition({ 0,15,-560 });
+	titleObj->scale = { titleObjScale };
+	titleObj->SetPosition({ titleObjPos });
 
 	clearObj->SetModel(clearModel);
-	clearObj->scale = { 3,3,3 };
-	clearObj->SetPosition({ 0,15,0 });
+	clearObj->scale = { clearObjScale };
+	clearObj->SetPosition({ clearObjPos });
 
 	player = new Player();
 	player->Init(playerModel, bulletModel);
 
 	startPlayer->SetModel(playerModel);
-	startPlayer->scale = { 2,2,2 };
-	startPlayer->SetPosition({0,0,-550});
+	startPlayer->scale = { startPlayerScale };
+	startPlayer->SetPosition({ startPlayerPos });
 
 	boss = new Boss();
-	boss->Init(bossModel, enemyBulletModel, barrierModel,{ 0,0,-200.0f });
+	boss->Init(bossModel, enemyBulletModel, barrierModel,{ 0,0,0 });//csvで座標読み込みする
 
 	bossChildLUF = new BossChild();
-	bossChildLUF->Init(bossModel, { 0, 0, 1000.0f }, 1);//csvで読み込みする
+	bossChildLUF->Init(bossModel, { bossPosInit }, 1);//csvで座標読み込みする
 	bossChildLUB = new BossChild();
-	bossChildLUB->Init(bossModel, { 0, 0, 1000.0f }, 2);
+	bossChildLUB->Init(bossModel, { bossPosInit }, 2);//csvで座標読み込みする
 	bossChildRUF = new BossChild();
-	bossChildRUF->Init(bossModel, { 0, 0, 1000.0f }, 3);
-	bossChildRUB = new BossChild();
-	bossChildRUB->Init(bossModel, { 0, 0, 1000.0f }, 4);
-	bossChildLDF = new BossChild();
-	bossChildLDF->Init(bossModel, { 0, 0, 1000.0f }, 5);
-	bossChildLDB = new BossChild();
-	bossChildLDB->Init(bossModel, { 0, 0, 1000.0f }, 6);
-	bossChildRDF = new BossChild();
-	bossChildRDF->Init(bossModel, { 0, 0, 1000.0f }, 7);
-	bossChildRDB = new BossChild();
-	bossChildRDB->Init(bossModel, { 0, 0, 1000.0f }, 8);
+	bossChildRUF->Init(bossModel, { bossPosInit }, 3);//csvで座標読み込みする
+	bossChildRUB = new BossChild();		  
+	bossChildRUB->Init(bossModel, { bossPosInit }, 4);//csvで座標読み込みする
+	bossChildLDF = new BossChild();		  
+	bossChildLDF->Init(bossModel, { bossPosInit }, 5);//csvで座標読み込みする
+	bossChildLDB = new BossChild();		  
+	bossChildLDB->Init(bossModel, { bossPosInit }, 6);//csvで座標読み込みする
+	bossChildRDF = new BossChild();		  
+	bossChildRDF->Init(bossModel, { bossPosInit }, 7);//csvで座標読み込みする
+	bossChildRDB = new BossChild();		  
+	bossChildRDB->Init(bossModel, { bossPosInit }, 8);//csvで座標読み込みする
 
-	/*light = Light::Create();
-	light->SetLightColor({ 1,1,1 });
-	static XMVECTOR lightDir = { 1,-1.5,1,0 };
-	light->SetLightDir(lightDir);
-	Object3d::SetLight(light);*/
 	// ライト生成
 	lightGroup = LightGroup::Create();
 	// 3Dオブエクトにライトをセット
@@ -167,17 +158,17 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	camera->Init();
 	
 	cameraObj = new CameraObj();
-	cameraObj->Init({ 0.0f, 0.0f, 0.0f },{0,0,0});
+	cameraObj->Init({ cameraPosInit },{ cameraRotInit });
 
 	//床
 	wallFloor->SetModel(wallFlatModel);
-	wallFloor->scale = { 65,7,170 };
-	wallFloor->SetPosition({ 0,-65,50 });
+	wallFloor->scale = { floorScale };
+	wallFloor->SetPosition({ floorPos });
 
 	//床の道路
 	road->SetModel(roadModel);
-	road->scale = { 10,7,600 };
-	road->SetPosition({ 0,-55,650 });
+	road->scale = { roadScale };
+	road->SetPosition({ roadPos });
 
 	Object3d::SetCamera(camera);
 
@@ -188,7 +179,13 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 
 	// 3Dオブジェクト生成
 	Particle = ParticleManager::Create(dxcommon->GetDev(), camera);
+	Particle->LoadTexture(L"Resource/effect1.png");
 
+	Particle2 = ParticleManager::Create(dxcommon->GetDev(), camera);
+	Particle2->LoadTexture(L"Resource/Thunder.png");
+
+	particleEnemy = ParticleManager::Create(dxcommon->GetDev(), camera);
+	particleEnemy->LoadTexture(L"Resource/effect2.png");
 	billM = new BillManager();
 	billM->BillSet(billModel);
 	//ビル生成
@@ -200,36 +197,36 @@ void GameScene::Init(DirectXCommon* dxCommon, Input* input, Audio* audio,Win* wi
 	//レティクル
 	spriteCommon->LoadTexture(0, L"Resource/target.png");
 	reticleSprite = Sprite::Create(spriteCommon, 0);
-	reticleSprite->SetPosition({ 0.0f,0.0f,0.0f });
-	reticleSprite->SetSize({ 100,100 });
+	reticleSprite->SetPosition({ reticleSpritePos });
+	reticleSprite->SetSize({ reticleSpriteSize });
 	reticleSprite->TransVertexBuffer();
 
 
 	//ボスのhpバーの枠
 	spriteCommon->LoadTexture(4, L"Resource/hpWaku.png");
 	bossHpWakuSprite = Sprite::Create(spriteCommon, 4);
-	bossHpWakuSprite->SetPosition({ 640.0f,50.0f,0.0f });
-	bossHpWakuSprite->SetSize({ 769,38 });
+	bossHpWakuSprite->SetPosition({ bossHpWakuSpritePos });
+	bossHpWakuSprite->SetSize({ bossHpWakuSpriteSize });
 	bossHpWakuSprite->TransVertexBuffer();
 
 	//ボスのhpバー
 	spriteCommon->LoadTexture(5, L"Resource/hpBar.png");
 	bossHpBarSprite = Sprite::Create(spriteCommon, 5, { 0,0 });
-	bossHpBarSprite->SetPosition({ 273.0f,34.0f,0.0f });
+	bossHpBarSprite->SetPosition({ bossHpBarSpritePos });
 
 	//プレイヤーのhp
 	spriteCommon->LoadTexture(6, L"Resource/heart.png");
 	playerHpSprite = Sprite::Create(spriteCommon, 6);
-	playerHpSprite->SetPosition({ 1112.0f,640.0f,0.0f });
-	playerHpSprite->SetSize({ 288,96 });
-	playerHpSprite->SetTexsize({ 288,96 });
+	playerHpSprite->SetPosition({ playerHpSpritePos });
+	playerHpSprite->SetSize({ playerHpSpriteSize });
+	playerHpSprite->SetTexsize({ playerHpSpriteTexsize });
 	playerHpSprite->TransVertexBuffer();
 
 	//movie　skip用
 	spriteCommon->LoadTexture(11, L"Resource/kSkip.png");
 	kSkipSprite = Sprite::Create(spriteCommon, 11);
-	kSkipSprite->SetPosition({ 1200.0f,20.0f,0.0f });
-	kSkipSprite->SetSize({ 140,32 });
+	kSkipSprite->SetPosition({ SkipSpritePos });
+	kSkipSprite->SetSize({ SkipSpriteSize });
 	kSkipSprite->TransVertexBuffer();
 
 	//デバッグテキスト
@@ -263,8 +260,8 @@ void GameScene::Update()
 	playerHpSprite->Update();//playerのhp
 	kSkipSprite->Update();//ムービースキップ
 	//デバッグテキスト
-	debugtext_minute->Print(moji, 0, 0, 1.0f);
-	debugtext_minute2->Print(moji2, 0, 100, 1.0f);
+	debugtext_minute->Print(moji, debugTextPos.x, debugTextPos.y, debugTextScale);
+	debugtext_minute2->Print(moji2, debugTextPos2.x, debugTextPos2.y, debugTextScale);
 
 	
 //デバッグ用コマンド
@@ -292,12 +289,14 @@ void GameScene::Update()
 			boss->GetEnemy()->OnBossCollision();
 		}		
 	}
+	//クリアシーン
 	if (input->isKeyTrigger(DIK_N))
 	{
 		pointsLast = true;
 		scene_ = Scene::Clear;
 		sceneDraw_ = SceneDraw::ClearDraw;
 	}
+	//ゲームオーバーシーン
 	if (input->isKeyTrigger(DIK_M))
 	{
 		playerDieFlag = true;
@@ -309,7 +308,7 @@ void GameScene::Update()
 	billM->Update();
 
 	//スカイドーム
-	skydome->SetPosition({ 0,-220,skydomeZ });
+	skydome->SetPosition({ skydomePos });
 	skydome->Update();
 
 	//設置物の更新
@@ -317,7 +316,7 @@ void GameScene::Update()
 	road->Update();
 	kanbanObj->Update();
 	kanbanPlaneObj->Update();
-	shotObj->Update();
+	deadObj->Update();
 	targetObj->Update();
 	
 	//2dレティクルスプライトの座標
@@ -345,24 +344,33 @@ void GameScene::Update()
 	player->SetHwnd(hwnd);
 	player->SetViewPort(viewPort);
 	player->SetCameraMatViewProjection(cameraObj->GetMatViewProjection());
-	Particle->CreateParticlePlayer(20, 4, { player->GetWorldPosition().x,player->GetWorldPosition().y + 4,player->GetWorldPosition().z -4 },
-		{ 0.5,0.5,0.5 }, { 0.2,0.2,0.2 }, 1.0f, 0.0f, { 1,0,0 }, { 1,0.5,0 });
+	
+	//プレイヤーのエンジン演出
+	Particle->CreateParticlePlayer(particleCountEngine, particleLifeEngine, { startPlayer->position.x,startPlayer->position.y,startPlayer->position.z - particleEngineAdd },
+		particleVelocityEngine, particleAccelEngine, particleStartScaleEngine, particleEndScaleEngine,
+		particleStartColorEngine, particleEndColorEngine);
+
+	Particle->CreateParticlePlayer(particleCountEngine, particleLifeEngine, { player->GetWorldPosition().x,player->GetWorldPosition().y,player->GetWorldPosition().z - particleEngineAdd },
+		particleVelocityEngine, particleAccelEngine, particleStartScaleEngine, particleEndScaleEngine,
+		particleStartColorEngine, particleEndColorEngine);
 
 	player->Update();
-
 	startPlayer->Update();
 	Particle->Update();
+	Particle2->Update();
+	particleEnemy->Update();
 	lightGroup->Update();
-	lightGroup->SetAmbientColor({ 1,1,1 });
-	lightGroup->SetDirLightDir(0, XMVECTOR{1,-1.7,1,0 });//0, XMVECTOR{ 1,-1.4,1,0 }
-	lightGroup->SetDirLightActive(0, true);
-	lightGroup->SetDirLightActive(1, true);
-	lightGroup->SetDirLightActive(2, true);
+	
+	//平行光源　　　
+	lightGroup->SetAmbientColor({ lightColor });//ライトカラー
+	lightGroup->SetDirLightDir(0, lightPos);//場所
+	lightGroup->SetDirLightActive(0, true);//有効化
+	//丸影
 	lightGroup->SetCircleShadowActive(0, true);
-	lightGroup->SetCircleShadowDir(0, XMVECTOR({ 0,-5,0,0 }));
+	lightGroup->SetCircleShadowDir(0, lightCircleShadowDir);
 	lightGroup->SetCircleShadowCasterPos(0, XMFLOAT3(player->GetWorldPosition()));
-	lightGroup->SetCircleShadowAtten(0, XMFLOAT3({ 0.2f,0.3f,0.0f }));
-	lightGroup->SetCircleShadowFactorAngle(0, XMFLOAT2({ 0.0f,3.0f }));
+	lightGroup->SetCircleShadowAtten(0, lightCircleShadowAtten);
+	lightGroup->SetCircleShadowFactorAngle(0, lightCircleShadowFactorAngle);
 
 }
 
@@ -385,7 +393,8 @@ void GameScene::Draw()
 	Object3d::PreDraw(dxcommon->GetCmdlist());
 	
 	Particle->Draw(dxcommon->GetCmdlist());
-	
+	Particle2->Draw(dxcommon->GetCmdlist());
+	particleEnemy->Draw(dxcommon->GetCmdlist());
 	Object3d::PostDraw();
 // 3Dオブクジェクトの描画おわり
 
@@ -393,6 +402,536 @@ void GameScene::Draw()
 	
 }
 
+
+
+void GameScene::Title()
+{
+	if (input->isMouseKey())
+	{
+		cameraObj->SetStartMovieSkip(true);
+		scene_ = Scene::Game;
+		sceneDraw_ = SceneDraw::GameDraw;
+	}
+	titleObj->Update();
+	clickCount++;
+	clickObj->Update();
+
+	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
+	{
+		oneWay2->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
+		oneWay2->Update();
+	}
+	//csvのenemy発生
+	UpdateEnemyPop();
+
+	ParticleTitle();
+
+}
+
+void GameScene::Game()
+{
+	//sprite
+		//ボスのhp
+	bossHpBarSprite->SetSize({ bossHpBar.x,bossHpBar.y });
+	bossHpBarSprite->TransVertexBuffer();
+
+	bossHpBarSprite->Update();//ボスのhpバー
+	bossHpWakuSprite->Update();//ボスのhpバーの枠
+
+	//playerのhp
+	playerHpSprite->SetPosition({ playerHpSpritePos });
+	playerHpSprite->SetSize({ hpBar.x,hpBar.y });
+	playerHpSprite->SetTexsize({ hpBar.x,hpBar.y });
+	playerHpSprite->TransVertexBuffer();
+
+	//3d設置物
+		//スカイドーム
+		//カメラの移動量より少し遅く動く
+	skydomePos.z += cameraObj->GetEyeVec().z * skydomeVec;
+
+	//スタートムービー
+	if (cameraObj->GetStartMovieFlag() == false)
+	{
+		//playerを上ななめ前にとばす
+		startPlayer->position.z += startPlayerAddZ;
+		startPlayer->position.y += startPlayerAddY;
+	}
+
+	//ムービースキップ
+	if (input->isKeyTrigger(DIK_K))
+	{
+		cameraObj->SetStartMovieSkip(false);
+		startPlayer->SetPosition(startPlayerAfterPos);
+		movieSkipFlag = true;//ムービースキップのスプライト
+	}
+
+	//スタートムービー後の自機(仮)の場所
+	if (startPlayer->GetPosition().z >= startPlayerAfterPos.z && boss->GetBossDead() == false)
+	{
+		startPlayer->SetPosition(startPlayerAfterPos);
+		movieSkipFlag = true;//ムービースキップのスプライト
+	}
+	else
+	{
+		Particle->CreateParticlePlayer(particleCountEngine, particleLifeEngine, { startPlayer->position.x,startPlayer->position.y,startPlayer->position.z - particleEngineAdd },
+			particleVelocityEngine, particleAccelEngine, particleStartScaleEngine, particleEndScaleEngine,
+			particleStartColorEngine, particleEndColorEngine);
+		ParticleTitle();
+	}
+
+	//csvのenemy発生
+	UpdateEnemyPop();
+
+	//チュートリアルがおわっているかをカメラに教える
+	cameraObj->SetTutorialFlag(tutorialFlag);
+
+	//ムービーが終わった後のチュートリアル用のobj　と　playerの位置設定
+	if (cameraObj->GetStartGameFlag() == TRUE && setObjectFlag == false)
+	{
+		targetObj->SetPosition({ InGametargetObjPos });
+		player->SetPlayerPos({ playerPos });
+		setObjectFlag = true;
+	}
+	//弾の発射説明obj　　(画面右の看板)(アニメーションする)
+	if (cameraObj->GetStartGameFlag() == TRUE)
+	{
+		kanbanTime++;
+	}
+	if (kanbanTime >= kanbanTimeMax)
+	{
+		kanbanShotObj->SetPosition({ kanbanShotPosDown });
+		kanbanShot2Obj->SetPosition({ kanbanShotPos });
+		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
+	}
+	if (kanbanTime >= kanbanTimeMax * 2)
+	{
+		kanbanShotObj->SetPosition({ kanbanShotPosDown });
+		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot3Obj->SetPosition({ kanbanShotPos });
+		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
+	}
+	if (kanbanTime >= kanbanTimeMax * 3)
+	{
+		kanbanShotObj->SetPosition({ kanbanShotPosDown });
+		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot4Obj->SetPosition({ kanbanShotPos });
+	}
+	if (kanbanTime >= kanbanTimeMax * 4)
+	{
+		kanbanShotObj->SetPosition({ kanbanShotPos });
+		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
+		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
+		kanbanTime = 0;
+	}
+	//弾の発射説明obj　の更新処理
+	kanbanShotObj->Update();
+	kanbanShot2Obj->Update();
+	kanbanShot3Obj->Update();
+	kanbanShot4Obj->Update();
+
+
+	//自機
+	player->SetStartFlag(cameraObj->GetStartGameFlag());
+	player->SetCameraObj(cameraObj->GetWorldTransform());
+	player->SetCameraPos(cameraObj->GetEye());
+	player->SetCameraEyeVec(cameraObj->GetEyeVec());
+	player->SetPlayerHpBar(hpBar.x);
+
+	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player->GetBullets();
+	//自機の弾のパーティクル
+	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
+	{
+		bullet1 = bullet->GetWorldPosition();
+
+		//攻撃時パーティクルがでる
+		if (input->isMouseKey())
+		{
+			attackParticleFlag = true;
+		}
+		if (attackParticleFlag == true)
+		{
+			Particle2->CreateParticle(particleCountBullet, particleLifeBullet, bullet1,
+				particleVelocityBullet, particleAccelBullet, 
+				particleStartScaleBullet, particleEndScaleBullet, 
+				particleStartColorBullet, particleEndColorBullet);
+		}
+	}
+
+	// 敵
+	//oneway更新処理
+	for (std::unique_ptr<EnemyOneWay>& oneWay : oneWays)
+	{
+		CheckAllCollision(oneWay->GetEnemy());
+		oneWay->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
+		oneWay->SetPlayerPosition(player->GetWorldPosition());
+		lightGroup->SetCircleShadowCasterPos(0, XMFLOAT3(oneWay->GetEnemy()->GetWorldPosition()));
+
+		oneWay->Update();
+	}
+
+	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
+	{
+		CheckAllCollision(oneWay2->GetEnemy());
+		oneWay2->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
+		oneWay2->Update();
+	}
+
+	//circle更新処理
+	for (std::unique_ptr<EnemyCircle>& circle : circles)
+	{
+		CheckAllCollision(circle->GetEnemy());
+		circle->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
+		circle->SetPlayerPosition(player->GetWorldPosition());
+		lightGroup->SetCircleShadowCasterPos(0, XMFLOAT3(circle->GetEnemy()->GetWorldPosition()));
+
+		circle->Update();
+	}
+
+	//ボス
+	boss->SetPlayerWorldPos(player->GetWorldPosition());
+	boss->GetEnemy()->SetBossHpBar(bossHpBar.x, bossHpBarMax);
+	boss->Update();
+
+	//ボスの周りをまわる敵
+
+	 //ボスの周りをまわる攻撃のため
+	 //ボスに追従するため
+	bossChildLUF->SetBossPos(boss->GetPos());
+	bossChildLUF->SetBossVec(boss->GetBossVec());
+	bossChildLUF->Update();
+
+	bossChildLUB->SetBossPos(boss->GetPos());
+	bossChildLUB->SetBossVec(boss->GetBossVec());
+	bossChildLUB->Update();
+
+	bossChildRUF->SetBossPos(boss->GetPos());
+	bossChildRUF->SetBossVec(boss->GetBossVec());
+	bossChildRUF->Update();
+
+	bossChildRUB->SetBossPos(boss->GetPos());
+	bossChildRUB->SetBossVec(boss->GetBossVec());
+	bossChildRUB->Update();
+
+	bossChildLDF->SetBossPos(boss->GetPos());
+	bossChildLDF->SetBossVec(boss->GetBossVec());
+	bossChildLDF->Update();
+
+	bossChildLDB->SetBossPos(boss->GetPos());
+	bossChildLDB->SetBossVec(boss->GetBossVec());
+	bossChildLDB->Update();
+
+	bossChildRDF->SetBossPos(boss->GetPos());
+	bossChildRDF->SetBossVec(boss->GetBossVec());
+	bossChildRDF->Update();
+
+	bossChildRDB->SetBossPos(boss->GetPos());
+	bossChildRDB->SetBossVec(boss->GetBossVec());
+	bossChildRDB->Update();
+
+
+	//ボスがバリアを張ったか
+	bossChildLUF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildLUB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildRUF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildRUB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildLDF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildLDB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildRDF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+	bossChildRDB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
+
+	//ボス系当たり判定
+	CheckAllCollision(boss->GetEnemy());
+	CheckBossANDChildCollision(bossChildLUF->GetEnemy());
+	CheckBossANDChildCollision(bossChildLUB->GetEnemy());
+	CheckBossANDChildCollision(bossChildRUF->GetEnemy());
+	CheckBossANDChildCollision(bossChildRUB->GetEnemy());
+	CheckBossANDChildCollision(bossChildLDF->GetEnemy());
+	CheckBossANDChildCollision(bossChildLDB->GetEnemy());
+	CheckBossANDChildCollision(bossChildRDF->GetEnemy());
+	CheckBossANDChildCollision(bossChildRDB->GetEnemy());
+	CheckTargetCollision();
+
+	//ボスのバリアを割る
+	if (
+		bossChildLUF->GetMiniDead() == true &&
+		bossChildLUB->GetMiniDead() == true &&
+		bossChildRUF->GetMiniDead() == true &&
+		bossChildRUB->GetMiniDead() == true &&
+		bossChildLDF->GetMiniDead() == true &&
+		bossChildLDB->GetMiniDead() == true &&
+		bossChildRDF->GetMiniDead() == true &&
+		bossChildRDB->GetMiniDead() == true
+		)
+	{
+		boss->SetBarrierFlag(false);
+	}
+
+	//hp
+	bossHpBar.x = boss->GetEnemy()->GetHpBarX();
+	hpBar.x = player->GetHpBar();
+
+	//ボス戦はじまる (カメラが止まる)
+	if (cameraObj->GetEndFlag() == TRUE)
+	{
+		bossFlag = true;
+	}
+
+	//ボスが倒されたら
+	if (boss->GetEnemy()->IsDead() == true)
+	{
+		player->SetEndFlag(true);
+		player->SetkeyInput(false);
+
+		//ボスの演出がおわったら
+		if (boss->GetEnemy()->GetWorldPosition().y <= floorY)
+		{
+			//シーンチェンジまち用
+			dieTimer--;
+			if (dieTimer <= 0)
+			{
+				player->SetEndMovieFlag(true);
+				//シーンチェンジ
+				if (player->GetWorldPosition().z >= endPlayerPos)
+				{
+					pointsLast = true;
+					scene_ = Scene::Clear;
+					sceneDraw_ = SceneDraw::ClearDraw;
+				}
+			}
+			else
+			{
+				cameraObj->SetEndMovieFlag(true);
+			}
+		}
+		else
+		{
+			particleEnemy->CreateParticle(particleCountBossDie, particleLifeBossDie, boss->GetPos(),
+				particleVelocityBossDie, particleAccelBossDie,
+				particleStartScaleBossDie, particleEndScaleBossDie,
+				particleStartColorBossDie, particleEndColorBossDie);
+		}
+	}
+
+	
+
+
+	//プレイヤーのhpが０になったら
+	if (player->GetHp0() == TRUE)
+	{
+		player->SetEndFlag(true);
+		player->SetkeyInput(false);
+		//パーティクル生成
+		Particle->CreateParticle(particleCountPlayerDie, particleLifePlayerDie, player->GetWorldPosition(), 
+			particleVelocityPlayerDie, particleAccelPlayerDie,
+			particleStartScalePlayerDie, particleEndScalePlayerDie,
+			particleStartColorPlayerDie, particleEndColorPlayerDie);
+
+		//やられた演出まち用
+		dieTimer--;
+
+		if (dieTimer <= 0)
+		{
+			//シーンチェンジ
+			playerDieFlag = true;
+			scene_ = Scene::GameOver;
+			sceneDraw_ = SceneDraw::GameOverDraw;
+			dieTimer = dieTimerMax;
+		}
+
+	}
+	//ゲームが終わったらビルを消す
+	if (pointsLast == true || playerDieFlag == true)
+	{
+		billM->SetBillDeadFlag(true);
+	}
+
+	//条件を満たしたlistけす
+
+	oneWays.remove_if([](std::unique_ptr<EnemyOneWay>& oneWay)
+		{
+			return oneWay->GetIsDead();
+		});
+	oneWayMovies.remove_if([](std::unique_ptr<EnemyOneWay>& oneWayMovie)
+		{
+			return oneWayMovie->GetIsDead();
+		});
+
+	circles.remove_if([](std::unique_ptr<EnemyCircle>& circle)
+		{
+			return circle->GetIsDead();
+		});
+
+}
+
+void GameScene::Clear()
+{
+	ParticleClear();
+	clearObj->rotation.y++;
+	clearObj->SetPosition({ clearSceneClearObjPos.x,clearSceneClearObjPos.y ,clearSceneClearObjPos.z + cameraObj->GetEye().z });
+	clickCount++;
+	clickObj->SetPosition({ ClearclickObjPos.x,ClearclickObjPos.y,ClearclickObjPos.z + cameraObj->GetEye().z });
+	clearObj->Update();
+	clickObj->Update();
+
+}
+
+void GameScene::GameOver()
+{
+	cameraObj->SetStopFlag(true);
+	deadObj->rotation.y++;
+	deadObj->SetPosition({ GameOverdeadObjPos.x,GameOverdeadObjPos.y,GameOverdeadObjPos.z + cameraObj->GetEye().z  });
+
+	deadObj->Update();
+	clickCount++; 
+	clickObj->SetPosition({ GameOverclickObjPos.x,GameOverclickObjPos.y,GameOverclickObjPos.z + cameraObj->GetEye().z });
+	clickObj->Update();
+}
+
+void GameScene::TitleDraw()
+{
+	/// ここに3Dオブジェクトの描画処理
+	Object3d::PreDraw(dxcommon->GetCmdlist());
+	titleObj->Draw();
+	if (clickCount >= clickAliveCount)
+	{
+		clickObj->Draw();
+		if (clickCount >= clickDeadCount)
+		{
+			clickCount = clickCountReset;
+		}
+	}
+	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
+	{
+		oneWay2->Draw();
+	}
+	Object3d::PostDraw();
+	// 3Dオブクジェクトの描画おわり
+	spriteCommon->PreDraw();
+	reticleSprite->Draw();
+}
+
+void GameScene::GameDraw()
+{
+	/// ここに3Dオブジェクトの描画処理
+	Object3d::PreDraw(dxcommon->GetCmdlist());
+	kanbanObj->Draw();
+	kanbanPlaneObj->Draw();
+	kanbanShotObj->Draw();
+	kanbanShot2Obj->Draw();
+	kanbanShot3Obj->Draw();
+	kanbanShot4Obj->Draw();
+	
+	if (targetHp >= 1)
+	{
+		targetObj->Draw();
+	}
+
+	if (mutekiFlag == true && player->GetHp0() == false)
+	{
+		tenmetuCount++;
+		if (tenmetuCount >= tenmetuAliveCount)
+		{
+			player->Draw();
+			if (tenmetuCount >= tenmetuDeadCount)
+			{
+				tenmetuCount = tenmetuCountReset;
+			}
+		}
+	}
+	else
+	{
+		player->Draw();
+	}
+
+	for (std::unique_ptr<EnemyOneWay>& oneWay : oneWays)
+	{
+		oneWay->Draw();
+	}
+	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
+	{
+		oneWay2->Draw();
+	}
+	for (std::unique_ptr<EnemyCircle>& circle : circles)
+	{
+		circle->Draw();
+	}
+
+	if (cameraObj->GetEndFlag() == TRUE)
+	{
+		boss->Draw();
+		bossChildLUF->Draw();
+		bossChildLUB->Draw();
+		bossChildRUF->Draw();
+		bossChildRUB->Draw();
+		bossChildLDF->Draw();
+		bossChildLDB->Draw();
+		bossChildRDF->Draw();
+		bossChildRDB->Draw();
+	}
+	Object3d::PostDraw();
+	// 3Dオブクジェクトの描画おわり
+
+	spriteCommon->PreDraw();
+	reticleSprite->Draw();
+	if (movieSkipFlag == false)
+	{
+		kSkipSprite->Draw();
+	}
+	if (tutorialFlag == true)
+	{
+	}
+	else
+	{
+		playerHpSprite->Draw();
+	}
+	if (bossFlag == true)
+	{
+		bossHpBarSprite->Draw();
+		bossHpWakuSprite->Draw();
+	}
+
+	//デバッグテキスト
+	//debugtext_minute->DrawAll();
+	//debugtext_minute2->DrawAll();
+}
+
+void GameScene::ClearDraw()
+{
+	/// ここに3Dオブジェクトの描画処理
+	Object3d::PreDraw(dxcommon->GetCmdlist());
+	if (clickCount >= clickAliveCount)
+	{
+		clickObj->Draw();
+		if (clickCount >= clickDeadCount)
+		{
+			clickCount = clickCountReset;
+		}
+	}
+	clearObj->Draw();
+	Object3d::PostDraw();
+}
+
+void GameScene::GameOverDraw()
+{
+	/// ここに3Dオブジェクトの描画処理
+	Object3d::PreDraw(dxcommon->GetCmdlist());
+	if (clickCount >= clickAliveCount)
+	{
+		clickObj->Draw();
+		if (clickCount >= clickDeadCount)
+		{
+			clickCount = clickCountReset;
+		}
+	}
+	deadObj->Draw();
+	Object3d::PostDraw();
+	// 3Dオブクジェクトの描画おわり
+}
+
+//当たり判定
 void GameScene::CheckAllCollision(Enemy* enemy)
 {
 	if (mutekiFlagDeb == true)
@@ -421,16 +960,18 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 	{
 		pos2 = bullet->GetWorldPosition();
 		length = ((pos2.x - pos1.x) * (pos2.x - pos1.x)) +
-				 ((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
-				 ((pos2.z - pos1.z) * (pos2.z - pos1.z));
+			((pos2.y - pos1.y) * (pos2.y - pos1.y)) +
+			((pos2.z - pos1.z) * (pos2.z - pos1.z));
 		if (length <= size)
 		{
 			if (boss->GetEnemy()->IsDead() == false && mutekiFlag == false)
 			{
 				player->OnCollision();
 				//パーティクル生成
-				Particle->CreateParticle(5, 32, player->GetWorldPosition(), { 0.8,0.8,0.8 }, { 0,-0.05,0 }, 10.0f, 2.0f,
-					{ 1,1,1 }, { 1,0,0 });
+				Particle->CreateParticle(particleCountPlayer, particleLifePlayer, player->GetWorldPosition(),
+					particleVelocityPlayer, particleAccelPlayer,
+					particleStartScalePlayer, particleEndScalePlayer,
+					particleStartColorPlayer, particleEndColorPlayer);
 
 				mutekiFlag = true;
 			}
@@ -438,7 +979,7 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 			bullet->OnCollision();
 		}
 	}
-	
+
 	//自弾と敵当たり判定
 	pos1 = enemy->GetWorldPosition();
 
@@ -459,26 +1000,33 @@ void GameScene::CheckAllCollision(Enemy* enemy)
 				enemy->OnCollision();
 
 				bullet->OnCollision();
+
+
 				//パーティクル生成
-				Particle->CreateParticle(30, 64, enemy->GetWorldPosition(), { 0.5,0.5,0.5 }, { 0.02,0.02,0.02 }, 15.0f, 1.0f,
-					{ 1,1,1 }, { 1,0.5,0 });
+				particleEnemy->CreateParticle(particleCountEnemy, particleLifeEnemy, enemy->GetWorldPosition(),
+					particleVelocityEnemy, particleAccelEnemy,
+					particleStartScaleEnemy, particleEndScaleEnemy,
+					particleStartColorEnemy, particleEndColorEnemy);
 			}
-			
+
 		}
 		//ボスと弾の当たり判定
 		if (pos2.z <= pos1.z + pos1BossAdd && pos2.z >= pos1.z &&
 			pos2.x <= pos1.x + pos1BossAdd && pos2.x >= pos1.x - pos1BossAdd &&
 			pos2.y <= pos1.y + pos1BossAdd && pos2.y >= pos1.y - pos1Add)
 		{
-			if(cameraObj->GetRaleIndex() >= 6 )
+			if (cameraObj->GetRaleIndex() >= 6)
 			{
 				enemy->OnBossCollision();
-				if (boss->GetBarrierFlag() == false || boss->GetBossMovieFlag() == false)
+				if (boss->GetBarrierFlag() == false && boss->GetBossMovieFlag() == false)
 				{
-					Particle->CreateParticle(30, 32, enemy->GetWorldPosition(), { 1.3,1.3,1.3 }, { 0.01,0.01,0.01 }, 25.0f, 2.0f,
-						{ 1,1,1 }, { 1,0.5,0 });
+
+					particleEnemy->CreateParticle(particleCountBoss, particleLifeBoss, enemy->GetWorldPosition(),
+						particleVelocityBoss, particleAccelBoss,
+						particleStartScaleBoss, particleEndScaleBoss,
+						particleStartColorBoss, particleEndColorBoss);
 				}
-			
+
 				bullet->OnCollision();
 			}
 		}
@@ -531,12 +1079,15 @@ void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 			((pos2.z - pos1.z) * (pos2.z - pos1.z));
 		if (length <= size)
 		{
+
 			if (boss->GetEnemy()->IsDead() == false && mutekiFlag == false)
 			{
 				player->OnCollision();
 				//パーティクル生成
-				Particle->CreateParticle(5, 32, player->GetWorldPosition(), { 0.8,0.8,0.8 }, { 0,-0.05,0 }, 10.0f, 2.0f,
-					{ 1,1,1 }, { 1,0,0 });
+				Particle->CreateParticle(particleCountPlayer, particleLifePlayer, player->GetWorldPosition(),
+					particleVelocityPlayer, particleAccelPlayer,
+					particleStartScalePlayer, particleEndScalePlayer,
+					particleStartColorPlayer, particleEndColorPlayer);
 				mutekiFlag = true;
 			}
 
@@ -559,25 +1110,36 @@ void GameScene::CheckBossANDChildCollision(Enemy* bossChild)
 			pos2.x <= pos1.x + pos1Add && pos2.x >= pos1.x - pos1Add &&
 			pos2.y <= pos1.y + pos1Add && pos2.y >= pos1.y - pos1Add)
 		{
-			if(boss->GetBarrierPhaseFlag() == true)
+			if (boss->GetBarrierPhaseFlag() == TRUE)
 			{
-				
+				int particleCountBossChild = 30;
+				int particleLifeBossChild = 32;
+				XMFLOAT3 particleVelocityBossChild = { 1.3f, 1.3f, 1.3f };
+				XMFLOAT3 particleAccelBossChild = { 0.01f, 0.01f, 0.01f };
+				float particleStartScaleBossChild = 25.0f;
+				float particleEndScaleBossChild = 2.0f;
+				XMFLOAT3 particleStartColorBossChild = { 1.0f,1.0f,1.0f };
+				XMFLOAT3 particleEndColorBossChild = { 1.0f,0.5f,0.0f };
 				if (bossChild->IsDead() == true)
 				{
-					Particle->CreateParticle(30, 32, bossChild->GetWorldPosition(), { 1.3,1.3,1.3 }, { 0.01,0.01,0.01 }, 25.0f, 2.0f,
-						{ 1,1,1 }, { 1,0.5,0 });
+					particleEnemy->CreateParticle(particleCountBossChild, particleLifeBossChild, bossChild->GetWorldPosition(),
+						particleVelocityBossChild, particleAccelBossChild,
+						particleStartScaleBossChild, particleEndScaleBossChild,
+						particleStartColorBossChild, particleEndColorBossChild);
 				}
 				else
 				{
 					bossChild->OnBossMiniCollision();
-					Particle->CreateParticle(30, 32, bossChild->GetWorldPosition(), { 1.3,1.3,1.3 }, { 0.01,0.01,0.01 }, 25.0f, 2.0f,
-						{ 1,1,1 }, { 1,0.5,0 });
+					particleEnemy->CreateParticle(particleCountBossChild, particleLifeBossChild, bossChild->GetWorldPosition(),
+						particleVelocityBossChild, particleAccelBossChild,
+						particleStartScaleBossChild, particleEndScaleBossChild,
+						particleStartColorBossChild, particleEndColorBossChild);
 				}
 				bullet->OnCollision();
 			}
 		}
 	}
-	
+
 }
 
 void GameScene::CheckTargetCollision()
@@ -600,12 +1162,9 @@ void GameScene::CheckTargetCollision()
 
 	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
 	{
-		if (count == 1)
-		{
-		
-		}
+
 		pos2 = bullet->GetWorldPosition();
-		//チュートリアルの的にダメージ
+		//チュートリアルの 的 にダメージ
 		if (pos2.z <= pos1.z + pos1Addz && pos2.z >= pos1.z &&//z
 			pos2.x <= pos1.x + pos1Addx && pos2.x >= pos1.x - pos1Addx && //x
 			pos2.y <= pos1.y + pos1Addy && pos2.y >= pos1.y - pos1Addy && //y
@@ -616,16 +1175,20 @@ void GameScene::CheckTargetCollision()
 			targetHp--;
 			if (targetHp >= 1)
 			{
+
 				//パーティクル生成
-				Particle->CreateParticle(30, 32, bullet->GetWorldPosition(), { 2.8f, 2.8f, 2.8f }, { 0.02,0.02,0.02 }, 12.0f, 2.0f,
-					{ 1,0,0 }, { 0.5,0.3,0.17 });
+				Particle->CreateParticle(particleCountTarget, particleLifeTarget, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , targetObj->GetPosition().z },
+					particleVelocityTarget, particleAccelTarget,
+					particleStartScaleTarget, particleEndScaleTarget,
+					particleStartColorTarget, particleEndColorTarget);
 			}
-			else if(count == 0)
+			else if (count == 0)
 			{
 				count++;
-				Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , targetObj->GetPosition().z }
-					, { 2.8f, 2.8f, 2.8f }, { 0,-0.08,0 }, 12.0f, 2.0f,
-					{ 0,1,0 }, { 0.5,0.3,0.17 });
+				Particle->CreateParticle(particleCountTarget, particleLifeTarget, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , targetObj->GetPosition().z },
+					particleVelocityTarget, particleAccelTarget,
+					particleStartScaleTarget, particleEndScaleTarget,
+					particleStartColorTarget, particleEndColorTarget);
 				targetHp = targetHpMax;
 				targetObj->position.x = 50;
 
@@ -633,9 +1196,10 @@ void GameScene::CheckTargetCollision()
 			else if (count == 1)
 			{
 				count++;
-				Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , targetObj->GetPosition().z }
-					, { 2.8f, 2.8f, 2.8f }, { 0,-0.08,0 }, 12.0f, 2.0f,
-					{ 0,1,0 }, { 0.5,0.3,0.17 });
+				Particle->CreateParticle(particleCountTarget, particleLifeTarget, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , targetObj->GetPosition().z },
+					particleVelocityTarget, particleAccelTarget,
+					particleStartScaleTarget, particleEndScaleTarget,
+					particleStartColorTarget, particleEndColorTarget);
 				targetHp = targetHpMax;
 				targetObj->position.x = -50;
 				targetObj->rotation.y = 165;
@@ -643,13 +1207,16 @@ void GameScene::CheckTargetCollision()
 			else if (count == 2)
 			{
 				count++;
-				Particle->CreateParticle(30, 32, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , targetObj->GetPosition().z }
-					, { 2.8f, 2.8f, 2.8f }, { 0,-0.08,0 }, 12.0f, 2.0f,
-					{ 0,1,0 }, { 0.5,0.3,0.17 });
+				Particle->CreateParticle(particleCountTarget, particleLifeTarget, { targetObj->GetPosition().x ,  targetObj->GetPosition().y + shotObjAddy , targetObj->GetPosition().z },
+					particleVelocityTarget, particleAccelTarget,
+					particleStartScaleTarget, particleEndScaleTarget,
+					particleStartColorTarget, particleEndColorTarget);
 				targetHp = targetHpMax;
 				tutorialFlag = false;
 				targetObj->position.y = -250;
 				targetObj->rotation.y = 165;
+
+
 			}
 
 		}
@@ -680,6 +1247,7 @@ void GameScene::CheckBillCollision(BillManager* bill)
 	}
 }
 
+//csv読み込み
 void GameScene::EnemyPopLoadData()
 {
 	//ファイルを開く
@@ -728,7 +1296,7 @@ void GameScene::UpdateEnemyPop()
 		std::string word;
 
 		getline(line_stream, word, ',');
-		
+
 		if (word.find("//") == 0)
 		{
 			continue;
@@ -736,7 +1304,7 @@ void GameScene::UpdateEnemyPop()
 		else if (word.find("ONEWAY") == 0)
 		{
 			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
-		
+
 			getline(line_stream, word, ',');
 			int LR = std::atof(word.c_str());
 			bool LorR = false;
@@ -784,7 +1352,7 @@ void GameScene::UpdateEnemyPop()
 
 			//生成
 			std::unique_ptr<EnemyOneWay> newOneWay2 = std::make_unique<EnemyOneWay>();
-			newOneWay2->Init(enemyModel, pos, LorR, attackFlag,true);
+			newOneWay2->Init(enemyModel, pos, LorR, attackFlag, true);
 
 			//登録
 			oneWayMovies.push_back(std::move(newOneWay2));//move はユニークから譲渡するため
@@ -826,7 +1394,7 @@ void GameScene::UpdateEnemyPop()
 			XMFLOAT3 pos = CommandPositionSet(line_stream, word);
 
 			boss = new Boss();
-			boss->Init(bossModel, enemyBulletModel, barrierModel,{ pos });
+			boss->Init(bossModel, enemyBulletModel, barrierModel, { pos });
 		}
 		else if (word.find("CHILDLUF") == 0)
 		{
@@ -836,7 +1404,7 @@ void GameScene::UpdateEnemyPop()
 			int32_t number = (int32_t)std::atof(word.c_str());
 
 			bossChildLUF = new BossChild();
-			bossChildLUF->Init(bossModel,   pos ,number);
+			bossChildLUF->Init(bossModel, pos, number);
 		}
 		else if (word.find("CHILDLUB") == 0)
 		{
@@ -933,7 +1501,7 @@ void GameScene::UpdateEnemyPop()
 	}
 }
 
-XMFLOAT3 GameScene::CommandPositionSet(std::istream  &line_stream, std::string &word)
+XMFLOAT3 GameScene::CommandPositionSet(std::istream& line_stream, std::string& word)
 {
 	XMFLOAT3 position;
 	getline(line_stream, word, ',');
@@ -948,559 +1516,54 @@ XMFLOAT3 GameScene::CommandPositionSet(std::istream  &line_stream, std::string &
 	return position;
 }
 
-void GameScene::Title()
-{
-	if (input->isMouseKey())
-	{
-		cameraObj->SetStartMovieSkip(true);
-		scene_ = Scene::Game;
-		sceneDraw_ = SceneDraw::GameDraw;
-	}
-	titleObj->Update();
-	clickCount++;
-	clickObj->Update();
-
-	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
-	{
-		oneWay2->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
-		oneWay2->Update();
-	}
-	//csvのenemy発生
-	UpdateEnemyPop();
-
-	ParticleTitle();
-
-}
-
-void GameScene::Game()
-{
-	//sprite
-		//ボスのhp
-	bossHpBarSprite->SetSize({ bossHpBar,32 });
-	bossHpBarSprite->TransVertexBuffer();
-
-	bossHpBarSprite->Update();//ボスのhpバー
-	bossHpWakuSprite->Update();//ボスのhpバーの枠
-
-	//playerのhp
-	playerHpSprite->SetPosition({ 1112.0f,640.0f,0.0f });
-	playerHpSprite->SetSize({ hpBar,96 });
-	playerHpSprite->SetTexsize({ hpBar,96 });
-	playerHpSprite->TransVertexBuffer();
-
-	//3d設置物
-		//スカイドーム
-		//カメラの移動量より少し遅く動く
-	skydomeZ += cameraObj->GetEyeVec().z * skydomeVec;
-
-	//スタートムービー
-	if (cameraObj->GetStartMovieFlag() == false)
-	{
-		//playerを上ななめ前にとばす
-		startPlayer->position.z += startPlayerAddZ;
-		startPlayer->position.y += startPlayerAddY;
-	}
-
-	//ムービースキップ
-	if (input->isKeyTrigger(DIK_K))
-	{
-		cameraObj->SetStartMovieSkip(false);
-		startPlayer->SetPosition(startPlayerAfterPos);
-		movieSkipFlag = true;//ムービースキップのスプライト
-	}
-
-	//スタートムービー後の自機(仮)の場所
-	if (startPlayer->GetPosition().z >= startPlayerAfterPos.z && boss->GetBossDead() == false)
-	{
-		startPlayer->SetPosition(startPlayerAfterPos);
-		movieSkipFlag = true;//ムービースキップのスプライト
-	}
-	else
-	{
-		ParticleTitle();
-	}
-
-	//csvのenemy発生
-	UpdateEnemyPop();
-
-	//チュートリアルがおわっているかをカメラに教える
-	cameraObj->SetTutorialFlag(tutorialFlag);
-
-	//ムービーが終わった後のチュートリアル用のobj　と　playerの位置設定
-	if (cameraObj->GetStartGameFlag() == true && setObjectFlag == false)
-	{
-		targetObj->SetPosition({ 0,0,100 });
-		player->SetPlayerPos({ 0,0,0 });
-		setObjectFlag = true;
-	}
-	//弾の発射説明obj　　(画面右の看板)(アニメーションする)
-	if (cameraObj->GetStartGameFlag() == true)
-	{
-		kanbanTime++;
-	}
-	if (kanbanTime >= kanbanTimeMax)
-	{
-		kanbanShotObj->SetPosition({ kanbanShotPosDown });
-		kanbanShot2Obj->SetPosition({ kanbanShotPos });
-		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
-		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
-	}
-	if (kanbanTime >= kanbanTimeMax * 2)
-	{
-		kanbanShotObj->SetPosition({ kanbanShotPosDown });
-		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
-		kanbanShot3Obj->SetPosition({ kanbanShotPos });
-		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
-	}
-	if (kanbanTime >= kanbanTimeMax * 3)
-	{
-		kanbanShotObj->SetPosition({ kanbanShotPosDown });
-		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
-		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
-		kanbanShot4Obj->SetPosition({ kanbanShotPos });
-	}
-	if (kanbanTime >= kanbanTimeMax * 4)
-	{
-		kanbanShotObj->SetPosition({ kanbanShotPos });
-		kanbanShot2Obj->SetPosition({ kanbanShotPosDown });
-		kanbanShot3Obj->SetPosition({ kanbanShotPosDown });
-		kanbanShot4Obj->SetPosition({ kanbanShotPosDown });
-		kanbanTime = 0;
-	}
-	//弾の発射説明obj　の更新処理
-	kanbanShotObj->Update();
-	kanbanShot2Obj->Update();
-	kanbanShot3Obj->Update();
-	kanbanShot4Obj->Update();
-
-
-	//自機
-	player->SetStartFlag(cameraObj->GetStartGameFlag());
-	player->SetCameraObj(cameraObj->GetWorldTransform());
-	player->SetCameraPos(cameraObj->GetEye());
-	player->SetCameraEyeVec(cameraObj->GetEyeVec());
-	player->SetPlayerHpBar(hpBar);
-
-	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player->GetBullets();
-	//自機の弾のパーティクル
-	for (const std::unique_ptr<PlayerBullet>& bullet : playerBullets)
-	{
-		bullet1 = bullet->GetWorldPosition();
-
-		//攻撃時パーティクルがでる
-		if (input->isMouseKey())
-		{
-			attackParticleFlag = true;
-		}
-		if (attackParticleFlag == true)
-		{
-			Particle->CreateParticle(30, 8, bullet1, { 0.5,0.5,0.5 }, { 0.03,0.03,0.03 }, 5.0f, 1.0f, { 1,1,1 }, { 1,0,0 });
-		}
-	}
-
-	// 敵
-	//oneway更新処理
-	for (std::unique_ptr<EnemyOneWay>& oneWay : oneWays)
-	{
-		CheckAllCollision(oneWay->GetEnemy());
-		oneWay->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
-		oneWay->SetPlayerPosition(player->GetWorldPosition());
-		lightGroup->SetCircleShadowCasterPos(0, XMFLOAT3(oneWay->GetEnemy()->GetWorldPosition()));
-
-		oneWay->Update();
-	}
-
-	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
-	{
-		CheckAllCollision(oneWay2->GetEnemy());
-		oneWay2->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
-		oneWay2->Update();
-	}
-
-	//circle更新処理
-	for (std::unique_ptr<EnemyCircle>& circle : circles)
-	{
-		CheckAllCollision(circle->GetEnemy());
-		circle->GetEnemy()->SetCameraZ(cameraObj->GetEyeVec().z);
-		circle->SetPlayerPosition(player->GetWorldPosition());
-		lightGroup->SetCircleShadowCasterPos(0, XMFLOAT3(circle->GetEnemy()->GetWorldPosition()));
-
-		circle->Update();
-	}
-
-	//ボス
-	boss->SetPlayerWorldPos(player->GetWorldPosition());
-	boss->GetEnemy()->SetBossHpBar(bossHpBar, bossHpBarMax);
-	boss->Update();
-
-	//ボスの周りをまわる敵
-
-	 //ボスの周りをまわる攻撃のため
-	 //ボスに追従するため
-	bossChildLUF->SetBossPos(boss->GetPos());
-	bossChildLUF->SetBossVec(boss->GetBossVec());
-	bossChildLUF->Update();
-
-	bossChildLUB->SetBossPos(boss->GetPos());
-	bossChildLUB->SetBossVec(boss->GetBossVec());
-	bossChildLUB->Update();
-
-	bossChildRUF->SetBossPos(boss->GetPos());
-	bossChildRUF->SetBossVec(boss->GetBossVec());
-	bossChildRUF->Update();
-
-	bossChildRUB->SetBossPos(boss->GetPos());
-	bossChildRUB->SetBossVec(boss->GetBossVec());
-	bossChildRUB->Update();
-
-	bossChildLDF->SetBossPos(boss->GetPos());
-	bossChildLDF->SetBossVec(boss->GetBossVec());
-	bossChildLDF->Update();
-
-	bossChildLDB->SetBossPos(boss->GetPos());
-	bossChildLDB->SetBossVec(boss->GetBossVec());
-	bossChildLDB->Update();
-
-	bossChildRDF->SetBossPos(boss->GetPos());
-	bossChildRDF->SetBossVec(boss->GetBossVec());
-	bossChildRDF->Update();
-
-	bossChildRDB->SetBossPos(boss->GetPos());
-	bossChildRDB->SetBossVec(boss->GetBossVec());
-	bossChildRDB->Update();
-
-
-	//ボスがバリアを張ったか
-	bossChildLUF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildLUB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildRUF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildRUB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildLDF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildLDB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildRDF->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-	bossChildRDB->SetBarrierPhaseFlag(boss->GetBarrierPhaseFlag());
-
-	//ボス系当たり判定
-	CheckAllCollision(boss->GetEnemy());
-	CheckBossANDChildCollision(bossChildLUF->GetEnemy());
-	CheckBossANDChildCollision(bossChildLUB->GetEnemy());
-	CheckBossANDChildCollision(bossChildRUF->GetEnemy());
-	CheckBossANDChildCollision(bossChildRUB->GetEnemy());
-	CheckBossANDChildCollision(bossChildLDF->GetEnemy());
-	CheckBossANDChildCollision(bossChildLDB->GetEnemy());
-	CheckBossANDChildCollision(bossChildRDF->GetEnemy());
-	CheckBossANDChildCollision(bossChildRDB->GetEnemy());
-	CheckTargetCollision();
-
-	//ボスのバリアを割る
-	if (
-		bossChildLUF->GetMiniDead() == true &&
-		bossChildLUB->GetMiniDead() == true &&
-		bossChildRUF->GetMiniDead() == true &&
-		bossChildRUB->GetMiniDead() == true &&
-		bossChildLDF->GetMiniDead() == true &&
-		bossChildLDB->GetMiniDead() == true &&
-		bossChildRDF->GetMiniDead() == true &&
-		bossChildRDB->GetMiniDead() == true
-		)
-	{
-		boss->SetBarrierFlag(false);
-	}
-
-	//hp
-	bossHpBar = boss->GetEnemy()->GetHpBarX();
-	hpBar = player->GetHpBar();
-
-	//ボス戦はじまる (カメラが止まる)
-	if (cameraObj->GetEndFlag() == true)
-	{
-		bossFlag = true;
-	}
-
-	//ボスが倒されたら
-	if (boss->GetEnemy()->IsDead() == true)
-	{
-		player->SetEndFlag(true);
-		player->SetkeyInput(false);
-
-		//ボスの演出がおわったら
-		if (boss->GetEnemy()->GetWorldPosition().y <= floorY)
-		{
-			//シーンチェンジまち用
-			dieTimer--;
-			if (dieTimer <= 0)
-			{
-				player->SetEndMovieFlag(true);
-				//シーンチェンジ
-				if (player->GetWorldPosition().z >= endPlayerPos)
-				{
-					pointsLast = true;
-					scene_ = Scene::Clear;
-					sceneDraw_ = SceneDraw::ClearDraw;
-				}
-			}
-			else
-			{
-				cameraObj->SetEndMovieFlag(true);
-			}
-		}
-		else
-		{
-			Particle->CreateParticle(30, 48, boss->GetPos(), { 0.5,0.5,0.5 }, { 0.05,0.05,0.05 }, 10.0f, 2.0f,
-				{ 1,1,1 }, { 1,0.5,0 });
-		}
-	}
-
-
-
-	//プレイヤーのhpが０になったら
-	if (player->GetHp0() == true)
-	{
-		player->SetEndFlag(true);
-		player->SetkeyInput(false);
-		//パーティクル生成
-		Particle->CreateParticle(5, 32, player->GetWorldPosition(), { 0.8,0.8,0.8 }, { 0,-0.05,0 }, 10.0f, 2.0f,
-			{ 1,1,1 }, { 1,0,0 });
-
-		//やられた演出まち用
-		dieTimer--;
-
-		if (dieTimer <= 0)
-		{
-			//シーンチェンジ
-			playerDieFlag = true;
-			scene_ = Scene::GameOver;
-			sceneDraw_ = SceneDraw::GameOverDraw;
-			dieTimer = dieTimerMax;
-		}
-
-	}
-	//ゲームが終わったらビルを消す
-	if (pointsLast == true || playerDieFlag == true)
-	{
-		billM->SetBillDeadFlag(true);
-	}
-
-	//条件を満たしたlistけす
-
-	oneWays.remove_if([](std::unique_ptr<EnemyOneWay>& oneWay)
-		{
-			return oneWay->GetIsDead();
-		});
-	oneWayMovies.remove_if([](std::unique_ptr<EnemyOneWay>& oneWayMovie)
-		{
-			return oneWayMovie->GetIsDead();
-		});
-
-	circles.remove_if([](std::unique_ptr<EnemyCircle>& circle)
-		{
-			return circle->GetIsDead();
-		});
-
-}
-
-void GameScene::Clear()
-{
-	ParticleClear();
-	clearObj->rotation.y++;
-	clearObj->SetPosition({ 0,10,cameraObj->GetEye().z +50 });
-	clickCount++;
-	clickObj->SetPosition({ 0,-5,cameraObj->GetEye().z + 50 });
-	clearObj->Update();
-	clickObj->Update();
-
-}
-
-void GameScene::GameOver()
-{
-	cameraObj->SetStopFlag(true);
-	shotObj->rotation.y++;
-	shotObj->SetPosition({ 0,0,cameraObj->GetEye().z + 80 });
-
-	shotObj->Update();
-	clickCount++;
-	clickObj->SetPosition({ 0,-15,cameraObj->GetEye().z + 50 });
-	clickObj->Update();
-}
-
-void GameScene::TitleDraw()
-{
-	/// ここに3Dオブジェクトの描画処理
-	Object3d::PreDraw(dxcommon->GetCmdlist());
-	titleObj->Draw();
-	if (clickCount >= clickAliveCount)
-	{
-		clickObj->Draw();
-		if (clickCount >= clickDeadCount)
-		{
-			clickCount = clickCountReset;
-		}
-	}
-	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
-	{
-		oneWay2->Draw();
-	}
-	Object3d::PostDraw();
-	// 3Dオブクジェクトの描画おわり
-	spriteCommon->PreDraw();
-	reticleSprite->Draw();
-}
-
-void GameScene::GameDraw()
-{
-	/// ここに3Dオブジェクトの描画処理
-	Object3d::PreDraw(dxcommon->GetCmdlist());
-	kanbanObj->Draw();
-	kanbanPlaneObj->Draw();
-	kanbanShotObj->Draw();
-	kanbanShot2Obj->Draw();
-	kanbanShot3Obj->Draw();
-	kanbanShot4Obj->Draw();
-	
-	if (targetHp >= 1)
-	{
-		targetObj->Draw();
-	}
-
-	if (mutekiFlag == true && player->GetHp0() == false)
-	{
-		tenmetuCount++;
-		if (tenmetuCount >= tenmetuAliveCount)
-		{
-			player->Draw();
-			if (tenmetuCount >= tenmetuDeadCount)
-			{
-				tenmetuCount = tenmetuCountReset;
-			}
-		}
-	}
-	else
-	{
-		player->Draw();
-	}
-
-	for (std::unique_ptr<EnemyOneWay>& oneWay : oneWays)
-	{
-		oneWay->Draw();
-	}
-	for (std::unique_ptr<EnemyOneWay>& oneWay2 : oneWayMovies)
-	{
-		oneWay2->Draw();
-	}
-	for (std::unique_ptr<EnemyCircle>& circle : circles)
-	{
-		circle->Draw();
-	}
-
-	if (cameraObj->GetEndFlag() == true)
-	{
-		boss->Draw();
-		bossChildLUF->Draw();
-		bossChildLUB->Draw();
-		bossChildRUF->Draw();
-		bossChildRUB->Draw();
-		bossChildLDF->Draw();
-		bossChildLDB->Draw();
-		bossChildRDF->Draw();
-		bossChildRDB->Draw();
-	}
-	Object3d::PostDraw();
-	// 3Dオブクジェクトの描画おわり
-
-	spriteCommon->PreDraw();
-	reticleSprite->Draw();
-	if (movieSkipFlag == false)
-	{
-		kSkipSprite->Draw();
-	}
-	if (tutorialFlag == true)
-	{
-	}
-	else
-	{
-		playerHpSprite->Draw();
-	}
-	if (bossFlag == true)
-	{
-		bossHpBarSprite->Draw();
-		bossHpWakuSprite->Draw();
-	}
-
-	//デバッグテキスト
-	//debugtext_minute->DrawAll();
-	//debugtext_minute2->DrawAll();
-}
-
-void GameScene::ClearDraw()
-{
-	/// ここに3Dオブジェクトの描画処理
-	Object3d::PreDraw(dxcommon->GetCmdlist());
-	if (clickCount >= clickAliveCount)
-	{
-		clickObj->Draw();
-		if (clickCount >= clickDeadCount)
-		{
-			clickCount = clickCountReset;
-		}
-	}
-	clearObj->Draw();
-	Object3d::PostDraw();
-}
-
-void GameScene::GameOverDraw()
-{
-	/// ここに3Dオブジェクトの描画処理
-	Object3d::PreDraw(dxcommon->GetCmdlist());
-	if (clickCount >= clickAliveCount)
-	{
-		clickObj->Draw();
-		if (clickCount >= clickDeadCount)
-		{
-			clickCount = clickCountReset;
-		}
-	}
-	shotObj->Draw();
-	Object3d::PostDraw();
-	// 3Dオブクジェクトの描画おわり
-}
-
+//パーティクル
 void GameScene::ParticleClear()
 {
-	int addParticle = 110;
-	float particleY = -30;
+	
 	//ムービー中のパーティクル
 	movieParticleTime++;
 	//60frame から　120frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
-	if (movieParticleTime >= 60 && movieParticleTime <= 120)
+	if (movieParticleTime >= movieParticleTime60f && movieParticleTime <= movieParticleTime120f)
 	{
 		movieParticleXL = particleMinPosXTitle;
 		movieParticleXR = particleMaxPosXTitle;
-		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { -movieParticleXL, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
-			particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
-			particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { -movieParticleXL, particleYClear,cameraObj->GetEye().z + particleAddZClear },
+			particleVelocityClear,particleAccelClear, 
+			particleStartScaleClear, particleEndScaleClear, 
+			particleStartColorClear, particleEndColorClear);
+		
+		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleYClear,cameraObj->GetEye().z + particleAddZClear },
+			particleVelocityClear,particleAccelClear, 
+			particleStartScaleClear, particleEndScaleClear,
+			particleStartColorClear, particleEndColorClear);
 		//80frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
-		if (movieParticleTime >= 80)
+		if (movieParticleTime >= movieParticleTime80f)
 		{
-			Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
-				particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+			Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleYClear,cameraObj->GetEye().z + particleAddZClear },
+				particleVelocityClear,particleAccelClear, 
+				particleStartScaleClear, particleEndScaleClear, 
+				particleStartColorClear, particleEndColorClear);
 		}
 	}
 	//120frame から　180frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
-	else if (movieParticleTime >= 120 && movieParticleTime <= 180)
+	else if (movieParticleTime >= movieParticleTime120f && movieParticleTime <= movieParticleTime180f)
 	{
 		movieParticleXL = particleMaxPosXTitle;
 		movieParticleXR = particleMinPosXTitle;
-		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { -movieParticleXL, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
-			particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { -movieParticleXL, particleYClear,cameraObj->GetEye().z + particleAddZClear },
+			particleVelocityClear, particleAccelClear,
+			particleStartScaleClear, particleEndScaleClear,
+			particleStartColorClear, particleEndColorClear);
 		//160frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
-		if (movieParticleTime >= 160)
+		if (movieParticleTime >= movieParticleTime160f)
 		{
-			Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleY,cameraObj->GetEye().z + addParticle }, particleVelocityClear,
-				particleAccelClear, 10.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+			Particle->CreateParticleClear(particleCountTitle, particleLifeTitle, { movieParticleXR, particleYClear,cameraObj->GetEye().z + particleAddZClear },
+				particleVelocityClear, particleAccelClear,
+				particleStartScaleClear, particleEndScaleClear,
+				particleStartColorClear, particleEndColorClear);
 		}
 	}
-	else if (movieParticleTime >= 180)
+	else if (movieParticleTime >= movieParticleTime180f)
 	{
 		//180frameを0に
 		movieParticleTime = 0;
@@ -1509,39 +1572,50 @@ void GameScene::ParticleClear()
 
 void GameScene::ParticleTitle()
 {
+	
 	//ムービー中のパーティクル
 	movieParticleTime++;
 	//60frame から　120frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
-	if (movieParticleTime >= 60 && movieParticleTime <= 120)
+	if (movieParticleTime >= movieParticleTime60f && movieParticleTime <= movieParticleTime120f)
 	{
 		movieParticleXL = particleMinPosXTitle;
 		movieParticleXR = particleMaxPosXTitle;
-		Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, 0,-320 }, particleVelocityTitle,
-			particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
-		Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
-			particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, particleYTitle,particleZTitle },
+			particleVelocityTitle,particleAccelTitle, 
+			particleStartScaleTitle, particleEndScaleTitle, 
+			particleStartColorTitle, particleEndColorTitle);
+		Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, particleYTitle2,particleZTitle },
+			particleVelocityTitle, particleAccelTitle,
+			particleStartScaleTitle, particleEndScaleTitle,
+			particleStartColorTitle, particleEndColorTitle);
 		//80frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
-		if (movieParticleTime >= 80)
+		if (movieParticleTime >= movieParticleTime80f)
 		{
-			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
-				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, particleYTitle2,particleZTitle },
+				particleVelocityTitle, particleAccelTitle,
+				particleStartScaleTitle, particleEndScaleTitle,
+				particleStartColorTitle, particleEndColorTitle);
 		}
 	}
 	//120frame から　180frame　のあいだに出すパーティクル (ビルが攻撃されている感じ)
-	else if (movieParticleTime >= 120 && movieParticleTime <= 180)
+	else if (movieParticleTime >= movieParticleTime120f && movieParticleTime <= movieParticleTime180f)
 	{
 		movieParticleXL = particleMaxPosXTitle;
 		movieParticleXR = particleMinPosXTitle;
-		Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, 0,-320 }, particleVelocityTitle,
-			particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+		Particle->CreateParticle(particleCountTitle, particleLifeTitle, { -movieParticleXL, particleYTitle,particleZTitle },
+			particleVelocityTitle, particleAccelTitle,
+			particleStartScaleTitle, particleEndScaleTitle,
+			particleStartColorTitle, particleEndColorTitle);
 		//160frame から　でるパーティクル (ずっと同じ場所に出てると変だから)
-		if (movieParticleTime >= 160)
+		if (movieParticleTime >= movieParticleTime160f)
 		{
-			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, 20,-320 }, particleVelocityTitle,
-				particleAccelTitle, 15.0f, 0.0f, { 1,1,1 }, { 1,0.5,0 });
+			Particle->CreateParticle(particleCountTitle, particleLifeTitle, { movieParticleXR, particleYTitle2,particleZTitle },
+				particleVelocityTitle, particleAccelTitle,
+				particleStartScaleTitle, particleEndScaleTitle,
+				particleStartColorTitle, particleEndColorTitle);
 		}
 	}
-	else if (movieParticleTime >= 180)
+	else if (movieParticleTime >= movieParticleTime180f)
 	{
 		//180frameを0に
 		movieParticleTime = 0;

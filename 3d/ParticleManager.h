@@ -130,7 +130,7 @@ public: // メンバ関数
 	/// テクスチャ読み込み
 	/// </summary>
 	/// <returns>成否</returns>
-	void LoadTexture();
+	void LoadTexture(const wchar_t*  filename);
 
 	/// <summary>
 	/// モデル作成
